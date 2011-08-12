@@ -1,0 +1,14 @@
+{
+  "appName"  : "Ecko-It",
+  "vendor"   : "Ecko-It",
+  "homepage" : "http://eckoit.com",
+  "description" : "Keep what you hear.",
+  "localStartUrl" : "_design/app/dashboard.html",
+  "advanced" : {
+        "syncType"   : "bi-directional",
+        "embedded"   : false,
+        "main-jar"   : "couchapp-takeout-1.0-SNAPSHOT.jar",
+        "main-class" : "com.github.couchapptakeout.App",
+        "appClass"   : "com.googlecode.eckoit.tray.App"
+  }
+}    

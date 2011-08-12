@@ -1,0 +1,128 @@
+{
+    "rewrites" : [
+            {
+                    "from" : "",
+                    "to" : "index.html"
+            },
+			{
+                    "from" : "images/*",
+                    "to" : "images/*"
+            },
+            {
+                    "from" : "scripts/*",
+                    "to" : "scripts/*"
+            },
+            {
+                    "from" : "skin/*",
+                    "to" : "skin/*"
+            },
+            {
+                    "from" : "styles/*",
+                    "to" : "styles/*"
+            },
+            {
+                    "from" : "*",
+                    "to" : "../../*"
+            }
+    ],
+    "createdBy" : "Ryan Ramage",
+    "jnlp" : {
+     "information" : {
+          "title" : "Ecko-It",
+          "vendor" : "Eckoit Inc",
+          "homepage" : "http://eckoit.com",
+          "description" : "Liferecorder"
+      },
+      "submenu" : "Ecko-It",
+      "main-jar" : "eckoit-tray-1.0-SNAPSHOT.jar",
+      "main-class" : "com.googlecode.eckoit.tray.App"
+    },
+   "language": "javascript",
+   "shows": {
+       "takeout.jnlp": "function(doc, req) { if (!this._attachments) return''; if (!doc) return ''; var ddoc = req.path[2]; var codebase = 'http://' + req.headers.Host + '/' + req.path[0] + '/_design/'+ddoc+'/'; var defaults = { codebase : codebase, href : '_show/takeout.jnlp/_design/takeout-settings.jnlp'  }; var result = '<?xml version=\"1.0\" encoding=\"utf-8\"?>'; result += '<jnlp spec=\"1.5+\" codebase=\"'+codebase+'\" href=\"'+defaults.href+'\">'; var cur = doc; var advanced = cur.advanced; result += '<information><title>'+cur.appName+'</title><vendor>'+cur.vendor+'</vendor><homepage>'+cur.homepage+'</homepage><description kind=\"one-line\">'+cur.description+'</description>'; var icon = 'icon.png'; var splash = 'splash.png'; if (doc._attachments) { if (doc._attachments['splash.png']) { splash = '../takeout-settings.jnlp/splash.png'; } if (doc._attachments['icon.png']) { icon = '../takeout-settings.jnlp/icon.png' } } result += '<icon kind=\"splash\" href=\"'+ splash +'\"/>'; result += '<icon href=\"' + icon + '\"/>'; result += ' <offline-allowed/> '; result += ' <shortcut online=\"false\">'; result += '   <desktop/>'; result += '   <menu submenu=\"'+cur.appName+'\"/>'; result += ' </shortcut>'; result += '</information>'; result += '  <security><all-permissions/></security>'; result += '  <resources> <j2se version=\"1.4+\" initial-heap-size=\"32m\" max-heap-size=\"128m\" /> '; String.prototype.endsWith = function(suffix) { return this.indexOf(suffix, this.length - suffix.length) !== -1; }; for (var a in this._attachments) { if (a.endsWith('.jar')) { var main = ''; if (a == advanced['main-jar']) main = 'main=\"true\"'; result += ' <jar href=\"'+a+'\" '+main+'/> '; } } if (advanced.embedded) { var extended = 'http://' + req.headers.Host + '/' + req.path[0] + '/_design/takeout-extended/_show/JxBrowser.jnlp'; result += '   <extension name=\"jxbrowser\" href=\"' + extended + '\"/>'; } if (ddoc != 'takeout') { result += '   <property name=\"jnlp.ddoc\" value=\"'+ ddoc +'\"/>'; } result += '</resources>'; result += '  <application-desc main-class=\"'+advanced['main-class']+'\">'; result += '  <argument>' + cur.appName + '</argument>'; result += '  <argument>' + req.headers.Host + '</argument>'; result += '  <argument>' + req.userCtx.db + '</argument>'; if (req.userCtx && req.userCtx.name && req.userCtx.name != null) { result += '  <argument>' + req.userCtx.name + '</argument>'; } result += ' </application-desc>'; result += '</jnlp>'; return { 'headers' : {'Content-Type' : 'application/x-java-jnlp-file'}, 'body' :  result } }",
+       "webstart.jnlp": "function(doc, req) { if (!this._attachments) return''; var codebase = 'http://' + req.headers.Host + '/' + req.path[0] + '/_design/'+req.path[2]+'/'; var defaults = { codebase : codebase, href : '_show/webstart.jnlp'  }; var result = '<?xml version=\"1.0\" encoding=\"utf-8\"?>'; result += '<jnlp spec=\"1.0+\" codebase=\"'+codebase+'\" href=\"'+defaults.href+'\">'; var cur = this.jnlp.information; result += '<information><title>'+cur.title+'</title><vendor>'+cur.vendor+'</vendor><homepage>'+cur.homepage+'</homepage><description kind=\"one-line\">'+cur.description+'</description>'; if (this._attachments['splash.png']) { result += '<icon kind=\"splash\" href=\"splash.png\"/>'; } if (this._attachments['icon.png']) { result += '<icon href=\"icon.png\"/>'; } result += ' <offline-allowed/> '; result += ' <shortcut online=\"false\">'; result += '   <desktop/>'; result += '   <menu submenu=\"'+this.jnlp.submenu+'\"/>'; result += ' </shortcut>'; result += '</information>'; result += '  <security><all-permissions/></security>'; result += '  <resources> <j2se version=\"1.4+\" initial-heap-size=\"32m\" max-heap-size=\"128m\" /> '; String.prototype.endsWith = function(suffix) { return this.indexOf(suffix, this.length - suffix.length) !== -1; }; for (var a in this._attachments) { if (a.endsWith('.jar')) { var main = ''; if (a == this.jnlp['main-jar']) main = 'main=\"true\"'; result += ' <jar href=\"'+a+'\" '+main+'/> '; } } result += '</resources>'; result += '  <application-desc main-class=\"'+this.jnlp['main-class']+'\">'; result += '  <argument>' + req.headers.Host + '</argument>'; result += '  <argument>' + req.userCtx.db + '</argument>'; if (req.userCtx && req.userCtx.name && req.userCtx.name != null) { result += '  <argument>' + req.userCtx.name + '</argument>'; } result += ' </application-desc>'; result += '</jnlp>'; return { 'headers' : {'Content-Type' : 'application/x-java-jnlp-file'}, 'body' :  result } }",
+       "full": "function(doc, req) { var result = ''; for (name in doc) { if (typeof doc[name] !== 'function') { if (!(name.substr(0,1) == '-') && !(name.substr(0,1) == '_')) { result = result + JSON.stringify(doc[name], null, ' '); } } } result = result + '\\n'; result += doc['-wiki'] ; return result; } "
+
+   },
+   "views": {
+       "audio_by_time": {
+           "map": "function(doc) { if (doc.recording || doc.mark) { var type = 'recording'; if (doc.mark) type = 'mark'; var result = { _id: doc._id, type: type, start : doc[type].start }; if (doc.recording) { result.file = doc._attachments; } if (doc[type].length) { result.end = (doc[type].length * 1000) + doc[type].start; } if (doc.tags && doc.tags.length > 0) { result.tags = doc.tags; } if (doc.text && doc.text != null) { result.text = doc.text; } emit(result.start, result); } } "
+       },
+       "audio_by_tag": {
+           "map": "function(doc) { if (doc.mark) { var result = { _id: doc._id, type: 'mark', start : doc.mark.start }; if (doc.mark.length) { result.end = (doc.mark.length * 1000) + doc.mark.start; } if (doc.text && doc.text != null) { result.text = doc.text; } if (doc.tags && doc.tags.length > 0) { result.tags = doc.tags; for (var i = 0 ; i < doc.tags.length; i++) { emit(doc.tags[i], result); } } } if (doc.conversation && doc.type && doc.topic && doc.type == 'topicChange' ) { var result = { _id: doc._id, type: doc.type, conversation: doc.conversation, recording: doc.recording, start: doc.timestamp, startOffset: doc.startTime, topicStack: doc.topicStack }; if (doc.endTime) { result.end = (doc.endTime * 1000) + doc.timestamp; result.endOffset = doc.endTime; } if (doc.text) { result.text = doc.text; } emit(doc.topic, result); } }"
+       },
+       "audio_by_undiarized": {
+           "map": "function(doc) { if (doc.recording && !doc.diarized) { emit(null, doc); } } "
+       },
+       "conversations_by_conversation": {
+           "map": "function(doc) {\n  if ( doc.conversation && doc.type && (doc.type == 'reference' || doc.type == 'topicChange' || doc.type == 'actionable' )) {\n  \temit(doc.conversation, doc);\n  }\n}"
+       },
+       "conversations_by_segments": {
+           "map": "function(doc) {\n  if (doc.type && doc.type == 'segment')\n    emit(doc.conversation, doc);\n}"
+       },
+       "conversations_by_parent_tag": {
+           "map": "function(doc) { if (doc.conversation && doc.parent) { emit(doc.parent, doc); } }"
+       },
+       "tags_by_id": {
+           "map": "function(doc) {\n if (doc['-lastmodified']) { emit(null, doc['-tags']); } \n}"
+       },
+       "doc_by_tag": {
+           "map": "function(doc) {  var tags = doc['-tags'];  if (tags) {      for (i=0; i < tags.length; i++) {  emit(tags[i], doc._id);      }  }}"
+       },
+       "changes_by_date": {
+           "map": "function(doc) {\n  var lastModified = doc['-lastmodified'];\n  if (lastModified) {\n\tvar date = lastModified.split('T')[0];\n  \temit(lastModified, doc._id);\n  }\n}"
+       },
+       "tag_to_schema": {
+           "map": "function(doc) {\n  results = null;\n  if (doc['-fields']) {  \n\tresults = results || {}; \n  \tresults['-fields'] = doc['-fields'];\n  }\n  if (doc['-taggedaddmenu']) {\n\tresults = results || {}; \n\tresults['-taggedaddmenu']= doc['-taggedaddmenu'];\n  }\n  if (results) {\n  \temit(doc._id, results);\n  }\n}"
+       },
+       "tag_to_instanceInfo": {
+           "map": "function(doc) { if (doc['-instance']) { emit(doc._id, doc['-instance'])}}"
+       },
+       "tag_to_tags": {
+           "map": "function(doc) {  var tags = doc['-tags'];  if (tags) {      for (i=0; i < tags.length; i++) {  emit(tags[i], tags);      }  }}"
+       },
+       "topics": {
+           "map": "function(doc) { if (doc['-lastmodified']) { var topic = { }; topic._id = doc._id ; topic.type = 'topic'; if (doc['-tags'] && doc['-tags'].length > 0) { topic.type = doc['-tags'][0]; } topic.icon = {}; topic.icon.type = 'type'; topic.icon.icon = 'document-tag'; if (doc['-icon']) { topic.icon.type = 'type'; topic.icon.icon = doc['-icon']; } else { if (doc._attachments && doc._attachments['-icon.jpg']) { topic.icon.type = 'attachment'; topic.icon.icon = '/' + doc._id + '/' + '-icon.jpg' } } if (doc['-wiki']) { var text = doc['-wiki']; if (text.length >= 300) text = text.substring(0,300) + '...'; topic.text = text; } emit(doc._id.toLowerCase().replace(/_/g,' '), topic); } } "
+       },
+       "by_icons": {
+           "map": "function(doc) { if (doc['-lastmodified']) { var icon = {}; icon.type = 'type'; icon.icon = 'document-tag'; if (doc['-icon']) { icon.type = 'type'; icon.icon = doc['-icon']; } else { if (doc._attachments && doc._attachments['-icon.jpg']) { icon.type = 'attachment'; icon.icon = '/' + doc._id + '/' + '-icon.jpg' } } if (doc['-tags'] && doc['-tags'].length > 0) { icon.parent = doc['-tags'][0]; } emit(doc._id, icon); } } "
+       },
+       "dashboard_recent_liferecorder": {
+           "map": "function(doc) { \n   if (doc.mark) { \n\t  if (doc.mark) type = 'mark'; \n\t  var result = { \n\t    _id: doc._id, \n\t\ttype: 'mark',\n\t\tstart : doc.mark.start \n\t  }; \n\t  if (doc.mark.length) { \n\t     result.end = (doc.mark.length * 1000) + doc.mark.start; \n\t  } \n\t  if (doc.tags && doc.tags.length > 0) { \n\t     result.tags = doc.tags; \n\t  } \n\t  if (doc.text && doc.text != null) { result.text = doc.text; } \n\t  emit(result.start, result); \n  } \n} "
+       },
+       "life_total_by_day": {
+           "map": "function(doc) {\n  if (doc.mark) {\n\tvar d = new Date(doc.mark.start);\n        var year = d.getFullYear();\n        var month = d.getMonth() + 1;\n        if (month <= 9) month = '0' + month;\n\tvar day = d.getDate() ;\n        if (day <=9) day = '0' + day;\n\n\tvar unit = year + '-' + month + '-' + day;\n\tif (doc.tags) {\n\t\tfor (var i =0; i < doc.tags.length; i++){\n\t\t\tvar tag = doc.tags[i];\n\t\t\temit([tag,unit],1);\n\t\t}\n\t}\n  }\n}",
+           "reduce": "function(keys, values) {\n   return sum(values);\n}"
+       },
+       "life_total_by_week": {
+           "map": "function(doc) {\n\tDate.CultureInfo={name:\"en-US\",englishName:\"English (United States)\",nativeName:\"English (United States)\",dayNames:[\"Sunday\",\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\",\"Saturday\"],abbreviatedDayNames:[\"Sun\",\"Mon\",\"Tue\",\"Wed\",\"Thu\",\"Fri\",\"Sat\"],shortestDayNames:[\"Su\",\"Mo\",\"Tu\",\"We\",\"Th\",\"Fr\",\"Sa\"],firstLetterDayNames:[\"S\",\"M\",\"T\",\"W\",\"T\",\"F\",\"S\"],monthNames:[\"January\",\"February\",\"March\",\"April\",\"May\",\"June\",\"July\",\"August\",\"September\",\"October\",\"November\",\"December\"],abbreviatedMonthNames:[\"Jan\",\"Feb\",\"Mar\",\"Apr\",\"May\",\"Jun\",\"Jul\",\"Aug\",\"Sep\",\"Oct\",\"Nov\",\"Dec\"],amDesignator:\"AM\",pmDesignator:\"PM\",firstDayOfWeek:0,twoDigitYearMax:2029,dateElementOrder:\"mdy\",formatPatterns:{shortDate:\"M/d/yyyy\",longDate:\"dddd, MMMM dd, yyyy\",shortTime:\"h:mm tt\",longTime:\"h:mm:ss tt\",fullDateTime:\"dddd, MMMM dd, yyyy h:mm:ss tt\",sortableDateTime:\"yyyy-MM-ddTHH:mm:ss\",universalSortableDateTime:\"yyyy-MM-dd HH:mm:ssZ\",rfc1123:\"ddd, dd MMM yyyy HH:mm:ss GMT\",monthDay:\"MMMM dd\",yearMonth:\"MMMM, yyyy\"},regexPatterns:{jan:/^jan(uary)?/i,feb:/^feb(ruary)?/i,mar:/^mar(ch)?/i,apr:/^apr(il)?/i,may:/^may/i,jun:/^jun(e)?/i,jul:/^jul(y)?/i,aug:/^aug(ust)?/i,sep:/^sep(t(ember)?)?/i,oct:/^oct(ober)?/i,nov:/^nov(ember)?/i,dec:/^dec(ember)?/i,sun:/^su(n(day)?)?/i,mon:/^mo(n(day)?)?/i,tue:/^tu(e(s(day)?)?)?/i,wed:/^we(d(nesday)?)?/i,thu:/^th(u(r(s(day)?)?)?)?/i,fri:/^fr(i(day)?)?/i,sat:/^sa(t(urday)?)?/i,future:/^next/i,past:/^last|past|prev(ious)?/i,add:/^(\\+|after|from)/i,subtract:/^(\\-|before|ago)/i,yesterday:/^yesterday/i,today:/^t(oday)?/i,tomorrow:/^tomorrow/i,now:/^n(ow)?/i,millisecond:/^ms|milli(second)?s?/i,second:/^sec(ond)?s?/i,minute:/^min(ute)?s?/i,hour:/^h(ou)?rs?/i,week:/^w(ee)?k/i,month:/^m(o(nth)?s?)?/i,day:/^d(ays?)?/i,year:/^y((ea)?rs?)?/i,shortMeridian:/^(a|p)/i,longMeridian:/^(a\\.?m?\\.?|p\\.?m?\\.?)/i,timezone:/^((e(s|d)t|c(s|d)t|m(s|d)t|p(s|d)t)|((gmt)?\\s*(\\+|\\-)\\s*\\d\\d\\d\\d?)|gmt)/i,ordinalSuffix:/^\\s*(st|nd|rd|th)/i,timeContext:/^\\s*(\\:|a|p)/i},abbreviatedTimeZoneStandard:{GMT:\"-000\",EST:\"-0400\",CST:\"-0500\",MST:\"-0600\",PST:\"-0700\"},abbreviatedTimeZoneDST:{GMT:\"-000\",EDT:\"-0500\",CDT:\"-0600\",MDT:\"-0700\",PDT:\"-0800\"}};\n\n\tDate.prototype.getWeekOfYear=function(firstDayOfWeek){var y=this.getFullYear(),m=this.getMonth(),d=this.getDate();var dow=firstDayOfWeek||Date.CultureInfo.firstDayOfWeek;var offset=7+1-new Date(y,0,1).getDay();if(offset==8){offset=1;}\n\tvar daynum=((Date.UTC(y,m,d,0,0,0)-Date.UTC(y,0,1,0,0,0))/86400000)+1;var w=Math.floor((daynum-offset+7)/7);if(w===dow){y--;var prevOffset=7+1-new Date(y,0,1).getDay();if(prevOffset==2||prevOffset==8){w=53;}else{w=52;}}\n\treturn w;}\n\n\n  if (doc.mark) {\n\tvar d = new Date(doc.mark.start);\n        var year = d.getFullYear();\n\n        var week = d.getWeekOfYear(0);\n\tvar unit = year + '-' + week;\n\tif (doc.tags) {\n\t\tfor (var i =0; i < doc.tags.length; i++){\n\t\t\tvar tag = doc.tags[i];\n\t\t\temit([tag,unit],1);\n\t\t}\n\t}\n  }\n}",
+           "reduce": "function(keys, values) {\n   return sum(values);\n}"
+       },
+       "life_total_by_month": {
+           "map": "function(doc) {\n  if (doc.mark) {\n\tvar d = new Date(doc.mark.start);\n        var year = d.getFullYear();\n\n        var month= d.getMonth() + 1;\n        if (month <= 9) month = '0' + month;\n\tvar unit = year + '-' + month;\n\tif (doc.tags) {\n\t\tfor (var i =0; i < doc.tags.length; i++){\n\t\t\tvar tag = doc.tags[i];\n\t\t\temit([tag,unit],1);\n\t\t}\n\t}\n  }\n}",
+           "reduce": "function(keys, values) {\n   return sum(values);\n}"
+       },
+       "navigation_loose_docs": {
+           "map": "function(doc) {\n  if (doc['-lastmodified'] && (!doc['-tags'] || doc['-tags'].length == 0 )) {\n       emit('loose', 1);\n  }\n}\n",
+           "reduce": "function(key, values, rereduce) {\n   return sum(values);\n}"
+       },
+       "navigation_root_folders": {
+           "map": "function(doc) { if (doc['-tags'] && doc['-tags'].length > 0 ) { for (var i=0; i < doc['-tags'].length; i++) { emit(doc['-tags'][i], 1); } } }",
+           "reduce": "function(key, values, rereduce) {\n   return sum(values);\n}"
+       },
+       "screenshots_by_meeting": {
+           "map": "function(doc) {\n  if (doc.type && doc.type == 'screenShots' && doc._attachments) {\n      var result = { id: doc._id, attachments : [] };\n      for (var key in doc._attachments) {\n\tresult.attachments.push(key)\n      }\n      emit(doc.meeting, result);\n  }\n}"
+       }
+
+   },
+   "lists": {
+       "graphml": "function (head, req) { var clean_id = function(id) {return id.replace(/[^a-zA-Z_0-9]+/g,'')}; var readable = function (id) {return id.replace(/_/g,' ');}; var xml = new Array(); send('<?xml version=\"1.0\" encoding=\"UTF-8\"?><graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\">'); send('<graph id=\"topics\" edgedefault=\"directed\">'); send('<key id=\"name\" for=\"node\" attr.name=\"name\" attr.type=\"string\"/> '); var row; while(row = getRow()) { send('<node id=\"' + clean_id(row.id) + '\" >'); send('<data key=\"name\">'+ readable(row.id) +'</data>'); send('</node>'); if (row.value) { for (var i=0; i < row.value.length; i++) { var tag = clean_id(row.value[i]); send('<edge source=\"'+tag+'\" target=\"' + clean_id(row.id) + '\"/> '); } } } send('</graph></graphml>'); } "
+   },
+   "filters": {
+       "design_only": "function(doc,req) { if (doc._id.indexOf('_design') === 0) return true; return false; }",
+       "everythingButLR": "function (doc, req) { if (doc.recording && doc.liferecorder) { return false; } return true; } ",
+       "not_takeout": "function (doc, req) { if (doc._id == \"_design/takeout\" || doc._id == \"_design/takeout-extended\") { return false; } return true; } "
+   }
+
+
+}

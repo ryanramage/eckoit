@@ -1,0 +1,1 @@
+{"couch":{"host":"localhost","port":5984,"db":"ecko-it"}, "designDocName" : "_design/app2"}

@@ -1,0 +1,10 @@
+{
+   "autolinks": [
+       {
+           "name": "gmail tag",
+           "url": "https://mail.google.com/mail/?shva=1#label/<%=_id%>"
+       }
+   ],
+   "name": "life",
+   "description": "A place to keep all your stuff."
+}
