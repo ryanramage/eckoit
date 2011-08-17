@@ -1,1 +1,5 @@
-{"couch":{"host":"localhost","port":5984,"db":"ecko-it"}, "designDocName" : "_design/app2"}
+{
+    "couch":{"host":"localhost","port":5984,"db":"ecko-it"},
+    "designDocName" : "_design/app2",
+    "test-couch" : {"host" : "ecko-it.iriscouch.com", "port" : "5984", "db" : "test", "username" : "test"}
+}

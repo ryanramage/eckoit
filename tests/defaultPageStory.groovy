@@ -2,18 +2,16 @@ using "geb"
 
 scenario "index page", {
 
+    given "On the default page", {
+        baseUrl = System.getProperty("geb.build.baseUrl")
+    }
     when "we open the index page", {
-        go "http://localhost:5984/grand_design_unstable/_design/app/index.html#Meeting"
+        go baseUrl
     }
     then "The title shown is meeting", {
-
-        $('span#title').text().shouldBe "Meeting"
+        page.title.shouldBe "Ecko-It"
     }
-    and
-    then "The tag shown is Default Tags", {
-        $('div#taglist a', 0).text().shouldBe "Default Tags"
 
-    }
 }
 
 
