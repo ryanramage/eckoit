@@ -53,4 +53,10 @@
           </snapshots>
         </repository>
     </repositories>
+    <pluginRepositories>
+      <pluginRepository>
+        <id>reupholster-plugin-snapshots</id>
+        <url>http://reupholster.googlecode.com/svn/maven</url>
+      </pluginRepository>
+    </pluginRepositories>
 </project>
