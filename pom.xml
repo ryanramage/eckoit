@@ -43,7 +43,7 @@
         <repository>
           <id>reupholster</id>
           <name>reupholster Repository</name>
-          <url>https://reupholster.googlecode.com/svn/reupholster/</url>
+          <url>http://reupholster.googlecode.com/svn/maven</url>
           <releases>
            <enabled>true</enabled>
            <updatePolicy>never</updatePolicy>
