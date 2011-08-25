@@ -1,26 +1,284 @@
 <!doctype html>
-<html>
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="utf-8">
   <title>Ecko-It</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+      <script src="js/lib/html5.js"></script>
+    <![endif]-->
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <link rel="icon" type="image/vnd.microsoft.icon" href="images/ecko-it.ico">
 
+  <link rel="stylesheet" href="css/bootstrap-1.1.0.min.css">
+
+
+  <script src="js/lib/jquery-1.6.2.min.js"></script>
+  <script src="js/application.js"></script>
 </head>
 
 <body>
-  <header>
-  </header>
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <h3><a href="#">Ecko-It</a></h3>
+          <ul>
+		    <li><a href="#">Dashboard</a></li>
+			<li><a href="#">Timeline</a></li>
+            <li class="active"><a href="#">Topics</a></li>
+            <li ><a href="#">Threads</a></li>
+			<li ><a href="#">Meetings</a></li>
+          </ul>
+          <form action="">
+            <input type="text" placeholder="Search">
+          </form>
+          <ul class="nav secondary-nav">
+            <li class="menu">
+              <a href="#" class="menu">Dropdown</a>
+              <ul class="menu-dropdown">
+                <li><a href="#">Secondary link</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Another link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div> <!-- /fill -->
+    </div> <!-- /topbar -->
 
-  <div>
-      Holy Crap, its all gone!
+    <div class="container">
+
+
+	
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <h1>Hello, world!</h1>
+        <p>Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+        <p><a class="btn primary large">Learn more &raquo;</a></p>
+      </div>
+
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="span6">
+          <h2>Heading</h2>
+          <p>Etiam porta sem malesuada magna mollis euismod. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+        </div>
+        <div class="span5">
+          <h2>Heading</h2>
+           <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+       </div>
+        <div class="span5">
+          <h3>Heading</h3>
+          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <p><a class="btn" href="#">View details &raquo;</a></p>
+        </div>
+      </div>
+	  <div class="row">
+		<div class="span5 columns offset2">
+		 <div class="alert-message info">
+			<a class="close" href="#">&times;</a>
+			<p>This seems like your first visit here!</p>
+		  </div>
+		</div>
+	  </div>
+	  <div class="page-header">
+		<h1>About You <small>Fill out this form so we can mine your data.</small></h1>
+	  </div>
+	  
+	  <form>
+        <fieldset>
+          <legend>Example form legend</legend>
+          <div class="clearfix">
+            <label for="">X-Large Input</label>
+            <div class="input">
+              <input class="xlarge" id="xlInput" name="xlInput" size="30" type="text" />
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label for="">Select</label>
+            <div class="input">
+              <select>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label for="">Select</label>
+            <div class="input">
+              <select class="medium">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label>Uneditable Input</label>
+            <div class="input">
+              <span class="uneditable-input">Some Value Here</span>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label for="disabledInput">Disabled Input</label>
+            <div class="input">
+              <input class="xlarge disabled" id="disabledInput" name="disabledInput" size="30" type="text" placeholder="Disabled input here�?S carry on." disabled />
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix error">
+            <label for="xlInput">X-Large Input</label>
+            <div class="input">
+              <input class="xlarge error" id="xlInput" name="xlInput" size="30" type="text" />
+              <span class="help-inline">Small snippet of help text</span>
+            </div>
+          </div> <!-- /clearfix -->
+        </fieldset>
+        <fieldset>
+          <legend>Example form legend</legend>
+          <div class="clearfix">
+            <label for="prependedInput">Prepended Text</label>
+            <div class="input">
+              <div class="input-prepend">
+                <span class="add-on">@</span>
+                <input class="medium" id="prependedInput" name="prependedInput" size="16" type="text" />
+              </div>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label for="prependedInput2">Prepended Checkbox</label>
+            <div class="input">
+              <div class="input-prepend">
+                <label class="add-on"><input type="checkbox" name="" id="" value="" /></label>
+                <input class="mini" id="prependedInput2" name="prependedInput2" size="16" type="text" />
+              </div>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label for="appendedInput">Appended Checkbox</label>
+            <div class="input">
+              <div class="input-append">
+                <input class="mini" id="appendedInput" name="appendedInput" size="16" type="text" />
+                <label class="add-on active"><input type="checkbox" name="" id="" value="" checked="checked" /></label>
+              </div>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label for="xlInput">File Input</label>
+            <div class="input">
+              <input class="input-file" id="fileInput" name="fileInput" type="file" />
+            </div>
+          </div> <!-- /clearfix -->
+        </fieldset>
+        <fieldset>
+          <legend>Example form legend</legend>
+          <div class="clearfix">
+            <label id="optionsCheckboxes">List of Options</label>
+            <div class="input">
+              <ul class="inputs-list">
+                <li>
+                  <label>
+                    <input type="checkbox" name="optionsCheckboxes" value="option1" />
+                    <span>Option one is this and that&mdash;be sure to include why it�??s great</span>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="checkbox" name="optionsCheckboxes" value="option2" />
+                    <span>Option two can also be checked and included in form results</span>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="checkbox" name="optionsCheckboxes" value="option2" />
+                    <span>Option three can&mdash;yes, you guessed it&mdash;also be checked and included in form results</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="disabled">
+                    <input type="checkbox" name="optionsCheckboxes" value="option2" disabled />
+                    <span>Option four cannot be checked as it is disabled.</span>
+                  </label>
+                </li>
+              </ul>
+              <span class="help-block">
+                <strong>Note:</strong> Labels surround all the options for much larger click areas and a more usable form.
+              </span>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label>Date Range</label>
+            <div class="input">
+              <div class="inline-inputs">
+                <input class="small" type="text" value="May 1, 2011" />
+                <input class="mini" type="text" value="12:00am" />
+                to
+                <input class="small" type="text" value="May 8, 2011" />
+                <input class="mini" type="text" value="11:59pm" />
+                <span class="help-inline">All times are shown as Pacific Standard Time (GMT -08:00).</span>
+              </div>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label for="textarea">Textarea</label>
+            <div class="input">
+              <textarea class="xxlarge" id="textarea" name="textarea"></textarea>
+              <span class="help-block">
+                Block of help text to describe the field above if need be.
+              </span>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="clearfix">
+            <label id="optionsRadio">List of Options</label>
+            <div class="input">
+              <ul class="inputs-list">
+                <li>
+                  <label>
+                    <input type="checkbox" name="optionsCheckboxes" value="option1" />
+                    <span>Option one is this and that&mdash;be sure to include why it�??s great</span>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="checkbox" name="optionsCheckboxes" value="option2" />
+                    <span>Option two can also be checked and included in form results</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div> <!-- /clearfix -->
+          <div class="actions">
+            <button type="submit" class="btn primary">Save Changes</button>&nbsp;<button type="reset" class="btn">Cancel</button>
+          </div>
+        </fieldset>
+      </form>
+	  
+	  
+	  
+      <footer>
+        <p>&copy; Company 2011</p>
+      </footer>
+
+    </div> <!-- /container -->
   </div>
 
-  <footer>
-  </footer>
+  <!-- JavaScript at the bottom for fast page loading -->
+
+  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+
+
+
+
 
 
 </body>
-
 </html>
