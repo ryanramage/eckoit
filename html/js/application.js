@@ -1,6 +1,10 @@
 $(document).ready(function(){
 
 
+    
+    $('#topbar').dropdown();
+
+
     var page_controller = {
         current : "",
         on : function(page, params) {
@@ -25,9 +29,9 @@ $(document).ready(function(){
         },
         '/topics': {
           '/tagged/([^/]+)': {
-            on: function(tags) {page_controller.on('topics', {tags: tags})}
+            on: function(tags) {page_controller.on('topics', {tags: tags}); }
           },
-          on: function() {page_controller.on('topics')}
+          on: function() {page_controller.on('topics'); }
         },
         '/threads' : {
             on : function() {page_controller.on('threads')}
