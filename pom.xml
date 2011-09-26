@@ -7,13 +7,6 @@
     <version>1.0-SNAPSHOT</version>
     <name>Ecko-It Couchapp</name>
     <url>http://eckoit.com</url>
-    <dependencies>
-        <dependency>
-            <groupId>com.googlecode.reupholster</groupId>
-            <artifactId>reupholster</artifactId>
-            <version>[0.4.1,)</version>
-        </dependency>
-    </dependencies>
     <build>
         <plugins> 
             <plugin>
@@ -36,6 +29,13 @@
                     </goals>
                   </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.googlecode.reupholster</groupId>
+                        <artifactId>reupholster</artifactId>
+                        <version>0.4.3-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

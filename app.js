@@ -11,6 +11,9 @@ var couchapp = require('couchapp')
 
   module.exports = ddoc;
 
+
+
+
   ddoc.language = "javascript";
   ddoc.rewrites = [
       {from:"/", to:'index.html'}

@@ -16,7 +16,6 @@ app.controller.on = function(page, params) {
 }
 
 
-
 app.view = {};
 
 

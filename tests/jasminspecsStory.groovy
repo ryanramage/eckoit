@@ -6,19 +6,21 @@ scenario "All Javascript Specs Pass", {
         baseUrl = System.getProperty("geb.build.baseUrl")
     }
     when "we open the index page", {
-        go baseUrl + 'js/SpecRunner.html'
+        baseUrl += 'js/SpecRunner.html'
+        go baseUrl
 
     }
     then "The title shown is meeting", {
         page.title.shouldBe "Jasmine Test Runner"
     }
     and "runner passed", {
-
         waitFor {
-            ! $(".runner").classes().contains("running");
-        }
+            
+            $(".runner").classes().contains("passed") || $(".runner").classes().contains("failed")
+        };
+        System.out.println ( $("div")*.text() );
         assert $("div.runner").classes().contains("passed");
-        System.out.println ( $("div")*.text() )
+        
     }
 
 }
