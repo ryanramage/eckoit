@@ -22,7 +22,6 @@
                 "js/lib/jquery.couch.js",
                 "js/lib/ICanHaz.min.js",
                 "js/lib/bootstrap-alerts.js",
-                "js/lib/bootstrap-dropdown.js",
                 "js/lib/bootstrap-modal.js",
                 "js/lib/bootstrap-twipsy.js",
                 "js/lib/bootstrap-popover.js",
@@ -49,17 +48,7 @@
                 <form action="">
                     <input type="text" placeholder="Search">
                 </form>
-                <ul class="nav secondary-nav">
-                    <li class="dropdown" data-dropdown="dropdown" >
-                        <a href="#" class="dropdown-toggle">Dropdown</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Secondary link</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Another link</a></li>
-                        </ul>
-                    </li>
-                </ul>
+               
             </div>
         </div> <!-- /fill -->
     </div> <!-- /topbar -->
@@ -150,6 +139,34 @@
                 </div>
             </div>
         </script>
+         <script id="topicCreateTemplate" type="text/html">
+                  <div class="clearfix">
+                    <label id="optionsNewType">Title</label>
+                    <div class="input">
+                        <input type="text" name="Title" class="span9" placeholder="What's the title of the topic? Be specific."/>
+                    </div>
+                  </div> <!-- /clearfix -->
+
+                  <div class="clearfix">
+                    <label for="textarea">Textarea</label>
+                    <div class="input">
+                      <textarea class="xxlarge" id="textarea2" name="textarea2" rows="5"></textarea>
+                      <span class="help-block">
+                        Enter Topic Details.
+                      </span>
+                    </div>
+                  <!-- /clearfix -->
+                  </div>
+
+
+        </script>
+
+
+
+
+
+
+
         <script id="timelineRowTemplate" type="text/html">
             <div class="row topic timeline">
                 <div class="span2">
@@ -236,14 +253,16 @@
                         <div class="span13">
                             <ul class="breadcrumb">
                                 <li>Tags <span class="divider">&gt;</span></li>
-                                <li><a href="#/topics/tagged/javascript">javascript</a> <span class="divider">|</span></li>
-                                <li><a href="#/topics/tagged/libraries">libraries</a></li>
+                                {{#tags}}
+                                    <li><a href="#/topics/tagged/{{.}}">{{.}}</a> <span class="divider">|</span></li>
+                                {{/tags}}
+
                             </ul>
                         </div>
                     </div>
                     <div class="row">
                         <div class="span=2">
-                            <a href="#/topics/new" class="btn success">New Topic</a>
+                            <a href="#/topics/new/topic" class="btn success">New Topic</a>
                         </div>
                         <div class="span10 offset1">
                             <ul class="pills topicFilter " data-pills="pills">
@@ -274,42 +293,53 @@
 
         <script id="topicNewTemplate" type="text/html">
             <!-- Main hero unit for a primary marketing message or call to action -->
-            <form>
+            <form class="newForm">
                 <fieldset>
-                  <legend>Example form legend</legend>
+                  <legend>Add New</legend>
                   <div class="clearfix">
-                    <label for="prependedInput">Prepended Text</label>
+                    <label id="optionsNewType">Type</label>
                     <div class="input">
-                      <div class="input-prepend">
-                        <span class="add-on">@</span>
-                        <input class="medium" id="prependedInput" name="prependedInput" size="16" type="text" />
-                      </div>
+                        <ul class="inputs-list newTopicType">
+                            <li>
+                                <label>
+                                    <input type="radio" name="optionsType"  id="topicType"  value="topic" />
+                                    <span>Topic</span>
+                                </label>
+                            </li>
+                            <li> 
+                                <label>
+                                    <input type="radio" name="optionsType" id="bookmarkType"  value="bookmark" />
+                                    <span>Bookmark</span>
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="radio" name="optionsType" id="pictureType"  value="picture" />
+                                    <span>Picture</span>
+                                </label>
+                            </li>
+
+
+                        </ul>
                     </div>
                   </div> <!-- /clearfix -->
+
+                  <div class="topicTypeForm">
+                      
+                  </div>
+
                   <div class="clearfix">
-                    <label for="prependedInput2">Prepended Checkbox</label>
+                    <label id="optionsNewType">Tags</label>
                     <div class="input">
-                      <div class="input-prepend">
-                        <label class="add-on"><input type="checkbox" name="" id="" value="" /></label>
-                        <input class="mini" id="prependedInput2" name="prependedInput2" size="16" type="text" />
-                      </div>
+                        <input type="text" name="dsadas" />
                     </div>
                   </div> <!-- /clearfix -->
-                  <div class="clearfix">
-                    <label for="appendedInput">Appended Checkbox</label>
-                    <div class="input">
-                      <div class="input-append">
-                        <input class="mini" id="appendedInput" name="appendedInput" size="16" type="text" />
-                        <label class="add-on active"><input type="checkbox" name="" id="" value="" checked="checked" /></label>
-                      </div>
-                    </div>
-                  </div> <!-- /clearfix -->
-                  <div class="clearfix">
-                    <label for="xlInput">File Input</label>
-                    <div class="input">
-                      <input class="input-file" id="fileInput" name="fileInput" type="file" />
-                    </div>
-                  </div> <!-- /clearfix -->
+                  
+
+                  <div class="actions">
+                      <button class="save btn primary">Save</button>
+                      <a href="#/topics" class="btn">Cancel</a>
+                  </div>
                 </fieldset>
             </form>
         </script>
@@ -330,7 +360,7 @@
         </footer>
 
     </div> <!-- /container -->
-</div>
+
 
 
 </body>
