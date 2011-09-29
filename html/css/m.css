@@ -7,3 +7,11 @@
     font-size: 20px;
     text-align: center;
 }
+
+.columnbubles .left {
+    float: left;
+}
+
+.columnbubles .right {
+    float: right;
+}

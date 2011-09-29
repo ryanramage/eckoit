@@ -78,6 +78,7 @@ Swipe.prototype = {
 
     // translate to given index position
     this.element.style.webkitTransform = 'translate3d(' + -(index * this.width) + 'px,0,0)';
+    //this.element.style.transform = 'translate3d(' + -(index * this.width) + 'px,0,0)';
 
     // set new index to allow for expression arguments
     this.index = index;
@@ -137,7 +138,7 @@ Swipe.prototype = {
 
     }
 
-
+    console.log(this.start);
     // used for testing first onTouchMove event
     this.isScrolling = undefined;
     
@@ -164,6 +165,8 @@ Swipe.prototype = {
 
     this.deltaX = newX - this.start.pageX;
 
+    console.log(this.deltaX);
+
     // determine if scrolling test has run - one time test
     if ( typeof this.isScrolling == 'undefined') {
       this.isScrolling = !!( this.isScrolling || Math.abs(this.deltaX) < Math.abs(newY - this.start.pageY) );
@@ -187,16 +190,19 @@ Swipe.prototype = {
       
       // translate immediately 1-to-1 
       this.element.style.webkitTransform = 'translate3d(' + (this.deltaX - this.index * this.width) + 'px,0,0)';
+      //this.element.style.transform = 'translate3d(' + (this.deltaX - this.index * this.width) + 'px,0,0)';
     }
 
   },
 
   onTouchEnd: function(e) {
 
-    console.log(this.started);
     if(!this.started) return;
     this.started = false;
-  
+
+
+    console.log('ended');
+
     // determine if slide attempt triggers next/prev slide
     var isValidSlide = 
           Number(new Date()) - this.start.time < 250      // if slide duration is less than 250ms
