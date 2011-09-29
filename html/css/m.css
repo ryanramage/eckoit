@@ -1,0 +1,9 @@
+.swipe li div {
+    margin: 0 10px;
+    padding: 50px 10px;
+    background: #1DB1FF;
+    font-weight: bold;
+    color: white;
+    font-size: 20px;
+    text-align: center;
+}
