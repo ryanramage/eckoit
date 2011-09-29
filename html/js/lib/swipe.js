@@ -20,11 +20,6 @@ window.Swipe = function(element, options) {
   // reference dom elements
   this.container = element;
   this.element = this.container.getElementsByTagName('ul')[0]; // the slide pane
-  this.slides = this.element.getElementsByTagName('li');
-  this.length = this.slides.length;
-
-  // return immediately if their are less than two slides
-  if (this.length < 2) return null;
 
   // static css
   this.container.style.overflow = 'hidden';
@@ -48,6 +43,17 @@ Swipe.prototype = {
 
     this.started = false;
 
+    // return immediately if their are less than two slides
+    if (this.length < 2) return null;
+
+
+    // get and measure amt of slides
+    this.slides = this.element.getElementsByTagName('li');
+    this.length = this.slides.length;
+
+    // return immediately if their are less than two slides
+    if (this.length < 2) return null;
+
     // hide slider element but keep positioning during setup
     this.container.style.visibility = 'hidden';
 
@@ -61,6 +67,7 @@ Swipe.prototype = {
       var el = this.slides[index];
       el.style.width = this.width + 'px';
       el.style.display = 'table-cell';
+      el.style.verticalAlign = 'top';
     }
 
     // set start position and force translate to remove initial flickering
@@ -78,7 +85,6 @@ Swipe.prototype = {
 
     // translate to given index position
     this.element.style.webkitTransform = 'translate3d(' + -(index * this.width) + 'px,0,0)';
-    //this.element.style.transform = 'translate3d(' + -(index * this.width) + 'px,0,0)';
 
     // set new index to allow for expression arguments
     this.index = index;
@@ -117,7 +123,6 @@ Swipe.prototype = {
   },
 
   onTouchStart: function(e) {
-
     var x,y;
     try {
         x = e.touches[0].pageX;
@@ -138,7 +143,6 @@ Swipe.prototype = {
 
     }
 
-    console.log(this.start);
     // used for testing first onTouchMove event
     this.isScrolling = undefined;
     
@@ -151,6 +155,7 @@ Swipe.prototype = {
   },
 
   onTouchMove: function(e) {
+
     if (!this.start || !this.started) return;
     var newX;
     var newY;
@@ -162,10 +167,7 @@ Swipe.prototype = {
         newY = e.screenY;
     }
 
-
     this.deltaX = newX - this.start.pageX;
-
-    console.log(this.deltaX);
 
     // determine if scrolling test has run - one time test
     if ( typeof this.isScrolling == 'undefined') {
@@ -190,7 +192,6 @@ Swipe.prototype = {
       
       // translate immediately 1-to-1 
       this.element.style.webkitTransform = 'translate3d(' + (this.deltaX - this.index * this.width) + 'px,0,0)';
-      //this.element.style.transform = 'translate3d(' + (this.deltaX - this.index * this.width) + 'px,0,0)';
     }
 
   },
@@ -199,9 +200,6 @@ Swipe.prototype = {
 
     if(!this.started) return;
     this.started = false;
-
-
-    console.log('ended');
 
     // determine if slide attempt triggers next/prev slide
     var isValidSlide = 

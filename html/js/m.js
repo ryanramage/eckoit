@@ -14,6 +14,7 @@ $(function() {
 
     $('.add').click(function() {
         $('#slider ul').append("<li><div>ADDED</div></li>");
+        window.mySwipe.setup();
     })
 
 });
