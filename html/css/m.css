@@ -1,6 +1,6 @@
 .swipe li div {
-    margin: 0 10px;
-    padding: 50px 10px;
+    margin: 0 0px;
+    padding: 50px 00px;
     background: #1DB1FF;
     font-weight: bold;
     color: white;
@@ -8,10 +8,27 @@
     text-align: center;
 }
 
-.columnbubles .left {
-    float: left;
+.header .middle {
+    width: 150px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-.columnbubles .right {
-    float: right;
+.header .before {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 130px;
+}
+
+.header .after{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 130px;
+    text-align: right;
+}
+
+.header .middle {
+    text-align: center;
 }
