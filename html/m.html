@@ -1,78 +1,101 @@
-<!doctype html>
+
+<!DOCTYPE html>
+<html>
 <head>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'/> 
-    <title>Ecko-It</title>
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
-    <!--[if lt IE 9]>
-        <script src="js/lib/html5.js"></script>
-      <![endif]-->
-
-
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/swipe.css">
-    <link rel="stylesheet" href="css/m.css">
-
-    <script src="js/lib/head.min.js"></script>
-    <script>
-        head.js("js/lib/jquery-1.6.2.min.js",
-                "js/lib/json2.js",
-                "js/lib/jquery.couch.js",
-                "js/lib/swipe.js",
-                "js/lib/thumbs.0.5.2.min.js",
-                "js/m.js"
-            );
-    </script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Ecko-it</title>
+	<link rel="stylesheet"  href="css/jquery.mobile-1.0rc1.min.css" />
+	<link rel="stylesheet" href="css/m.css" />
+	<script src="js/lib//jquery-1.6.2.min.js"></script>
+	<script src="js/lib/jquery.mobile-1.0rc1.min.js"></script>
+        <script src="js/m.js"></script>
 
 </head>
-
 <body>
+<div data-role="page" class="type-interior" id="utag">
+    <div data-role="header">
+            <h1>&#181tag</h1>
+    </div><!-- /header --> 
+    <div data-role="content">
+        <div class="content-primary">
+            <form>
+                <div data-role="fieldcontain">
+                    <fieldset data-role="controlgroup">
+                        <legend>Tags</legend>
+                        <input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom" />
+                        <label for="checkbox-1">Funny</label>
+                        <input type="checkbox" name="checkbox-2" id="checkbox-2" class="custom" />
+                        <label for="checkbox-2">Todo</label>
+                    </fieldset>
+                </div>
 
-<div class="header">
-    <div class="before"></div>
-    <div class="middle">
-        &#181tag
-    </div>
-    <div class="after"></div>
+                <div data-role="fieldcontain">
+                        <label for="slider">Transcribe:</label>
+                        <select name="slider" id="slider" data-role="slider">
+                                <option value="off">Off</option>
+                                <option value="on">On</option>
+                        </select>
+                </div>
+                <div class="ui-body">
+                    <a data-role="button"  >Add</a>
+                 </div>
+
+            </form>
+        </div>
+        <div class="content-secondary">
+                <div  data-theme="b" data-content-theme="d">
+
+				<h2>Tag Groups</h2>
+
+				<ul data-role="listview" data-theme="c" data-dividertheme="d">
+                                        <li data-role="list-divider">Tag Group</li>
+					<li data-theme="a"><a href="docs-forms.html">Default</a></li>
+					<li><a href="forms-all.html">Work</a></li>
+					<li><a href="textinputs/">People</a></li>
+
+
+				</ul>
+		</div>
+        </div>
+
+    </div> <!-- content -->
+    <div data-role="footer" data-id="foo1" data-position="fixed">
+            <div data-role="navbar">
+                    <ul>
+                            <li><a href="footer-persist-a.html" class="ui-btn-active ui-state-persist">&#181tag</a></li>
+                            <li><a href="#meeting">Meeting</a></li>
+                    </ul>
+            </div><!-- /navbar -->
+    </div><!-- /footer -->
 </div>
+<div data-role="page" class="type-home" id="meeting">
+    <div data-role="header">
+            <h1>Meeting</h1>
+    </div><!-- /header -->  
+    <div data-role="content">
+        <h1></h1>
+        <form>
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup">
+                    <legend>QuickTags:</legend>
+                    <input type="checkbox" name="checkbox-1" id="checkbox-3" class="custom" />
+                    <label for="checkbox-3">Bread</label>
+                    <input type="checkbox" name="checkbox-2" id="checkbox-4" class="custom" />
+                    <label for="checkbox-4">Butter</label>
+                </fieldset>
+            </div>            
+        </form>
+    </div> <!-- Content  -->
+    <div data-role="footer" data-id="foo1" data-position="fixed">
+            <div data-role="navbar">
+                    <ul>
+                            <li><a href="#utag" data-direction="reverse">&#181tag</a></li>
 
-
-<div id="slider" class="swipe">
-  <ul>
-    <li style='display:block'>
-        <div>
-    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-
-The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-        </div>
-        
-    </li>
-    <li style='display:none'>
-        <div>
-t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-        </div>
-    </li>
-    <li style='display:none'>
-        <div>
-There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc.
-        </div>
-    </li>
-    <li style='display:none'>
-        <div>
-            4
-        </div>
-    </li>
-    <li style='display:none'>
-        <div>
-            5
-        </div>
-    </li>
-  </ul>
+                            <li><a href="footer-persist-a.html" class="ui-btn-active ui-state-persist">Meeting</a></li>
+                    </ul>
+            </div><!-- /navbar -->
+    </div><!-- /footer -->
 </div>
-
-    <button class="btn add">Add Column</button>
-
-
 </body>
 </html>
