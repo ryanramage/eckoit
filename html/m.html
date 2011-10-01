@@ -16,55 +16,63 @@
 <div data-role="page" class="type-interior" id="utag">
     <div data-role="header">
             <h1>&#181tag</h1>
-    </div><!-- /header --> 
+
+                    <div data-role="navbar" >
+                            <ul class="tag-groups">
+
+
+                            </ul>
+                    </div><!-- /navbar -->
+
+    </div><!-- /header -->
+
     <div data-role="content">
-        <div class="content-primary">
-            <form>
-                <div data-role="fieldcontain">
-                    <fieldset data-role="controlgroup">
-                        <legend>Tags</legend>
-                        <input type="checkbox" name="checkbox-1" id="checkbox-1" class="custom" />
-                        <label for="checkbox-1">Funny</label>
-                        <input type="checkbox" name="checkbox-2" id="checkbox-2" class="custom" />
-                        <label for="checkbox-2">Todo</label>
-                    </fieldset>
-                </div>
-
-                <div data-role="fieldcontain">
-                        <label for="slider">Transcribe:</label>
-                        <select name="slider" id="slider" data-role="slider">
-                                <option value="off">Off</option>
-                                <option value="on">On</option>
-                        </select>
-                </div>
-                <div class="ui-body">
-                    <a data-role="button"  >Add</a>
-                 </div>
-
-            </form>
-        </div>
-        <div class="content-secondary">
-                <div  data-theme="b" data-content-theme="d">
-
-				<h2>Tag Groups</h2>
-
-				<ul data-role="listview" data-theme="c" data-dividertheme="d">
-                                        <li data-role="list-divider">Tag Group</li>
-					<li data-theme="a"><a href="docs-forms.html">Default</a></li>
-					<li><a href="forms-all.html">Work</a></li>
-					<li><a href="textinputs/">People</a></li>
 
 
-				</ul>
-		</div>
-        </div>
+
+
+
+
+        <form>
+
+
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup">
+                    <legend>Tags</legend>
+
+
+                    <div class="tag-group-tags">
+
+                    </div>
+
+                </fieldset>
+            </div>
+
+
+
+
+
+            <div data-role="fieldcontain">
+                    <label for="slider">Transcribe:</label>
+                    <select name="slider" id="slider" data-role="slider">
+                            <option value="off">Off</option>
+                            <option value="on">On</option>
+                    </select>
+            </div>
+            <div class="ui-body">
+                <a data-role="button"  data-icon="plus" >Add</a>
+             </div>
+
+        </form>
+  
+
 
     </div> <!-- content -->
     <div data-role="footer" data-id="foo1" data-position="fixed">
-            <div data-role="navbar">
+            <div data-role="navbar" class="main-menu">
                     <ul>
-                            <li><a href="footer-persist-a.html" class="ui-btn-active ui-state-persist">&#181tag</a></li>
-                            <li><a href="#meeting">Meeting</a></li>
+                            <li><a href="#utag" class="ui-btn-active ui-state-persist" data-icon="star">&#181tag</a></li>
+                            <li><a href="#meeting" data-icon="grid">Meeting</a></li>
                     </ul>
             </div><!-- /navbar -->
     </div><!-- /footer -->
@@ -88,11 +96,11 @@
         </form>
     </div> <!-- Content  -->
     <div data-role="footer" data-id="foo1" data-position="fixed">
-            <div data-role="navbar">
+            <div data-role="navbar"  class="main-menu">
                     <ul>
-                            <li><a href="#utag" data-direction="reverse">&#181tag</a></li>
+                            <li><a href="#utag" data-direction="reverse" data-icon="star">&#181tag</a></li>
 
-                            <li><a href="footer-persist-a.html" class="ui-btn-active ui-state-persist">Meeting</a></li>
+                            <li><a href="#meeting" class="ui-btn-active ui-state-persist" data-icon="grid">Meeting</a></li>
                     </ul>
             </div><!-- /navbar -->
     </div><!-- /footer -->
