@@ -668,7 +668,11 @@
                   if (options.success) options.success(resp);
                 }
               } else if (options.error) {
-                options.error(req.status, resp.error, resp.reason);
+                  try {
+                        options.error(req.status, resp.error, resp.reason);
+                  } catch (e) {
+                      options.error(500, 'no server', 'no server');
+                  }
               } else {
                 alert("The document could not be saved: " + resp.reason);
               }
@@ -685,7 +689,7 @@
          * @param {ajaxSettings} options <a href="http://api.jquery.com/
          * jQuery.ajax/#jQuery-ajax-settings">jQuery ajax settings</a>
          */
-        bulkSave: function(docs, options) {
+        bulkSave: function(docs, options) { 
           var beforeSend = fullCommit(options);
           $.extend(options, {successStatus: 201, beforeSend : beforeSend});
           ajax({

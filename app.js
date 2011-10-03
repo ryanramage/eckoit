@@ -13,7 +13,6 @@ var couchapp = require('couchapp')
 
 
 
-
   ddoc.language = "javascript";
   ddoc.rewrites = [
       {from:"/", to:'index.html'}

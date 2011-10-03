@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html>
+<html  manifest="cache.manifest">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,12 +8,15 @@
 	<link rel="stylesheet" href="css/m.css" />
 	<script src="js/lib//jquery-1.6.2.min.js"></script>
 	<script src="js/lib/jquery.mobile-1.0rc1.min.js"></script>
+        <script src="js/lib/jquery.couch.js"></script>
+        <script src="js/lib/amplify.min.js"></script>
+        <script src="js/lib/jquery.mobile.notification.js"></script>
         <script src="js/m.js"></script>
 
 </head>
 <body>
 <div data-role="page" class="type-interior" id="utag">
-    <div data-role="header">
+    <div data-role="header" >
             <h1>&#181tag</h1>
 
                     <div data-role="navbar" >
@@ -33,7 +35,7 @@
 
 
 
-        <form>
+        <form id="utag-form">
 
 
             <div data-role="fieldcontain">
@@ -49,19 +51,26 @@
             </div>
 
 
-
-
+            <div data-role="fieldcontain">
+                <label for="note">Note</label>
+                <input type="text" name="note" id="note" value=""  />
+            </div>
 
             <div data-role="fieldcontain">
-                    <label for="slider">Transcribe:</label>
-                    <select name="slider" id="slider" data-role="slider">
-                            <option value="off">Off</option>
-                            <option value="on">On</option>
+                    <label for="transcribe">Transcribe</label>
+                    <select name="transcribe" id="transcribe" data-role="slider">
+                            <option value="false">Off</option>
+                            <option value="true">On</option>
                     </select>
             </div>
-            <div class="ui-body">
-                <a data-role="button"  data-icon="plus" >Add</a>
+
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup">
+                    <legend> </legend>
+                    <a  data-role="button"  data-icon="plus" data-inline="true" id="addTag" data-theme="b">Add</a>
+                </fieldset>
              </div>
+
 
         </form>
   
@@ -78,7 +87,7 @@
     </div><!-- /footer -->
 </div>
 <div data-role="page" class="type-home" id="meeting">
-    <div data-role="header">
+    <div data-role="header"  >
             <h1>Meeting</h1>
     </div><!-- /header -->  
     <div data-role="content">
