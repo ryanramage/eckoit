@@ -1,6 +1,6 @@
 $(document).ready(function(){
 
-
+    jQuery.couch.urlPrefix = 'api';
     app.router = Router(app.routes).init('/dashboard');
 
 
@@ -14,5 +14,5 @@ $(document).ready(function(){
 
     app.onDomReady();
 
-
+    $("abbr.timeago").timeago();
 });

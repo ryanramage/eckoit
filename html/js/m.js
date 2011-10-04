@@ -38,16 +38,13 @@ app.controller.init = function(details) {
             doc.tags =    app.current_tag_group.always_tag.concat(doc.tags);
         }
         app.controller.saveCouch(doc, function() {
-            $.mobile.messageBox( "Saved.", 2000 );
+            $.mobile.messageBox( "Saved.", 800 );
         }, function() {
-            console.log('prob saving to couch');
             // cant get to couch...save to local cache
             app.controller.saveLocal(doc, function() {
-                console.log('save local complete');
-                $.mobile.messageBox( "Saved. To be uploaded.", 2000 );
+                $.mobile.messageBox( "Saved. To be uploaded.", 800 );
             }, function(error) {
                // something really bad. Cant save anywhere!
-               console.log('save local error: ' + error);
             });
         });
         // send to couch
@@ -86,7 +83,6 @@ app.controller.saveCouch = function(doc, success, error) {
                 error: error
             });
         } catch (e) {
-            console.log('caught couch offline');
             error(e);
         }
 }
@@ -94,7 +90,6 @@ app.controller.saveCouch = function(doc, success, error) {
 
 app.controller.saveLocal = function(doc, success, error) {
     try {
-        console.log('save local');
         // we asssume the that amplify has been loaded in the page
         var saved = amplify.store('utags');
         if (!saved) saved = [];
@@ -111,17 +106,15 @@ app.controller.saveLocal = function(doc, success, error) {
 app.uploadLocalTags = function() {
     var saved = amplify.store('utags');    
     if (saved && saved.length > 0) {
-        console.log(saved.length + " saved");
         amplify.store('utags', []); 
         app.failed = [];
         $.each(saved, function(i, doc) {
             app.controller.saveCouch(doc, function() {
-                console.log("finally, saved");
+
             }, function() { 
 
                var changed = amplify.store('utags');
                changed.push(doc);
-               console.log('storing: ' + changed.length);
                amplify.store('utags', changed);
             });
         });
@@ -139,7 +132,8 @@ $('#utag').live('pagecreate',function(event){
                 name: "Home",
                 tags : [
                     {
-                        name: "Funny"
+                        name: "Funny",
+                        id : "12345"
                     },
                     {
                         name : "Helarity"
@@ -179,6 +173,7 @@ $('#utag').live('pagecreate',function(event){
         ]
     };
     app.controller.init(details);
+
 });
 
 
@@ -186,6 +181,7 @@ $(function() {
 
     jQuery.couch.urlPrefix = 'api';
 
+    // handle the tag groups
     $('.tab').live('click', function() {
         $('.tab').removeClass('ui-btn-active');
         $(this).addClass('ui-btn-active');
@@ -193,17 +189,20 @@ $(function() {
     });
 
 
-
+    // hide the footer nav on note.
+    // make room for some mobile keyboards
     $('#note').focus(function() {
         $('.main-menu').parent().hide()
     }).blur(function() {
         $('.main-menu').parent().show()
     });
 
-
+    // start the uploadLocalTags timer
     setTimeout(app.uploadLocalTags, 10000);
 });
 
+
+// on leaving the page, notify the user if tags not uploaded.
 function unloadPage(){
    var saved = amplify.store('utags');
    if (saved && saved.length > 0) {
@@ -211,5 +210,4 @@ function unloadPage(){
    }
    
 }
-
 window.onbeforeunload = unloadPage;

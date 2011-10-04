@@ -23,6 +23,27 @@ var couchapp = require('couchapp')
 
 /** add views/shows/lists below **/
 
+  ddoc.views.unfiltered = {
+      map : function(doc) {
+          if (doc.timestamp)                            emit([0, doc.timestamp], null);
+          if (doc.votes)                                emit([1, doc.votes],     null);
+          if (doc.views)                                emit([2, doc.views],     null);
+
+          if (doc.discussed) {
+            if (doc.discussed == 0 && doc.timestamp)    emit([3, doc.timestamp], null);
+            else if (doc.discussed == 0)                emit([3, null],          null);
+          }
+          if (doc.resolved) {
+              if (doc.resolved == false && doc.timestamp) emit([4, doc.timestamp], null);
+              else if (doc.resolved == false)             emit([4, null],          null);
+          }
+      },
+      reduce: '_count'
+  }
+
+
+
+
 
   ddoc.views.byTag = {
       map : function(doc) {

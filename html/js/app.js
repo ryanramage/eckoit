@@ -16,6 +16,7 @@ app.controller.save.topic = function() {
 
 app.view = {};
 
+app.ddoc = "app2";
 
 app.view.current = "";
 
@@ -44,6 +45,93 @@ app.onDomReady = function() {
 
 
 
+app.findBestTag = function(tags) {
+
+    if (!tags || tags.length == 0) return null;
+    if (tags.length == 1) return tags[0];
+    // in the future, we can query to find the smallest tag set.
+    return tags[0];
+}
+
+
+app.findExtraKeys = function(tags, bestTag) {
+    if (!tags || tags.length == 0) return null;
+    if (tags.length == 1) return null;
+    var extraKeys = [];
+    for (var i=0; i < tags.length; i++) {
+        var tag = tags[i];
+        if (tag != bestTag) extraKeys.push(tag);
+    }
+    return extraKeys;
+}
+
+app.controller.findTopics = function(tags, callback, sort) {
+    if (!sort) sort = 0;
+
+    if (!tags) {
+        $.couch.db('').view(app.ddoc + '/unfiltered', {
+            startkey : [sort],
+            endkey : [sort, {}],
+            include_docs : true,
+            reduce: false,
+            success : callback
+        });
+    } else {
+
+        var tag = app.findBestTag(tags);
+        var options = {
+            startkey : [tag, sort],
+            endkey : [tag, sort, {}],
+            include_docs : true,
+            reduce: false
+            
+        };
+
+        var extra_keys = app.findExtraKeys(tags, tag);
+        if (extra_keys) {
+            options.extra_keys = JSON.stringify(extra_keys);
+        }
+        $.couch.db('').list(app.ddoc + '/intersection', 'byTag', options, {
+            success : callback,
+            dataType: 'json'
+        });
+
+    }
+}
+
+
+app.view.showTopics = function(results) {
+
+    var div = $('.row.topics');
+    app.controller.showTopics(results, div);
+}
+
+
+app.view.typeToTemplate = {
+    "com.eckoit.utag" : "timelineRowTemplate"
+}
+
+
+
+app.controller.showTopics = function(results, div) {
+    div.empty();
+    $.each(results.rows, function(i,row) {
+       var doc = row.doc;
+       app.controller.showTopic(doc, div);
+    });
+}
+
+
+app.controller.showTopic = function(topic, div) {
+    if (!topic.type) return;
+    var template = app.view.typeToTemplate[topic.type];
+    if (!template) return;
+    div.append( ich[template](topic)  );
+    
+}
+
+
+
 
 
 app.routes = {
@@ -62,6 +150,7 @@ app.routes = {
                     _tags = app.view.splitTags(tags);
                     app.view.activeCategory('topics');
                     app.view.mainPageChange('topics', {tags:_tags});
+                    app.controller.findTopics(_tags, app.view.showTopics);
                     
                 }
           },
@@ -92,12 +181,14 @@ app.routes = {
                     app.view.activeCategory('topics');
                     app.view.mainPageChange('topicNew');
                     
+                    
 
                 }
           },
           on: function() {
               app.view.activeCategory('topics');
               app.view.mainPageChange('topics');
+              app.controller.findTopics(null, app.view.showTopics);
           }
         },
         '/threads' : {

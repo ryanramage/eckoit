@@ -26,6 +26,7 @@ describe("Topics filtered by Tags", function() {
   });
   it("should handle one tag", function() {
       var result = app.view.splitTags("apple");
+      expect(result.length).toBe(1);
      expect(result).toContain("apple");
   });
   it ("should be an empty array on no tags", function() {

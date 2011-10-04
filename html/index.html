@@ -1,4 +1,4 @@
-<!doctype html>
+    <!doctype html>
 <head>
     <meta charset="utf-8">
     <title>Ecko-It</title>
@@ -26,6 +26,7 @@
                 "js/lib/bootstrap-twipsy.js",
                 "js/lib/bootstrap-popover.js",
                 "js/lib/bootstrap-tabs.js",
+                "js/lib/jquery.timeago.js",
                 "js/app.js",
                 "js/onready.js"
             );
@@ -90,7 +91,9 @@
                         A really good vector graphics toolkit
                     </p>
                     <div class="tags">
-                        <span class="label notice">javascript</span> <span class="label notice">libraries</span> <span class="label">Graphics</span> <span class="label">canvas</span>
+                        {{#tags}}
+                            <span class="label notice">{{.}}</span>
+                        {{/tags}}
                     </div>
                 </div>
                 <div class="span2">
@@ -161,12 +164,6 @@
 
         </script>
 
-
-
-
-
-
-
         <script id="timelineRowTemplate" type="text/html">
             <div class="row topic timeline">
                 <div class="span2">
@@ -182,13 +179,15 @@
                 </div>
                 <div class="span8 ">
                     <div class="title">
-                        <a href="#/timeline/18-Jun-2011_7:43:14_PM">3 months ago</a>
+                        <a href="#/timeline/18-Jun-2011_7:43:14_PM"><abbr class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</abbr></a>
                     </div>
                     <p class="small">
-                        Talking to @cowboy about jquery bbq plugin at #jqdevyeg.
+                        {{note}}
                     </p>
                     <div class="tags">
-                        <span class="label notice">javascript</span> <span class="label notice">libraries</span> <span class="label">jquery</span> <span class="label">html5</span> <span class="label">history</span>
+                        {{#tags}}
+                            <span class="label notice">{{.}}</span>
+                        {{/tags}}
                     </div>
                 </div>
                 <div class="span2">
