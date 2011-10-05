@@ -37,17 +37,31 @@ app.controller.init = function(details) {
         if (app.current_tag_group && app.current_tag_group.always_tag && app.current_tag_group.always_tag.length > 0) {
             doc.tags =    app.current_tag_group.always_tag.concat(doc.tags);
         }
-        app.controller.saveCouch(doc, function() {
-            $.mobile.messageBox( "Saved.", 800 );
-        }, function() {
-            // cant get to couch...save to local cache
-            app.controller.saveLocal(doc, function() {
-                $.mobile.messageBox( "Saved. To be uploaded.", 800 );
-            }, function(error) {
-               // something really bad. Cant save anywhere!
+
+
+
+        app.controller.addCurrentPosition(doc, function(doc) {
+            // send to couch
+            app.controller.saveCouch(doc, function() {
+                $.mobile.messageBox( "Saved.", 800 );
+                $('#note').val('');
+            }, function() {
+                // cant get to couch...save to local cache
+                app.controller.saveLocal(doc, function() {
+                    $.mobile.messageBox( "Saved. To be uploaded.", 800 );
+                    $('#note').val('');
+                }, function(error) {
+                   // something really bad. Cant save anywhere!
+                });
             });
-        });
-        // send to couch
+
+
+        })
+
+
+
+        // clear the text input
+        
         return false;
     });
 }
@@ -177,6 +191,26 @@ $('#utag').live('pagecreate',function(event){
 });
 
 
+app.controller.enableGeotag = false;
+
+app.controller.addCurrentPosition = function(doc, callback) {
+    
+    if (!app.controller.enableGeotag) {
+        callback(doc);
+        return;
+    }
+    geo_position_js.getCurrentPosition(function(p) {
+            doc.position = p.coords;
+            if (GeoHash) {
+                doc.position.geohash = GeoHash.encodeGeoHash(doc.position.latitude, doc.position.longitude);
+            }
+            callback(doc);
+    },function() {
+        callback(doc);
+    },{enableHighAccuracy:true});
+}
+
+
 $(function() {
 
     jQuery.couch.urlPrefix = 'api';
@@ -199,6 +233,24 @@ $(function() {
 
     // start the uploadLocalTags timer
     setTimeout(app.uploadLocalTags, 10000);
+
+
+
+    // track position
+    var init_geotag = function init_position() {
+        try {
+            if(geo_position_js.init()) {
+                app.controller.enableGeotag = true;
+            } else {
+                app.controller.enableGeotag = false
+            }
+        } catch (e) {
+            app.controller.enableGeotag = false;
+        }
+    }
+    
+    init_geotag();
+
 });
 
 

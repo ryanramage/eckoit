@@ -179,7 +179,7 @@
                 </div>
                 <div class="span8 ">
                     <div class="title">
-                        <a href="#/timeline/18-Jun-2011_7:43:14_PM"><abbr class="timeago" title="2008-07-17T09:24:17Z">July 17, 2008</abbr></a>
+                        <a href="#/timeline/18-Jun-2011_7:43:14_PM"><time class="timeago" datetime="{{datestamp_iso}}">{{datestamp_string}}</time></a>
                     </div>
                     <p class="small">
                         {{note}}
@@ -236,13 +236,9 @@
             </div>
         </script>
         <script id="relatedTagsTemplate" type="text/html">
-            <li>+ graphics</li>
-            <li>+ Canvas</li>
-            <li>+ project-x</li>
-            <li>+ working-group</li>
-            <li>+ jquery</li>
-            <li>+ html5</li>
-            <li>+ history</li>
+            {{#tags}}
+                 <li>{{.}}</li>
+            {{/tags}}
         </script>
 
         <script id="topicsTemplate" type="text/html">

@@ -14,5 +14,5 @@ $(document).ready(function(){
 
     app.onDomReady();
 
-    $("abbr.timeago").timeago();
+    $("time.timeago").timeago();
 });

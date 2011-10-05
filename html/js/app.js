@@ -70,8 +70,9 @@ app.controller.findTopics = function(tags, callback, sort) {
 
     if (!tags) {
         $.couch.db('').view(app.ddoc + '/unfiltered', {
-            startkey : [sort],
-            endkey : [sort, {}],
+            startkey : [sort, {}],
+            endkey : [sort],
+            descending : true,
             include_docs : true,
             reduce: false,
             success : callback
@@ -80,8 +81,9 @@ app.controller.findTopics = function(tags, callback, sort) {
 
         var tag = app.findBestTag(tags);
         var options = {
-            startkey : [tag, sort],
-            endkey : [tag, sort, {}],
+            startkey : [tag, sort, {}],
+            endkey : [tag, sort],
+            descending : true,
             include_docs : true,
             reduce: false
             
@@ -100,10 +102,32 @@ app.controller.findTopics = function(tags, callback, sort) {
 }
 
 
+
+app.controller.findDistinctTags = function(results, filterTags) {
+    var tag_arr = _.map(results.rows, function(row){ return row.doc.tags  });
+    var tags = _.union(tag_arr);
+
+    if (filterTags) {
+
+        tags = _.difference(tags, filterTags);
+
+    }
+
+    return tags
+}
+
+
+app.view.showDistinctTags = function(tags) {
+    $('.related.unstyled').html( ich['relatedTagsTemplate']( { tags : tags} )  );
+}
+
+
+
 app.view.showTopics = function(results) {
 
     var div = $('.row.topics');
     app.controller.showTopics(results, div);
+    $("time.timeago").timeago();
 }
 
 
@@ -126,6 +150,13 @@ app.controller.showTopic = function(topic, div) {
     if (!topic.type) return;
     var template = app.view.typeToTemplate[topic.type];
     if (!template) return;
+
+    if (topic.timestamp) {
+        topic.datestamp = new Date(topic.timestamp);
+        topic.datestamp_iso = iso8601(topic.datestamp);
+        topic.datestamp_string = topic.datestamp.toLocaleString();
+    }
+
     div.append( ich[template](topic)  );
     
 }
@@ -150,7 +181,11 @@ app.routes = {
                     _tags = app.view.splitTags(tags);
                     app.view.activeCategory('topics');
                     app.view.mainPageChange('topics', {tags:_tags});
-                    app.controller.findTopics(_tags, app.view.showTopics);
+                    app.controller.findTopics(_tags, function(results) {
+                        app.view.showTopics(results);
+                        var tags = app.controller.findDistinctTags(results, _tags);
+                        app.view.showDistinctTags(tags);
+                    });
                     
                 }
           },
@@ -188,7 +223,11 @@ app.routes = {
           on: function() {
               app.view.activeCategory('topics');
               app.view.mainPageChange('topics');
-              app.controller.findTopics(null, app.view.showTopics);
+              app.controller.findTopics(null, function(results) {
+                  app.view.showTopics(results);
+                  var tags = app.controller.findDistinctTags(results);
+                  app.view.showDistinctTags(tags);
+              });
           }
         },
         '/threads' : {
@@ -207,3 +246,18 @@ app.view.splitTags = function(tags) {
 
     return _tags;
 }
+
+
+
+var zeropad = function(num) {
+	return ((num < 10) ? '0' : '') + num;
+}
+
+var iso8601 = function (date) {
+	return date.getUTCFullYear()
+	 + "-" + zeropad(date.getUTCMonth()+1)
+	 + "-" + zeropad(date.getUTCDate())
+	 + "T" + zeropad(date.getUTCHours())
+	 + ":" + zeropad(date.getUTCMinutes())
+	 + ":" + zeropad(date.getUTCSeconds()) + "Z";
+}  
