@@ -49,7 +49,9 @@
                 <form action="">
                     <input type="text" placeholder="Search">
                 </form>
-               
+               <ul class="maintabs">
+                    <li class="dashboard"><a href="m.html">Mobile</a></li>
+                </ul>
             </div>
         </div> <!-- /fill -->
     </div> <!-- /topbar -->
@@ -180,15 +182,27 @@
                 <div class="span8 ">
                     <div class="title">
                         <a href="#/timeline/18-Jun-2011_7:43:14_PM"><time class="timeago" datetime="{{datestamp_iso}}">{{datestamp_string}}</time></a>
+
+
                     </div>
                     <p class="small">
                         {{note}}
                     </p>
-                    <div class="tags">
-                        {{#tags}}
-                            <span class="label notice">{{.}}</span>
-                        {{/tags}}
+                    <div class="tagholder">
+                        <span class="tags">
+                            {{#tags}}
+                            <a href="#/topics/tagged/{{.}}"><span class="label notice">{{.}}</span></a>
+                            {{/tags}}
+                        </span>
+                        {{#position}}
+                        <span class="position">
+                            {{#geohash}}
+                            <a href="http://geohash.org/{{geohash}}">&#8853;</a><span></span>
+                            {{/geohash}}
+                        </span>
+                        {{/position}}
                     </div>
+
                 </div>
                 <div class="span2">
                     <button class="btn">&#9654;</button>

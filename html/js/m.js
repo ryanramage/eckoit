@@ -39,16 +39,15 @@ app.controller.init = function(details) {
         }
 
 
-
-        app.controller.addCurrentPosition(doc, function(doc) {
-            // send to couch
+        $.mobile.messageBox( "Saving...", 800 );
+        app.controller.addCurrentPosition(doc, function(doc) {            
             app.controller.saveCouch(doc, function() {
-                $.mobile.messageBox( "Saved.", 800 );
+                $.mobile.messageBox( "Save Complete.", 800 );
                 $('#note').val('');
             }, function() {
                 // cant get to couch...save to local cache
                 app.controller.saveLocal(doc, function() {
-                    $.mobile.messageBox( "Saved. To be uploaded.", 800 );
+                    $.mobile.messageBox( "Saved. Will upload on connect.", 800 );
                     $('#note').val('');
                 }, function(error) {
                    // something really bad. Cant save anywhere!
@@ -207,7 +206,7 @@ app.controller.addCurrentPosition = function(doc, callback) {
             callback(doc);
     },function() {
         callback(doc);
-    },{enableHighAccuracy:true});
+    },{enableHighAccuracy:true, maximumAge: 1});
 }
 
 
