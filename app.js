@@ -7,6 +7,7 @@ var couchapp = require('couchapp')
     , views: {}
     , lists: {}
     , shows: {}
+    , updates: {}
   }
 
   module.exports = ddoc;
@@ -72,6 +73,27 @@ var couchapp = require('couchapp')
       reduce : '_count'
   }
 
+  ddoc.views.byGeohash = {
+      map : function(doc) {
+          if (doc.position && doc.position.geohash) {
+              emit(doc.position.geohash, null);
+          }
+      }
+  }
+
+  ddoc.views.byGeohashExact = {
+     map : function(doc) {
+          if (doc.position && doc.position.geohash) {
+              for (var i=5; i < 9; i++) {
+                 var geohash = doc.position.geohash.substr(0,i);
+                 emit([geohash, doc.timestamp], null);
+              }
+          }
+      },
+      reduce: '_count'
+  }
+
+
 
   ddoc.lists.intersection = function (head, req) {
       var row;
@@ -113,5 +135,25 @@ var couchapp = require('couchapp')
       send('\n]}');
   }
 
+
+
+  ddoc.updates.bumpVotes = function(doc, req) {
+      if (!doc) {
+          return [null, "Need an existing doc"];
+      } else {
+          if (!doc.votes) doc.votes = 1;
+          else doc.votes++;
+          return [doc, doc.votes + ""];
+      }
+  }
+  ddoc.updates.bumpViews = function(doc, req) {
+      if (!doc) {
+          return [null, "Need an existing doc"];
+      } else {
+          if (!doc.views) doc.views = 1;
+          else doc.views++;
+          return [doc, doc.views + ""];
+      }
+  }
 
   couchapp.loadAttachments(ddoc, path.join(__dirname, 'html'));

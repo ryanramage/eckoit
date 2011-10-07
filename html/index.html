@@ -27,6 +27,7 @@
                 "js/lib/bootstrap-popover.js",
                 "js/lib/bootstrap-tabs.js",
                 "js/lib/jquery.timeago.js",
+                "js/lib/geo.js",
                 "js/app.js",
                 "js/onready.js"
             );
@@ -167,13 +168,13 @@
         </script>
 
         <script id="timelineRowTemplate" type="text/html">
-            <div class="row topic timeline">
+            <div class="row topic timeline" >
                 <div class="span2">
-                    <div class="votes">
-                        <div class="mini-counts">0</div>
+                    <div class="votes" data-id="{{_id}}">
+                        <div class="mini-counts">{{#votes}}{{votes}}{{/votes}}{{^votes}}0{{/votes}}</div>
                         <div>Votes</div>
                     </div>
-                    <div class="views">
+                    <div class="views" data-id="{{_id}}">
                         <div class="mini-counts">0</div>
                         <div>Views</div>
                     </div>
@@ -197,7 +198,7 @@
                         {{#position}}
                         <span class="position">
                             {{#geohash}}
-                            <a href="http://geohash.org/{{geohash}}">&#8853;</a><span></span>
+                            <a href="#/topics/located/{{geohash}}">&#8853;</a><span></span>
                             {{/geohash}}
                         </span>
                         {{/position}}

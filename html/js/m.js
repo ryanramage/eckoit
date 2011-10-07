@@ -191,23 +191,28 @@ $('#utag').live('pagecreate',function(event){
 
 
 app.controller.enableGeotag = false;
+app.controller.updateLocation = null;
+app.controller.currentLocation = 0;
 
 app.controller.addCurrentPosition = function(doc, callback) {
-    
-    if (!app.controller.enableGeotag) {
-        callback(doc);
-        return;
+
+    var lastpos = Geotag.getLastPosition();
+    if (lastpos) {
+        doc.position = lastpos.coords;
+        if (GeoHash) {
+             doc.position.geohash = GeoHash.encodeGeoHash(doc.position.latitude, doc.position.longitude);
+        }
+        
     }
-    geo_position_js.getCurrentPosition(function(p) {
-            doc.position = p.coords;
-            if (GeoHash) {
-                doc.position.geohash = GeoHash.encodeGeoHash(doc.position.latitude, doc.position.longitude);
-            }
-            callback(doc);
-    },function() {
-        callback(doc);
-    },{enableHighAccuracy:true, maximumAge: 1});
+
+    callback(doc);
+    return;
+    
 }
+
+
+
+
 
 
 $(function() {
@@ -236,19 +241,11 @@ $(function() {
 
 
     // track position
-    var init_geotag = function init_position() {
-        try {
-            if(geo_position_js.init()) {
-                app.controller.enableGeotag = true;
-            } else {
-                app.controller.enableGeotag = false
-            }
-        } catch (e) {
-            app.controller.enableGeotag = false;
-        }
+    if(window.navigator.geolocation) {
+        Geotag.init();
     }
-    
-    init_geotag();
+
+
 
 });
 

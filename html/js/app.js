@@ -40,7 +40,32 @@ app.view.activeCategory = function(category) {
 
 
 app.onDomReady = function() {
+    $('.votes').live('click', function() {
+        var $me = $(this);
+        var id = $me.data('id');
+        app.controller.bumpVotes(id, function(newCount) {
+            $me.find('.mini-counts').text(newCount);
+        }, function(error) {
 
+        });
+    })
+
+    $('')
+
+}
+
+
+app.controller.bumpVotes = function(id, callback, error) {
+    $.post('api/_design/'+ app.ddoc +'/_update/bumpVotes/' + id, function(result) {
+        callback(result);
+    })
+}
+
+
+app.controller.bumpViews = function(id, callback, error) {
+    $.post('api/_design/'+ app.ddoc +'/_update/bumpViews/' + id, function(result) {
+        callback(result);
+    })
 }
 
 
@@ -163,6 +188,53 @@ app.controller.showTopic = function(topic, div) {
 
 
 
+app.controller.findClosest =  function getClosest(geohash, resolution, callbackBlock, callbackComplete) {
+
+    if (resolution) {
+        geohash = geohash.substr(0,resolution);
+    }
+
+
+   var neighbors = {};
+   neighbors.center = geohash;
+   neighbors.top = GeoHash.calculateAdjacent(geohash,'top');
+   neighbors.bottom = GeoHash.calculateAdjacent(geohash,'bottom');
+   neighbors.right = GeoHash.calculateAdjacent(geohash,'right');
+   neighbors.left = GeoHash.calculateAdjacent(geohash,'left');
+   neighbors.topleft = GeoHash.calculateAdjacent(neighbors.left,'top');
+   neighbors.topright = GeoHash.calculateAdjacent(neighbors.right,'top');
+   neighbors.bottomright = GeoHash.calculateAdjacent(neighbors.right,'bottom');
+   neighbors.bottomleft = GeoHash.calculateAdjacent(neighbors.left,'bottom');
+
+   var finished = _.after(9, callbackComplete)
+
+   // massive query
+   var c = 1;
+   _.each(neighbors, function(localhash, spot) {
+       console.log(localhash);
+        var deferred = function() {
+            $.couch.db('').view(app.ddoc + '/byGeohashExact', {
+                startkey : [localhash,{}],
+                endkey : [localhash],
+                descending : true,
+                reduce : false,
+                limit : 10,
+                include_docs : true,
+                success : function(results) {
+                   if (results.rows && results.rows.length > 0) {
+                        callbackBlock(results.rows);
+                   }
+                   finished();
+                }
+            });
+        }
+        _.delay(deferred, 100 * c++);
+   });
+
+}
+
+
+
 
 
 app.routes = {
@@ -188,6 +260,36 @@ app.routes = {
                     });
                     
                 }
+          },
+          '/located/([^/]+)' : {
+              on: function(geohash) {
+                app.view.activeCategory('topics');
+                app.view.mainPageChange('topics');
+                var memo = [];
+                var neighborsCount = 0;
+                if (geohash.length >= 8) {
+                    geohash = geohash.substr(0,8);
+                }
+
+                
+                app.controller.findClosest(geohash, null, function(rows){
+                    memo = memo.concat(rows);
+                    neighborsCount++;
+                }, function() {
+                    var results = {};
+                    var now = new Date().getTime();
+                    if (neighborsCount > 1) {
+                        results.rows = _.sortBy(memo,function(item) { return now - item.doc.timestamp} )
+                    } else {
+                        results.rows = memo;
+                    }
+                    
+                    app.view.showTopics(results);
+                    var tags = app.controller.findDistinctTags(results);
+                    app.view.showDistinctTags(tags);
+                })
+
+              }
           },
           '/new' : {
                 "/([^/]+)" : {
