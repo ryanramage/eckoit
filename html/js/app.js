@@ -211,7 +211,6 @@ app.controller.findClosest =  function getClosest(geohash, resolution, callbackB
    // massive query
    var c = 1;
    _.each(neighbors, function(localhash, spot) {
-       console.log(localhash);
         var deferred = function() {
             $.couch.db('').view(app.ddoc + '/byGeohashExact', {
                 startkey : [localhash,{}],

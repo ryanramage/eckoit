@@ -12,6 +12,13 @@ $(document).ready(function(){
     }) ;
 
 
+    $('.topicFilter li').live('click', function() {
+        var sort = $(this).data('sort');
+        
+    });
+
+
+
     app.onDomReady();
 
     $("time.timeago").timeago();

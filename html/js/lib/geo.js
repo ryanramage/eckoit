@@ -127,19 +127,22 @@ exports.GeoHash = GeoHash;
 Geotag = (function(){
     var updateLocation = null;
     var currentPosition = null;
-    var onFail = null;
+    var callbackFail = null;
+
+    var onSuccess = function(position) {
+        currentPosition = position;
+    }
+    var onFail = function(error) {
+            currentPosition = null;
+            if (callbackFail) {
+                callbackFail(error);
+            }
+    }
 
     return  {
         init : function(failCallback) {
             onFail = failCallback;
-            navigator.geolocation.watchPosition(app.geotag.success, app.geotag.fail, {enableHighAccuracy: true});
-        },
-        success: function (position) {
-            currentPosition = position;
-        },
-        fail: function(error) {
-            currentPosition = null;
-            onFail(error);
+            navigator.geolocation.watchPosition(onSuccess, onFail, {enableHighAccuracy: true});
         },
         stop: function() {
             navigator.geolocation.clearWatch(updateLocation);

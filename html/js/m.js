@@ -6,11 +6,13 @@ app.controller = app.controller || {};
 app.model = {};
 app.model.current_tag_group = {};
 
+jQuery.couch.urlPrefix = 'api';
+
 app.controller.init = function(details) {
     if (!details.tag_groups) return;
     app.model.details = details;
     $.each(details.tag_groups, function(i, group) {
-        app.controller.addTagGroup(group);
+        app.controller.addTagGroup(i, group);
     });
 
     app.controller.showTagGroup(details.tag_groups[0]);
@@ -63,9 +65,20 @@ app.controller.init = function(details) {
         
         return false;
     });
+
+    var fix = function() {
+
+        $('.utaggroups').data('role', 'navbar')
+        $('.utaggroups').navbar();
+        $('.tag-group-tags').trigger('create');
+    }
+    setTimeout(fix, 2);
+
+
 }
 
-app.controller.addTagGroup = function(group) {
+app.controller.addTagGroup = function(i, group) {
+
     var content = $('<li><a href="#"  class="tab  '+group.name+'" >'+ group.name+ '</a></li>');
     $('.tag-groups').append(content);
     content.find('a').click(function() {
@@ -139,53 +152,11 @@ app.uploadLocalTags = function() {
 
 
 $('#utag').live('pagecreate',function(event){
-      var details = {
-        tag_groups: [
-            {
-                name: "Home",
-                tags : [
-                    {
-                        name: "Funny",
-                        id : "12345"
-                    },
-                    {
-                        name : "Helarity"
-                    }
-                ]
-            },
-            {
-                name : "Work",
-                always_tag: ['work'],
-                tags : [
-                    {
-                        name : "Todo"
-                    },
-                    {
-                        name : "Delegate"
-                    },
-                    {
-                        name : "Earthy"
-                    }
-                ]
-            },
-            {
-                name : "Phone",
-                always_tag: [],
-                tags : [
-                    {
-                        name : "mamba"
-                    },
-                    {
-                        name : "baba"
-                    },
-                    {
-                        name : "nobo"
-                    }
-                ]
-            },
-        ]
-    };
-    app.controller.init(details);
+    $.couch.db('').openDoc('-settings', {
+        success : function(doc) {
+            app.controller.init(doc);
+        }
+    });
 
 });
 
@@ -217,7 +188,7 @@ app.controller.addCurrentPosition = function(doc, callback) {
 
 $(function() {
 
-    jQuery.couch.urlPrefix = 'api';
+    
 
     // handle the tag groups
     $('.tab').live('click', function() {
