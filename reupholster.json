@@ -1,8 +1,8 @@
 {
   couch : {
     host : "localhost",
-    port : 5984,
-    db : "ecko-it"
+    port : 5983,
+    db : "life"
   },
   test-couch : {
     host : "ecko-it.iriscouch.com",

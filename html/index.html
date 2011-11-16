@@ -11,11 +11,21 @@
 
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fullcalendar.css">
     <link rel="stylesheet" href="css/local.css">
 
+
+    <script>
+        Timeline_ajax_url = "js/lib/timeline_2.3.1/timeline_ajax/simile-ajax-api.js";
+        Timeline_urlPrefix = 'js/lib/timeline_2.3.1/timeline_js/';
+        Timeline_parameters = 'bundle=true';
+    </script>
+
+    <script src="js/lib/timeline_2.3.1/timeline_js/timeline-api.js"></script>
     <script src="js/lib/head.min.js"></script>
     <script>
-        head.js("js/lib/jquery-1.6.2.min.js", 
+        head.js("js/lib/jquery-1.6.2.min.js",
+                "js/lib/jquery-ui-1.8.11.custom.min.js",
                 "js/lib/SS.min.js",
                 "js/lib/underscore.js",
                 "js/lib/json2.js",
@@ -28,6 +38,9 @@
                 "js/lib/bootstrap-tabs.js",
                 "js/lib/jquery.timeago.js",
                 "js/lib/geo.js",
+                "js/lib/raphael-min.js",
+                "js/lib/date-utils.min.js",
+                "js/lib/fullcalendar.min.js",
                 "js/app.js",
                 "js/onready.js"
             );
@@ -299,6 +312,9 @@
                     </p>
                 </div>
             </div>
+            <footer>
+                <p>&copy; Eckoit Inc. 2011</p>
+            </footer>
         </script>
 
         <script id="topicNewTemplate" type="text/html">
@@ -355,7 +371,21 @@
         </script>
 
 
+        <script id="timelineTemplate" type="text/html">
+  
+            <div class="calendar-ui">
 
+            </div>
+            <div id="timeline-ui" style="">
+
+
+            </div>
+
+            <footer>
+                <p>&copy; Eckoit Inc. 2011</p>
+            </footer>
+
+        </script>
 
 
         <script id="topicTemplate" type="text/html">
@@ -364,6 +394,10 @@
         <script id="bookmarkTemplate" type="text/html">
 
         </script>
+
+
+
+
 
         <footer>
             <p>&copy; Eckoit Inc. 2011</p>

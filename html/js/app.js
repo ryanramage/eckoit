@@ -232,7 +232,118 @@ app.controller.findClosest =  function getClosest(geohash, resolution, callbackB
 
 }
 
+app.controller.createTimeline = function() {
+    var initialDate = new Date();
+    var utcOffset = initialDate.getUTCOffset();
 
+    // hack attack. Not sure what timeline really wants?
+    var timeZoneOffset = parseInt(utcOffset[0] + utcOffset[2]);
+    var eventSource = new Timeline.DefaultEventSource();
+    var theme = Timeline.ClassicTheme.create();
+    var bandInfos = [
+        Timeline.createBandInfo({
+            overview:       true,
+            layout:         'overview',
+            eventSource:    eventSource,
+            width:          "20%",
+            intervalUnit:   Timeline.DateTime.HOUR,
+            intervalPixels: 50,
+            theme: theme,
+            date : initialDate,
+            timeZone: timeZoneOffset
+        }),
+
+        Timeline.createBandInfo({
+            eventSource:    eventSource,
+            width:          "80%",
+            intervalUnit:   Timeline.DateTime.MINUTE,
+            intervalPixels: 30,
+            theme: theme,
+            date : initialDate,
+            timeZone: timeZoneOffset
+        })
+    ];
+    
+    bandInfos[0].highlight = true;
+    bandInfos[0].syncWith = 1;
+
+    var tl = Timeline.create(document.getElementById("timeline-ui"), bandInfos);
+
+
+    var date = new Date();
+		var d = date.getDate();
+		var m = date.getMonth();
+		var y = date.getFullYear();
+
+    $('.calendar-ui').fullCalendar({
+        selectable: true,
+        header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek'
+        },
+        editable: true,
+        events: [
+                {
+                        title: 'All Day Event',
+                        start: new Date(y, m, 1)
+                },
+                {
+                        title: 'Long Event',
+                        start: new Date(y, m, d-5),
+                        end: new Date(y, m, d-2)
+                },
+                {
+                        id: 999,
+                        title: 'Repeating Event',
+                        start: new Date(y, m, d-3, 16, 0),
+                        allDay: false
+                },
+                {
+                        id: 999,
+                        title: 'Repeating Event',
+                        start: new Date(y, m, d+4, 16, 0),
+                        allDay: false
+                },
+                {
+                        title: 'Meeting',
+                        start: new Date(y, m, d, 10, 30),
+                        allDay: false
+                },
+                {
+                        title: 'Lunch',
+                        start: new Date(y, m, d, 12, 0),
+                        end: new Date(y, m, d, 14, 0),
+                        allDay: false
+                },
+                {
+                        title: 'Lunch',
+                        start: new Date(y, m, d, 12, 0),
+                        end: new Date(y, m, d, 14, 0),
+                        allDay: false
+                },
+                {
+                        title: 'Lunch',
+                        start: new Date(y, m, d, 12, 0),
+                        end: new Date(y, m, d, 14, 0),
+                        allDay: false
+                },
+                {
+                        title: 'Birthday Party',
+                        start: new Date(y, m, d+1, 19, 0),
+                        end: new Date(y, m, d+1, 22, 30),
+                        allDay: false
+                },
+                {
+                        title: 'Click for Google',
+                        start: new Date(y, m, 28),
+                        end: new Date(y, m, 29),
+                        url: 'http://google.com/'
+                }
+        ]
+
+    });
+}
 
 
 
@@ -244,7 +355,12 @@ app.routes = {
             }
         },
         '/timeline' : {
-            on : function() {app.view.activeCategory('timeline')}
+            on : function() {
+                app.view.activeCategory('timeline');
+                app.view.mainPageChange('timeline');
+                //$('.timeline-ui').timeline();
+                app.controller.createTimeline();
+            }
         },
         '/topics': {
           '/tagged/([^/]+)': {
@@ -305,7 +421,7 @@ app.routes = {
                             $('.topicTypeForm').html( ich[template]()  );
                         } catch(e) {}
                         $('form.newForm .save').click(function() {
-                            console.log('save: ' + newType);
+        
                             app.controller.save[newType]();
                             return false;
                         });

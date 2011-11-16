@@ -68,3 +68,41 @@ body {
 
 
 
+.tagholder .position {
+    font-size: 18px;
+}
+
+
+
+
+table.fc-header {
+    border: none !important;
+    margin-bottom: 3px;
+}
+
+table.fc-border-separate {
+    border: none !important;
+    margin-bottom: 0px;
+}
+
+td.fc-header-center {
+    border-left: none !important;
+}
+
+td.fc-header-right {
+    border-left: none !important;
+}
+
+
+
+#timeline-ui {
+   height: 252px;
+   border: 1px solid #aaa;
+   
+}
+
+.calendar-ui {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
