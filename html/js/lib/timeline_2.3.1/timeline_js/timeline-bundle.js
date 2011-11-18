@@ -1782,8 +1782,14 @@ if(A==0){C=B.getUTCHours()+":00";
 E=true;
 }else{C=A;
 }break;
-case SimileAjax.DateTime.HOUR:C=B.getUTCHours()+"hr";
-break;
+case SimileAjax.DateTime.HOUR:
+    var hr = B.getUTCHours()
+    if (hr === 0) {
+        C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();
+    } else {
+        C=B.getUTCHours()+"hr";
+    }
+    break;
 case SimileAjax.DateTime.DAY:C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();
 break;
 case SimileAjax.DateTime.WEEK:C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();
