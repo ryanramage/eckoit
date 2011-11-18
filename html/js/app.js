@@ -129,7 +129,7 @@ app.controller.findTopics = function(tags, callback, sort) {
 
 
 app.controller.findDistinctTags = function(results, filterTags) {
-    var tag_arr = _.map(results.rows, function(row){ return row.doc.tags  });
+    var tag_arr = _.map(results.rows, function(row){return row.doc.tags});
     var tags = _.union(tag_arr);
 
     if (filterTags) {
@@ -143,7 +143,7 @@ app.controller.findDistinctTags = function(results, filterTags) {
 
 
 app.view.showDistinctTags = function(tags) {
-    $('.related.unstyled').html( ich['relatedTagsTemplate']( { tags : tags} )  );
+    $('.related.unstyled').html( ich['relatedTagsTemplate']( {tags : tags} )  );
 }
 
 
@@ -232,8 +232,25 @@ app.controller.findClosest =  function getClosest(geohash, resolution, callbackB
 
 }
 
-app.controller.createTimeline = function() {
-    var initialDate = new Date();
+
+app.controller.parseRequestedDate = function(date) {
+
+	date = unescape(date);
+        date = date.replace(/_/g," ");
+        var resultDate = new Date(Date.parse(date));
+        if (!resultDate) {
+            resultDate = new Date(date);
+        }
+
+        return resultDate;
+	
+}
+
+
+app.controller.createTimeline = function(initialDate) {
+
+    if (!initialDate) initialDate = new Date();
+
     var utcOffset = initialDate.getUTCOffset();
 
     // hack attack. Not sure what timeline really wants?
@@ -270,78 +287,12 @@ app.controller.createTimeline = function() {
     var tl = Timeline.create(document.getElementById("timeline-ui"), bandInfos);
 
 
-    var date = new Date();
-		var d = date.getDate();
-		var m = date.getMonth();
-		var y = date.getFullYear();
 
-    $('.calendar-ui').fullCalendar({
-        selectable: true,
-        header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'month,agendaWeek'
-        },
-        editable: true,
-        events: [
-                {
-                        title: 'All Day Event',
-                        start: new Date(y, m, 1)
-                },
-                {
-                        title: 'Long Event',
-                        start: new Date(y, m, d-5),
-                        end: new Date(y, m, d-2)
-                },
-                {
-                        id: 999,
-                        title: 'Repeating Event',
-                        start: new Date(y, m, d-3, 16, 0),
-                        allDay: false
-                },
-                {
-                        id: 999,
-                        title: 'Repeating Event',
-                        start: new Date(y, m, d+4, 16, 0),
-                        allDay: false
-                },
-                {
-                        title: 'Meeting',
-                        start: new Date(y, m, d, 10, 30),
-                        allDay: false
-                },
-                {
-                        title: 'Lunch',
-                        start: new Date(y, m, d, 12, 0),
-                        end: new Date(y, m, d, 14, 0),
-                        allDay: false
-                },
-                {
-                        title: 'Lunch',
-                        start: new Date(y, m, d, 12, 0),
-                        end: new Date(y, m, d, 14, 0),
-                        allDay: false
-                },
-                {
-                        title: 'Lunch',
-                        start: new Date(y, m, d, 12, 0),
-                        end: new Date(y, m, d, 14, 0),
-                        allDay: false
-                },
-                {
-                        title: 'Birthday Party',
-                        start: new Date(y, m, d+1, 19, 0),
-                        end: new Date(y, m, d+1, 22, 30),
-                        allDay: false
-                },
-                {
-                        title: 'Click for Google',
-                        start: new Date(y, m, 28),
-                        end: new Date(y, m, 29),
-                        url: 'http://google.com/'
-                }
-        ]
 
+    $('.timelineplayer').timelineaudioplayer({
+        timeline: tl,
+        initialDate : initialDate,
+        calendarDiv : $('.calendar-ui')
     });
 }
 
@@ -355,6 +306,14 @@ app.routes = {
             }
         },
         '/timeline' : {
+            "/([^/]+)" : {
+                on : function(textDate) {
+                    var actualDate = app.controller.parseRequestedDate(textDate);
+                    app.view.activeCategory('timeline');
+                    app.view.mainPageChange('timeline');
+                    app.controller.createTimeline(actualDate);
+                }
+            },
             on : function() {
                 app.view.activeCategory('timeline');
                 app.view.mainPageChange('timeline');
@@ -394,7 +353,7 @@ app.routes = {
                     var results = {};
                     var now = new Date().getTime();
                     if (neighborsCount > 1) {
-                        results.rows = _.sortBy(memo,function(item) { return now - item.doc.timestamp} )
+                        results.rows = _.sortBy(memo,function(item) {return now - item.doc.timestamp} )
                     } else {
                         results.rows = memo;
                     }
