@@ -1511,6 +1511,7 @@ break;
 }B.setTime(C.getTime()-D);
 };
 SimileAjax.DateTime.removeTimeZoneOffset=function(B,A){return new Date(B.getTime()+A*SimileAjax.DateTime.gregorianUnitLengths[SimileAjax.DateTime.HOUR]);
+//SimileAjax.DateTime.removeTimeZoneOffset=function(B,A){return B;
 };
 SimileAjax.DateTime.getTimezone=function(){var A=new Date().getTimezoneOffset();
 return A/-60;

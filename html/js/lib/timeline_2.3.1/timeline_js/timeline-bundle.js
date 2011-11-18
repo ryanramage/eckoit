@@ -1769,6 +1769,7 @@ if(B==null){B=Timeline.GregorianDateLabeller.prototype.defaultLabelInterval;
 }return B.call(this,A,C);
 };
 Timeline.GregorianDateLabeller.prototype.labelPrecise=function(A){return SimileAjax.DateTime.removeTimeZoneOffset(A,this._timeZone).toUTCString();
+//Timeline.GregorianDateLabeller.prototype.labelPrecise=function(A){return SimileAjax.DateTime.removeTimeZoneOffset(A,this._timeZone).toLocaleDateString();
 };
 Timeline.GregorianDateLabeller.prototype.defaultLabelInterval=function(B,F){var C;
 var E=false;
