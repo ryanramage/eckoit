@@ -256,6 +256,7 @@ app.controller.createTimeline = function(initialDate) {
     // hack attack. Not sure what timeline really wants?
     var timeZoneOffset = parseInt(utcOffset[0] + utcOffset[2]);
     var eventSource = new Timeline.DefaultEventSource();
+    SimileAjax.History.enabled = false;
     var theme = Timeline.ClassicTheme.create();
     var bandInfos = [
         Timeline.createBandInfo({

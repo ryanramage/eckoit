@@ -65,15 +65,12 @@ describe("Timeline integration", function() {
           var ytime_middle = yesterday;;
           var ytime = ytime_middle.getTime();
 
-          console.log(ytime_middle.toString())
-
           //5 seconds either side, yes, generous
           var min = ytime - 5000;
           var max = ytime + 5000;
 
           var shown = timeline.getBand(1).getCenterVisibleDate().getTime();
 
-          console.log(new Date(shown).toString());
 
           expect(shown).toBeLessThan(max);
           expect(shown).toBeGreaterThan(min);
