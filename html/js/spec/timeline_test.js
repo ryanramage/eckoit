@@ -74,13 +74,8 @@ describe("Timeline integration", function() {
 
           expect(shown).toBeLessThan(max);
           expect(shown).toBeGreaterThan(min);
-
-
           $('#calendar-ui').fullCalendar('destroy');
       })
-
-
-
   });
 
 

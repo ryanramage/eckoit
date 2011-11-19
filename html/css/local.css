@@ -101,7 +101,7 @@ td.fc-header-right {
    
 }
 
-.calendar-ui {
+#calendar-ui {
     width: 800px;
     margin-left: auto;
     margin-right: auto;

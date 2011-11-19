@@ -1788,7 +1788,14 @@ case SimileAjax.DateTime.HOUR:
     if (hr === 0) {
         C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();
     } else {
-        C=B.getUTCHours()+"hr";
+        var ampm = 'am';
+        var hrs = B.getUTCHours();
+        var hrs12 = hrs % 12;
+        if (hrs >= 12) ampm = 'pm';
+        if (hrs == 12) hrs12 = 12;
+        C=hrs12 + ampm;
+
+        //C=B.getUTCHours()+"hr";
     }
     break;
 case SimileAjax.DateTime.DAY:C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();
