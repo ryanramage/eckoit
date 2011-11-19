@@ -292,7 +292,7 @@ app.controller.createTimeline = function(initialDate) {
     $('.timelineplayer').timelineaudioplayer({
         timeline: tl,
         initialDate : initialDate,
-        calendarDiv : $('.calendar-ui')
+        calendarDiv : $('#calendar-ui')
     });
 }
 

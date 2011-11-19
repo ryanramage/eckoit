@@ -1578,7 +1578,7 @@ if(F){F=(F.nodeType==1||F.nodeType==9)?F:F.parentNode;
 }return true;
 };
 if(SimileAjax.Platform.browser.isIE){C.attachEvent("on"+B,A);
-}else{C.addEventListener(B,A,false);
+}else{ if (C) C.addEventListener(B,A,false);
 }};
 SimileAjax.DOM.getPageCoordinates=function(B){var E=0;
 var D=0;

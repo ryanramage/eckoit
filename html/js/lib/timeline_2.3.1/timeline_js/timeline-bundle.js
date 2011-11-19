@@ -287,7 +287,7 @@ return false;
 };
 Timeline._Band.prototype._autoScroll=function(D,C){var A=this;
 var B=SimileAjax.Graphics.createAnimation(function(E,F){A._moveEther(F);
-},0,D,1000,C);
+},0,D,100,C);
 B.run();
 };
 Timeline._Band.prototype._moveEther=function(A){this.closeBubble();

@@ -10,7 +10,7 @@ scenario "All Javascript Specs Pass", {
         go baseUrl
 
     }
-    then "The title shown is meeting", {
+    then "The title shown is Jasmine Test Runner", {
         page.title.shouldBe "Jasmine Test Runner"
     }
     and "runner passed", {
@@ -26,5 +26,28 @@ scenario "All Javascript Specs Pass", {
 }
 
 
+scenario "All Timeline Specs Pass", {
 
+    given "On the default page", {
+        baseUrl = System.getProperty("geb.build.baseUrl")
+    }
+    when "we open the index page", {
+        baseUrl += 'js/TimelineSpecRunner.html'
+        go baseUrl
+
+    }
+    then "The title shown is Jasmine Test Runner", {
+        page.title.shouldBe "Jasmine Test Runner"
+    }
+    and "runner passed", {
+        waitFor(30) {
+
+            $(".runner").classes().contains("passed") || $(".runner").classes().contains("failed")
+        };
+        System.out.println ( $("div")*.text() );
+        assert $("div.runner").classes().contains("passed");
+
+    }
+
+}
 

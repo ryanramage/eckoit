@@ -16,6 +16,8 @@
     }
 
 
+
+
     var methods = {
         init : function(options) {
             return this.each(function() {
@@ -63,35 +65,47 @@
                     $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
                 }
 
-
-
+                data = $this.data('timelineplayer', {
+                    element : $this,
+                    settings: settings
+                });
             });
+        },
+        timeline : function() {
+             return $(this).data('timelineplayer').settings.timeline;
+        },
+        destroy : function() {
+            $(this).data('timelineplayer').settings.calendarDiv.fullCalendar('destroy');
         }
     }
 
 
     function normalizeTimelineForDaylightSavings(dateToFix, initialDate) {
+
+        var dateClone = new Date(dateToFix.getTime());
+
         // if the offset is different than the inital date, we bump it
-        var firstOffset = dateToFix.getTimezoneOffset();
+        var firstOffset = dateClone.getTimezoneOffset();
         var secondOffset = initialDate.getTimezoneOffset();
         if (firstOffset != secondOffset) {
 
             var diffMin = secondOffset - firstOffset  ;
-             dateToFix.addMinutes(diffMin);
-            return dateToFix;
+             dateClone.addMinutes(diffMin);
+            return dateClone;
         }
         return dateToFix;
     }
 
     function denormalize(dateToFix, initialDate) {
-                // if the offset is different than the inital date, we bump it
-        var firstOffset = dateToFix.getTimezoneOffset();
+        // if the offset is different than the inital date, we bump it
+        var dateClone = new Date(dateToFix.getTime());
+        var firstOffset = dateClone.getTimezoneOffset();
         var secondOffset = initialDate.getTimezoneOffset();
         if (firstOffset != secondOffset) {
 
             var diffMin = secondOffset - firstOffset  ;
-             dateToFix.addMinutes(-diffMin);
-            return dateToFix;
+             dateClone.addMinutes(-diffMin);
+            return dateClone;
         }
         return dateToFix;
     }
@@ -102,14 +116,14 @@
         var startDate = settings.initialDate;
         var internalDateChange = false;
 
-        settings.timeline.getBand(0).addOnScrollListener(function(band) {
+        settings.timeline.getBand(1).addOnScrollListener(function(band) {
             if (internalDateChange) return;
-            normalizeTimelineForDaylightSavings(settings.timeline.getBand(0).getCenterVisibleDate(), startDate);
+            normalizeTimelineForDaylightSavings(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
             var update = {
                   source : 'timeline',
-                  centreDate : denormalize(settings.timeline.getBand(0).getCenterVisibleDate(), startDate),
-                  minDate : denormalize(settings.timeline.getBand(0).getMinDate(), startDate),
-                  maxDate : denormalize(settings.timeline.getBand(0).getMaxDate(), startDate)
+                  centreDate : denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate),
+                  minDate : denormalize(settings.timeline.getBand(1).getMinDate(), startDate),
+                  maxDate : denormalize(settings.timeline.getBand(1).getMaxDate(), startDate)
             }
 
             timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
@@ -121,7 +135,8 @@
                 internalDateChange = true;
                 //this is a hack around timeline. 
                 var normal = normalizeTimelineForDaylightSavings(data.centreDate, startDate);
-                settings.timeline.getBand(0).setCenterVisibleDate(normal);
+                settings.timeline.getBand(1).setCenterVisibleDate(normal);
+                //settings.timeline.getBand(0).scrollToCenter(normal);
                 internalDateChange = false;
             }
         });
@@ -159,12 +174,27 @@
             viewDisplay : function(view) {
                 if (internalDateChange) return;
 
+                var offsetHrs = 9;
+
+                var date = new Date(view.start.getTime()).addHours(offsetHrs);
+
+
                 var update = {
                       source : CALENDAR_SOURCE,
-                      centreDate : view.start,
+                      centreDate : date,
                       minDate : view.start,
                       maxDate : view.end
                 }
+
+                if (view && view.name == "agendaWeek") {
+                    var today = new Date();
+                    if (today.between(view.start,  view.end)) {
+                        update.centreDate = today;
+                    }
+                }
+
+
+
 
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
                 
@@ -172,9 +202,15 @@
             select : function(startDate, endDate, allDay, jsEvent, view) {
                 if (internalDateChange) return;
 
+                var offsetHrs = 0;
+
+                if (view && view.name == "month") {
+                    // add 9hrs. gives a good start to the day
+                    offsetHrs = 9;
+                }
                 var update = {
                       source : CALENDAR_SOURCE,
-                      centreDate : startDate,
+                      centreDate : startDate.addHours(offsetHrs),
                       minDate : startDate,
                       maxDate : endDate
                 }
@@ -182,12 +218,24 @@
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
             },
             eventClick: function(calEvent, jsEvent, view) {
+
+                var offsetHrs = 0;
+
+                if (calEvent.allDay) {
+                    // add 9hrs. gives a good start to the day
+                    offsetHrs = 9;
+                }
+
+                var date = new Date(calEvent.start.getTime()).addHours(offsetHrs);
+
                 var update = {
                       source : CALENDAR_SOURCE,
-                      centreDate : calEvent.start,
-                      minDate : calEvent.start,
+                      centreDate : date,
+                      minDate : date,
                       maxDate : null
                 }
+
+
 
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
             },
@@ -201,8 +249,6 @@
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
             if (data.source != 'calendar') {
                 internalDateChange = true;
-
-                console.log('setting cal: ', data.centreDate.toString());
 
                 settings.calendarDiv.fullCalendar('gotoDate', data.centreDate);
                 settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, true);
