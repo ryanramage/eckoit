@@ -246,6 +246,145 @@ app.controller.parseRequestedDate = function(date) {
 	
 }
 
+app.controller.loadedAudio = {};
+
+app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) {
+
+
+
+    $.couch.db('').view(app.ddoc + '/audio_by_time', {
+        startkey :  minDate.getTime(),
+        endkey : maxDate.getTime(),
+        error : function() {
+
+        },
+        success : function(results) {
+
+            var centerItem;
+            var recordings = [];
+            $.each(results.rows, function(i, item) {
+                if (app.controller.loadedAudio[item.id]) return;
+
+                if (item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
+                    centerItem = item;
+                }
+
+                var recording =  {
+                    eventID: item.id,
+                    start: new Date(item.value.start),
+                    end: new Date(item.value.end),
+                    durationEvent : true,
+                    title : "",
+                    caption : "Recording",
+                    trackNum : 1
+                }
+                recordings.push(recording);
+            });
+            callback({
+                recordings: recordings,
+                centerItem : centerItem
+            });
+        }
+    })
+}
+
+    function tagToTimelineMarkerTitle(tag) {
+        var tagString = "Mark";
+        if (tag.tags) {
+            tagString = _.reduce(tag.tags, function(memo, tag){return memo + ',' + tag}, '').substring(1);
+
+        }
+        var title = " [" + tagString +"]";
+        if (tag.text) {
+            title = tag.text + " [" + tagString +"]";
+        }
+        return title;
+    }
+
+app.controller.typeToTimelineModel = {
+    "com.eckoit.utag" : function(doc) {
+        var base = {
+            eventID: doc._id,
+            start: new Date(doc.timestamp),
+            durationEvent : false,
+            //end : new Date(item.value.end),
+            title : tagToTimelineMarkerTitle(doc),
+
+            caption : "Liferecorder Mark"
+
+        };
+        //if(isTagNotEdited(item.value)) {
+        //    base.classname = 'untagged';
+       // }
+        return base;
+    },
+    "com.eckoit.liferecorder.mark" : function(doc) {
+
+        var base = {
+            eventID: doc._id,
+            start: new Date(doc.timestamp),
+            durationEvent : false,
+            //end : new Date(item.value.end),
+            title : tagToTimelineMarkerTitle(doc),
+            
+            caption : "Liferecorder Mark"
+
+        };
+        //if(isTagNotEdited(item.value)) {
+        //    base.classname = 'untagged';
+       // }
+        return base;
+    }
+}
+
+
+app.controller.typeToCalendarModel = {
+    "com.eckoit.utag" : function(doc) {
+
+    },
+    "com.eckoit.liferecorder.mark" : function(doc) {
+
+    }
+}
+
+
+app.controller.loadedEvents = {};
+
+app.controller.timelineEvents = function(minDate, maxDate, callback, reload) {
+   $.couch.db('').view(app.ddoc + '/timeline_stuff', {
+        startkey :  minDate.getTime(),
+        endkey : maxDate.getTime(),
+        include_docs : true,
+        error : function() {
+
+        },
+        success : function(results) {
+
+            var timelineModel = [];
+            var calendarModel = [];
+            $.each(results.rows, function(i, row) {
+
+
+                if(app.controller.loadedEvents[row.id]) return;
+
+                var test = app.controller.typeToTimelineModel[row.value];
+                var tl  = app.controller.typeToTimelineModel[row.value](row.doc);
+                var cal = app.controller.typeToCalendarModel[row.value](row.doc);
+                timelineModel.push(tl);
+                calendarModel.push(cal);
+                app.controller.loadedEvents[row.id] = true;
+            });
+
+            callback({
+                timelineModel: timelineModel,
+                calendarModel : calendarModel
+            });
+        }
+    })
+}
+
+
+
 
 app.controller.createTimeline = function(initialDate) {
 
@@ -285,15 +424,47 @@ app.controller.createTimeline = function(initialDate) {
     bandInfos[0].highlight = true;
     bandInfos[0].syncWith = 1;
 
+
+    var earliest = null;
+    var latest   = null;
+
     var tl = Timeline.create(document.getElementById("timeline-ui"), bandInfos);
 
+    var audioProvider = function(date_change_event, callback) {
 
+        // first query
+        if (earliest == null && latest == null) {
+            earliest = date_change_event.minDate;
+            latest   = date_change_event.maxDate;
+            app.controller.timelineAudio(date_change_event.minDate, date_change_event.maxDate, date_change_event.centreDate ,callback, false);
+        } else if (date_change_event.minDate && date_change_event.minDate.isBefore(earliest)) {
+            // we need before
+            var endForThisQuery = earliest;
+            earliest = date_change_event.minDate;
+            app.controller.timelineAudio(earliest, endForThisQuery, date_change_event.centreDate ,callback, false);
+         } else if (date_change_event.maxDate && date_change_event.maxDate.isAfter(latest)) {
+             var beginOfThisQuery = latest;
+             latest = date_change_event.maxDate;
+             app.controller.timelineAudio(beginOfThisQuery, latest, date_change_event.centreDate ,callback, false);
+         }
+    }
+
+
+    var seen = {};
+    // no cache for events
+    var eventProvider = function(date_change_event, callback) {
+        app.controller.timelineEvents(date_change_event.minDate, date_change_event.maxDate,callback);
+
+    }
 
 
     $('.timelineplayer').timelineaudioplayer({
         timeline: tl,
         initialDate : initialDate,
-        calendarDiv : $('#calendar-ui')
+        calendarDiv : $('#calendar-ui'),
+        timelineEventSource : eventSource,
+        audioProvider : audioProvider,
+        eventProvider : eventProvider
     });
 }
 

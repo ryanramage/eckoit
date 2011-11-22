@@ -7,6 +7,7 @@
 
     var UPDATE_DATE_VIEWS      = "timeline.audioplayer.views.updatedate";
     var USER_DATE_CHANGE_EVENT = "timeline.audioplayer.datechange";
+    var NEW_RESULTS_CHANGE_EVENT = "timeline.audioplayer.resultschange";
 
     var DATE_CHANGE_EVENT_TEMPLATE = {
         source : 'timeline',
@@ -30,9 +31,13 @@
                 var settings = {
                     swfPath: "/js/jPlayer",
                     initialDate : new Date(),
-                    eventProvider : function(startDate, endDate) {
-                        return [];
+                    eventProvider : function(date_change_event, callback) {
+                        callback([]);
                     },
+                    audioProvider : function(date_change_event, callback) {
+                        callback([]);
+                    },
+
                     debounceRate : 300
                 }
 
@@ -42,9 +47,9 @@
                 var $this = $(this);
 
                 
-
+                var calendar;
                 if (settings.calendarDiv) {
-                    createCalendar(settings, $this);
+                    calendar = createCalendar(settings, $this);
                 }
 
                 wireupTimeline(settings, $this);
@@ -61,8 +66,37 @@
                     
                 })
 
+                var event_data = {
+                    events : [
+                    ]
+                };
+
                 function broadcastNewDate() {
                     $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
+                    // query the db
+                    // get events for the widest net (usually just the calendar)
+                    var eventwindow = findWidestEventWindow(settings.timeline, calendar, lastDebouncedData);
+
+
+                    settings.audioProvider(eventwindow, function(results) {
+                        // show dem
+                        //settings.timelineEventSource..clear();
+
+                        event_data.events = event_data.events.concat(results.recordings);
+                        settings.timelineEventSource.clear();
+                        settings.timelineEventSource.loadJSON(event_data, document.location.href);
+                        $this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
+                    })
+
+                    settings.eventProvider(eventwindow, function(results) {
+                        if (results.timelineModel.length == 0) return;
+                        event_data.events = event_data.events.concat(results.timelineModel);
+                        settings.timelineEventSource.clear();
+                        settings.timelineEventSource.loadJSON(event_data, document.location.href);
+                        //$this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
+                    });
+
+
                 }
 
                 data = $this.data('timelineplayer', {
@@ -77,6 +111,18 @@
         destroy : function() {
             $(this).data('timelineplayer').settings.calendarDiv.fullCalendar('destroy');
         }
+    }
+
+
+    function findWidestEventWindow(timeline, calendar, lastDebouncedData) {
+        if (calendar) {
+            var view = calendar.fullCalendar( 'getView' );
+            lastDebouncedData.minDate = view.start;
+            lastDebouncedData.maxDate = view.end;
+        } else {
+            
+        }
+        return lastDebouncedData;
     }
 
 
@@ -154,22 +200,12 @@
 
         var initialDate = settings.initialDate;
 
-        settings.calendarDiv.fullCalendar({
+        var calendar = settings.calendarDiv.fullCalendar({
             header: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'month,agendaWeek'
             },
-            events: [
-                {
-                    title: 'Event1',
-                    start: new Date()
-                },
-                {
-                    title: 'Event2',
-                    start: '2011-11-01'
-                }
-            ],
             aspectRatio: 2,
             viewDisplay : function(view) {
                 if (internalDateChange) return;
@@ -211,8 +247,8 @@
                 var update = {
                       source : CALENDAR_SOURCE,
                       centreDate : startDate.addHours(offsetHrs),
-                      minDate : startDate,
-                      maxDate : endDate
+                      minDate : view.start,
+                      maxDate : view.end
                 }
 
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
@@ -255,7 +291,7 @@
                 internalDateChange = false;
             }
         });
-
+        return calendar;
 
 
     }
