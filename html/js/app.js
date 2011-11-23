@@ -271,14 +271,15 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
 
                 var recording =  {
                     eventID: item.id,
-                    start: new Date(item.value.start),
-                    end: new Date(item.value.end),
+                    start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(item.value.start)),
+                    end: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(item.value.end)),
                     durationEvent : true,
                     title : "",
                     caption : "Recording",
                     trackNum : 1
                 }
                 recordings.push(recording);
+                app.controller.loadedAudio[item.id] = true;
             });
             callback({
                 recordings: recordings,
@@ -305,12 +306,12 @@ app.controller.typeToTimelineModel = {
     "com.eckoit.utag" : function(doc) {
         var base = {
             eventID: doc._id,
-            start: new Date(doc.timestamp),
+            start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp)),
             durationEvent : false,
             //end : new Date(item.value.end),
             title : tagToTimelineMarkerTitle(doc),
 
-            caption : "Liferecorder Mark"
+            caption : "uTag"
 
         };
         //if(isTagNotEdited(item.value)) {
@@ -322,7 +323,7 @@ app.controller.typeToTimelineModel = {
 
         var base = {
             eventID: doc._id,
-            start: new Date(doc.timestamp),
+            start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp)),
             durationEvent : false,
             //end : new Date(item.value.end),
             title : tagToTimelineMarkerTitle(doc),
@@ -333,6 +334,7 @@ app.controller.typeToTimelineModel = {
         //if(isTagNotEdited(item.value)) {
         //    base.classname = 'untagged';
        // }
+
         return base;
     }
 }
@@ -340,10 +342,23 @@ app.controller.typeToTimelineModel = {
 
 app.controller.typeToCalendarModel = {
     "com.eckoit.utag" : function(doc) {
-
+        var base = {
+            id: doc._id,
+            title : tagToTimelineMarkerTitle(doc),
+            start: new Date(doc.timestamp).toString(),
+            allDay : false
+        }
+        console.log(base.start.toString());
+        return base;
     },
     "com.eckoit.liferecorder.mark" : function(doc) {
-
+        var base = {
+            id: doc._id,
+            title : tagToTimelineMarkerTitle(doc),
+            start: new Date(doc.timestamp).toString(),
+            allDay : false
+        }
+        return base;
     }
 }
 

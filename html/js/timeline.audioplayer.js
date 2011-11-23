@@ -90,10 +90,13 @@
 
                     settings.eventProvider(eventwindow, function(results) {
                         if (results.timelineModel.length == 0) return;
+
                         event_data.events = event_data.events.concat(results.timelineModel);
                         settings.timelineEventSource.clear();
                         settings.timelineEventSource.loadJSON(event_data, document.location.href);
                         //$this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
+                        console.log(results.calendarModel);
+                        calendar.fullCalendar('addEventSource',results.calendarModel).fullCalendar( 'rerenderEvents' )
                     });
 
 
@@ -117,8 +120,8 @@
     function findWidestEventWindow(timeline, calendar, lastDebouncedData) {
         if (calendar) {
             var view = calendar.fullCalendar( 'getView' );
-            lastDebouncedData.minDate = view.start;
-            lastDebouncedData.maxDate = view.end;
+            lastDebouncedData.minDate = view.visStart;
+            lastDebouncedData.maxDate = view.visEnd;
         } else {
             
         }
@@ -126,35 +129,7 @@
     }
 
 
-    function normalizeTimelineForDaylightSavings(dateToFix, initialDate) {
 
-        var dateClone = new Date(dateToFix.getTime());
-
-        // if the offset is different than the inital date, we bump it
-        var firstOffset = dateClone.getTimezoneOffset();
-        var secondOffset = initialDate.getTimezoneOffset();
-        if (firstOffset != secondOffset) {
-
-            var diffMin = secondOffset - firstOffset  ;
-             dateClone.addMinutes(diffMin);
-            return dateClone;
-        }
-        return dateToFix;
-    }
-
-    function denormalize(dateToFix, initialDate) {
-        // if the offset is different than the inital date, we bump it
-        var dateClone = new Date(dateToFix.getTime());
-        var firstOffset = dateClone.getTimezoneOffset();
-        var secondOffset = initialDate.getTimezoneOffset();
-        if (firstOffset != secondOffset) {
-
-            var diffMin = secondOffset - firstOffset  ;
-             dateClone.addMinutes(-diffMin);
-            return dateClone;
-        }
-        return dateToFix;
-    }
 
 
     function wireupTimeline(settings, timelineElement) {
@@ -167,7 +142,7 @@
             normalizeTimelineForDaylightSavings(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
             var update = {
                   source : 'timeline',
-                  centreDate : denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate),
+                  centreDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate),
                   minDate : denormalize(settings.timeline.getBand(1).getMinDate(), startDate),
                   maxDate : denormalize(settings.timeline.getBand(1).getMaxDate(), startDate)
             }
@@ -180,7 +155,7 @@
             if (data.source != 'timeline') {
                 internalDateChange = true;
                 //this is a hack around timeline. 
-                var normal = normalizeTimelineForDaylightSavings(data.centreDate, startDate);
+                var normal = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(data.centreDate, startDate);
                 settings.timeline.getBand(1).setCenterVisibleDate(normal);
                 //settings.timeline.getBand(0).scrollToCenter(normal);
                 internalDateChange = false;
@@ -277,7 +252,19 @@
             },
             selectable: true,
             unselectAuto: false,
-            editable: true
+            editable: true,
+            events: [
+                {
+                    title: 'My Event',
+                    start: 1321426715040,
+                    description: 'This is a cool event'
+                }
+                // more events here
+            ],
+            // can alter the event here
+            eventRender: function(event, element) {
+                
+            }
 
 
         }).fullCalendar('gotoDate', initialDate);
@@ -298,7 +285,39 @@
 
 
 
+    $.timelineaudioplayer = {
+         normalizeTimelineForDaylightSavings : function(dateToFix, initialDate) {
 
+            if (!initialDate) initialDate = new Date();
+
+            var dateClone = new Date(dateToFix.getTime());
+
+            // if the offset is different than the inital date, we bump it
+            var firstOffset = dateClone.getTimezoneOffset();
+            var secondOffset = initialDate.getTimezoneOffset();
+            if (firstOffset != secondOffset) {
+
+                var diffMin = secondOffset - firstOffset  ;
+                 dateClone.addMinutes(diffMin);
+                return dateClone;
+            }
+            return dateToFix;
+        },
+
+        denormalize : function(dateToFix, initialDate) {
+            // if the offset is different than the inital date, we bump it
+            var dateClone = new Date(dateToFix.getTime());
+            var firstOffset = dateClone.getTimezoneOffset();
+            var secondOffset = initialDate.getTimezoneOffset();
+            if (firstOffset != secondOffset) {
+
+                var diffMin = secondOffset - firstOffset  ;
+                 dateClone.addMinutes(-diffMin);
+                return dateClone;
+            }
+            return dateToFix;
+        }
+    }
 
 
 
