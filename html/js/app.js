@@ -274,8 +274,8 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
 
                 var recording =  {
                     eventID: item.id,
-                    start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(item.value.start)),
-                    end: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(item.value.end)),
+                    start: new Date(item.value.start),
+                    end: new Date(item.value.end),
                     durationEvent : true,
                     title : "",
                     caption : "Recording",
@@ -309,7 +309,7 @@ app.controller.typeToTimelineModel = {
     "com.eckoit.utag" : function(doc) {
         var base = {
             eventID: doc._id,
-            start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp)),
+            start: new Date(doc.timestamp),
             durationEvent : false,
             //end : new Date(item.value.end),
             title : app.controller.tagToTimelineMarkerTitle(doc),
@@ -318,7 +318,7 @@ app.controller.typeToTimelineModel = {
 
         };
         if (doc.duration) {
-            base.end = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp + doc.length));
+            base.end = new Date(doc.timestamp + doc.length);
         }
 
         
@@ -331,8 +331,8 @@ app.controller.typeToTimelineModel = {
 
         var base = {
             eventID: doc._id,
-            start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp)),
-            end :  $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp + doc.mark.length)),
+            start: new Date(doc.timestamp),
+            end :  new Date(doc.timestamp + doc.mark.length),
             durationEvent : false,
             //end : new Date(item.value.end),
             title : app.controller.tagToTimelineMarkerTitle(doc),
@@ -340,9 +340,6 @@ app.controller.typeToTimelineModel = {
             caption : "Liferecorder Mark"
 
         };
-
-        console.log('before: ' + new Date(doc.timestamp).toString());
-        console.log('adjusted: ' + base.start.toString());
         //if(isTagNotEdited(item.value)) {
         //    base.classname = 'untagged';
        // }

@@ -83,6 +83,16 @@
                         // show dem
                         //settings.timelineEventSource..clear();
 
+                        // normalize
+                        $.each(results, function(i, recording) {
+
+                            if (!recording) return;
+                            recording.start = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(recording.start,settings.initalDate);
+                            recording.end =   $.timelineaudioplayer.normalizeTimelineForDaylightSavings(recording.end,  settings.initalDate);
+
+                        });
+
+
                         event_data.events = event_data.events.concat(results.recordings);
                         settings.timelineEventSource.clear();
                         settings.timelineEventSource.loadJSON(event_data, document.location.href);
@@ -91,6 +101,14 @@
 
                     settings.eventProvider(eventwindow, function(results) {
                         if (results.timelineModel.length == 0) return;
+
+                        // normalize
+                        $.each(results, function(i, event) {
+                            event.start = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.start,settings.initalDate);
+                            event.end =   $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.end,  settings.initalDate);
+
+                        });
+
 
                         event_data.events = event_data.events.concat(results.timelineModel);
                         settings.timelineEventSource.clear();
@@ -317,8 +335,9 @@
     $.timelineaudioplayer = {
          normalizeTimelineForDaylightSavings : function(dateToFix, initialDate) {
 
+            if (!dateToFix) return null;
             if (!initialDate) initialDate = new Date();
-
+            
             var dateClone = new Date(dateToFix.getTime());
 
             // if the offset is different than the inital date, we bump it
