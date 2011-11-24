@@ -44,7 +44,7 @@ describe("Timeline integration", function() {
   });
 
 
-   it("Clicking on the calendar will change the timeline to that date but at 9am", function() {
+   it("Clicking on the calendar will change the timeline to that date but at 4pm", function() {
 
       // start with today
       app.controller.createTimeline();

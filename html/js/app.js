@@ -180,6 +180,7 @@ app.controller.showTopic = function(topic, div) {
         topic.datestamp = new Date(topic.timestamp);
         topic.datestamp_iso = iso8601(topic.datestamp);
         topic.datestamp_string = topic.datestamp.toLocaleString();
+        topic.datestamp_link = $.fullCalendar.formatDate(topic.datestamp, "d-MMM-yyyy_h:mm:ss_tt");
     }
 
     div.append( ich[template](topic)  );
@@ -289,18 +290,18 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
     })
 }
 
-    function tagToTimelineMarkerTitle(tag) {
-        var tagString = "Mark";
-        if (tag.tags) {
-            tagString = _.reduce(tag.tags, function(memo, tag){return memo + ',' + tag}, '').substring(1);
+ app.controller.tagToTimelineMarkerTitle = function (tag) {
+    var tagString = "Mark";
+    if (tag.tags) {
+        tagString = _.reduce(tag.tags, function(memo, tag){return memo + ',' + tag}, '').substring(1);
 
-        }
-        var title = " [" + tagString +"]";
-        if (tag.text) {
-            title = tag.text + " [" + tagString +"]";
-        }
-        return title;
     }
+    var title = " [" + tagString +"]";
+    if (tag.text) {
+        title = tag.text + " [" + tagString +"]";
+    }
+    return title;
+}
 
 app.controller.typeToTimelineModel = {
     "com.eckoit.utag" : function(doc) {
@@ -309,11 +310,16 @@ app.controller.typeToTimelineModel = {
             start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp)),
             durationEvent : false,
             //end : new Date(item.value.end),
-            title : tagToTimelineMarkerTitle(doc),
+            title : app.controller.tagToTimelineMarkerTitle(doc),
 
             caption : "uTag"
 
         };
+        if (doc.duration) {
+            base.end = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp + doc.length));
+        }
+
+        
         //if(isTagNotEdited(item.value)) {
         //    base.classname = 'untagged';
        // }
@@ -324,13 +330,15 @@ app.controller.typeToTimelineModel = {
         var base = {
             eventID: doc._id,
             start: $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp)),
+            end :  $.timelineaudioplayer.normalizeTimelineForDaylightSavings(new Date(doc.timestamp + doc.mark.length)),
             durationEvent : false,
             //end : new Date(item.value.end),
-            title : tagToTimelineMarkerTitle(doc),
+            title : app.controller.tagToTimelineMarkerTitle(doc),
             
             caption : "Liferecorder Mark"
 
         };
+
         //if(isTagNotEdited(item.value)) {
         //    base.classname = 'untagged';
        // }
@@ -340,25 +348,47 @@ app.controller.typeToTimelineModel = {
 }
 
 
+app.controller.isEventLength = function(start, end) {
+    if (!end) return false;
+    // if it is greater than 15 min, that is event for me.
+    if ((end.getTime() - start.getTime()) > (15 * 60 * 1000)) {
+        return true;
+    }
+    return false;
+}
+
+
 app.controller.typeToCalendarModel = {
     "com.eckoit.utag" : function(doc) {
+
         var base = {
             id: doc._id,
-            title : tagToTimelineMarkerTitle(doc),
-            start: new Date(doc.timestamp).toString(),
+            title : app.controller.tagToTimelineMarkerTitle(doc),
+            start: new Date(doc.timestamp),
             allDay : false
         }
-        console.log(base.start.toString());
-        return base;
+        if (doc.duration) {
+            base.end = new Date(doc.timestamp + doc.length)
+        }
+        if (app.controller.isEventLength(base.start, base.end)) {
+            return base;
+        }
+   
     },
     "com.eckoit.liferecorder.mark" : function(doc) {
         var base = {
             id: doc._id,
-            title : tagToTimelineMarkerTitle(doc),
-            start: new Date(doc.timestamp).toString(),
+            title : app.controller.tagToTimelineMarkerTitle(doc),
+            start: new Date(doc.timestamp),
+            end :  new Date(doc.timestamp + doc.mark.length),
             allDay : false
         }
-        return base;
+
+        if (app.controller.isEventLength(base.start, base.end)) {
+            return base;
+        }
+
+        
     }
 }
 
@@ -386,7 +416,9 @@ app.controller.timelineEvents = function(minDate, maxDate, callback, reload) {
                 var tl  = app.controller.typeToTimelineModel[row.value](row.doc);
                 var cal = app.controller.typeToCalendarModel[row.value](row.doc);
                 timelineModel.push(tl);
-                calendarModel.push(cal);
+                if (cal) {
+                    calendarModel.push(cal);
+                }
                 app.controller.loadedEvents[row.id] = true;
             });
 
@@ -404,6 +436,7 @@ app.controller.timelineEvents = function(minDate, maxDate, callback, reload) {
 app.controller.createTimeline = function(initialDate) {
 
     if (!initialDate) initialDate = new Date();
+
 
     var utcOffset = initialDate.getUTCOffset();
 
@@ -472,6 +505,8 @@ app.controller.createTimeline = function(initialDate) {
 
     }
 
+    // reset loaded events
+    app.controller.loadedEvents = {};
 
     $('.timelineplayer').timelineaudioplayer({
         timeline: tl,

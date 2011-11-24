@@ -71,13 +71,11 @@
                     ]
                 };
 
-                function broadcastNewDate() {
-                    $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
+
+                function showEvents() {
                     // query the db
                     // get events for the widest net (usually just the calendar)
                     var eventwindow = findWidestEventWindow(settings.timeline, calendar, lastDebouncedData);
-
-
                     settings.audioProvider(eventwindow, function(results) {
                         // show dem
                         //settings.timelineEventSource..clear();
@@ -95,12 +93,24 @@
                         settings.timelineEventSource.clear();
                         settings.timelineEventSource.loadJSON(event_data, document.location.href);
                         //$this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
-                        console.log(results.calendarModel);
                         calendar.fullCalendar('addEventSource',results.calendarModel).fullCalendar( 'rerenderEvents' )
                     });
+                }
+
+
+                function broadcastNewDate() {
+                    $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
+                    showEvents();
+
 
 
                 }
+
+
+                // onload, show envents
+                showEvents();
+
+
 
                 data = $this.data('timelineplayer', {
                     element : $this,
@@ -118,6 +128,8 @@
 
 
     function findWidestEventWindow(timeline, calendar, lastDebouncedData) {
+        if (!lastDebouncedData) lastDebouncedData = {};
+
         if (calendar) {
             var view = calendar.fullCalendar( 'getView' );
             lastDebouncedData.minDate = view.visStart;
@@ -139,12 +151,11 @@
 
         settings.timeline.getBand(1).addOnScrollListener(function(band) {
             if (internalDateChange) return;
-            normalizeTimelineForDaylightSavings(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
             var update = {
                   source : 'timeline',
                   centreDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate),
-                  minDate : denormalize(settings.timeline.getBand(1).getMinDate(), startDate),
-                  maxDate : denormalize(settings.timeline.getBand(1).getMaxDate(), startDate)
+                  minDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMinDate(), startDate),
+                  maxDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMaxDate(), startDate)
             }
 
             timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
@@ -185,7 +196,7 @@
             viewDisplay : function(view) {
                 if (internalDateChange) return;
 
-                var offsetHrs = 9;
+                var offsetHrs = 16;
 
                 var date = new Date(view.start.getTime()).addHours(offsetHrs);
 
@@ -216,8 +227,8 @@
                 var offsetHrs = 0;
 
                 if (view && view.name == "month") {
-                    // add 9hrs. gives a good start to the day
-                    offsetHrs = 9;
+                    // add 16hrs. Shows 4pm to give best full view of day
+                    offsetHrs = 16;
                 }
                 var update = {
                       source : CALENDAR_SOURCE,
@@ -254,11 +265,7 @@
             unselectAuto: false,
             editable: true,
             events: [
-                {
-                    title: 'My Event',
-                    start: 1321426715040,
-                    description: 'This is a cool event'
-                }
+
                 // more events here
             ],
             // can alter the event here
@@ -267,16 +274,20 @@
             }
 
 
-        }).fullCalendar('gotoDate', initialDate);
+        }).fullCalendar('gotoDate', initialDate)
+          .fullCalendar('select', initialDate, initialDate, true);
 
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
+            internalDateChange = true;
+            if (!data._calupdate) {
+                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, true);
+                data._calupdate = true;
+            }
             if (data.source != 'calendar') {
-                internalDateChange = true;
-
                 settings.calendarDiv.fullCalendar('gotoDate', data.centreDate);
                 settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, true);
-                internalDateChange = false;
             }
+            internalDateChange = false;
         });
         return calendar;
 
