@@ -130,13 +130,20 @@ html .fc,
 .fc-state-highlight { /* <td> today cell */ /* TODO: add .fc-today to <th> */
 	background: #ffc;
 	}
-	
-.fc-cell-overlay { /* semi-transparent rectangle while dragging */
+/*
+.fc-cell-overlay { 
 	background: #9cf;
 	opacity: .2;
-	filter: alpha(opacity=20); /* for IE */
+	filter: alpha(opacity=20); 
 	}
-	
+        */
+.fc-cell-overlay { /* semi-transparent rectangle while dragging */
+	background: #ffc;
+	opacity: .2;
+	filter: alpha(opacity=20); /* for IE */
+        border: 1px solid #6D84B4;
+
+}
 
 
 /* Buttons

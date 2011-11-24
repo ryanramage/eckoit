@@ -157,7 +157,8 @@ app.view.showTopics = function(results) {
 
 
 app.view.typeToTemplate = {
-    "com.eckoit.utag" : "timelineRowTemplate"
+    "com.eckoit.utag" : "timelineRowTemplate",
+    "com.eckoit.liferecorder.mark" : "timelineRowTemplate"
 }
 
 
@@ -242,6 +243,7 @@ app.controller.parseRequestedDate = function(date) {
         if (!resultDate) {
             resultDate = new Date(date);
         }
+        console.log(resultDate.toString());
 
         return resultDate;
 	
@@ -266,9 +268,9 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
             $.each(results.rows, function(i, item) {
                 if (app.controller.loadedAudio[item.id]) return;
 
-                if (item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
-                    centerItem = item;
-                }
+                //if (item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
+                //    centerItem = item;
+                //}
 
                 var recording =  {
                     eventID: item.id,
@@ -339,6 +341,8 @@ app.controller.typeToTimelineModel = {
 
         };
 
+        console.log('before: ' + new Date(doc.timestamp).toString());
+        console.log('adjusted: ' + base.start.toString());
         //if(isTagNotEdited(item.value)) {
         //    base.classname = 'untagged';
        // }
@@ -349,6 +353,7 @@ app.controller.typeToTimelineModel = {
 
 
 app.controller.isEventLength = function(start, end) {
+    return true;
     if (!end) return false;
     // if it is greater than 15 min, that is event for me.
     if ((end.getTime() - start.getTime()) > (15 * 60 * 1000)) {
@@ -431,6 +436,55 @@ app.controller.timelineEvents = function(minDate, maxDate, callback, reload) {
 }
 
 
+app.controller.dayStatsProvider = function(startDate, endDate, tagCountsCallback, audioCountsCallback) {
+    var startkey = [startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()];
+    var endkey = [endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate()]
+
+   $.couch.db('').view(app.ddoc + '/mark_totals', {
+        startkey :  startkey,
+        endkey : endkey,
+        reduce : true,
+        group_level : 3,
+        error : function() {
+        },
+        success : function(results) {
+            var normal = _.map(results.rows, function(row) {
+                var date = new Date(row.key[0],row.key[1] -1,row.key[2]);
+                return {
+                   date : date,
+                   count : row.value
+
+                };
+            });
+            tagCountsCallback(normal);
+        }
+    });    
+   $.couch.db('').view(app.ddoc + '/audio_totals', {
+        startkey :  startkey,
+        endkey : endkey,
+        reduce : true,
+        group_level : 3,
+        error : function() {
+        },
+        success : function(results) {
+            var normal = _.map(results.rows, function(row) {
+                var date = new Date(row.key[0],row.key[1]-1,row.key[2]);
+                return {
+                   date : date,
+                   count : row.value
+
+                };
+            });
+            audioCountsCallback(normal);
+        }
+    });
+    
+
+
+
+
+}
+
 
 
 app.controller.createTimeline = function(initialDate) {
@@ -478,6 +532,13 @@ app.controller.createTimeline = function(initialDate) {
 
     var tl = Timeline.create(document.getElementById("timeline-ui"), bandInfos);
 
+    // add a playhead
+    var playhead = $('<div id="playhead"></div>');
+    $('#timeline-ui').append(playhead);
+    var where = $('#timeline-ui').width() / 2;
+    playhead.css('margin-left', where + 'px');
+
+
     var audioProvider = function(date_change_event, callback) {
 
         // first query
@@ -505,6 +566,8 @@ app.controller.createTimeline = function(initialDate) {
 
     }
 
+
+
     // reset loaded events
     app.controller.loadedEvents = {};
 
@@ -514,7 +577,8 @@ app.controller.createTimeline = function(initialDate) {
         calendarDiv : $('#calendar-ui'),
         timelineEventSource : eventSource,
         audioProvider : audioProvider,
-        eventProvider : eventProvider
+        eventProvider : eventProvider,
+        dayStatsProvider : app.controller.dayStatsProvider
     });
 }
 

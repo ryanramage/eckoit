@@ -54,8 +54,8 @@ var couchapp = require('couchapp')
 
   ddoc.views.mark_totals = {
       map : function(doc) {
-          if (doc.mark) {
-             var start  = doc.mark.start;
+          if (doc.timestamp) {
+             var start  = doc.timestamp;
              var d = new Date(start);
              var year = d.getFullYear();
              var month = d.getMonth() + 1;

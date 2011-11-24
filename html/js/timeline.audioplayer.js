@@ -37,7 +37,10 @@
                     audioProvider : function(date_change_event, callback) {
                         callback([]);
                     },
-
+                    dayStatsProvider : function(startDate, endDate, tagCountsCallback, audioCountsCallback) {
+                        tagCountsCallback([]);
+                        audioCountsCallback([]);
+                    },
                     debounceRate : 300
                 }
 
@@ -101,17 +104,9 @@
                 function broadcastNewDate() {
                     $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
                     showEvents();
-
-
-
                 }
-
-
                 // onload, show envents
                 showEvents();
-
-
-
                 data = $this.data('timelineplayer', {
                     element : $this,
                     settings: settings
@@ -214,11 +209,34 @@
                         update.centreDate = today;
                     }
                 }
-
-
-
-
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+
+                // update the stats
+                settings.dayStatsProvider(view.visStart, view.visEnd, 
+                    function(tagCounts) {
+
+                        $('.fc-labels').remove();
+                        $.each(tagCounts, function(i, count){
+
+                           var calDayNum = view.visStart.getDaysBetween(count.date);
+                           var baseDiv = $('.fc-day' + calDayNum);
+
+                           var child = baseDiv.find('.fc-labels');
+                           if (child.length == 0) {
+                               child = $('<div class="fc-labels"></div>');
+                               baseDiv.children().first().prepend(child);
+                           }
+                           child.text(count.count);
+
+                        });
+
+                    },
+                    function(audioCounts) {
+
+                    }
+                );
+
+
                 
             },
             select : function(startDate, endDate, allDay, jsEvent, view) {
@@ -280,12 +298,12 @@
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
             internalDateChange = true;
             if (!data._calupdate) {
-                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, true);
+                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, false);
                 data._calupdate = true;
             }
             if (data.source != 'calendar') {
                 settings.calendarDiv.fullCalendar('gotoDate', data.centreDate);
-                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, true);
+                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, false);
             }
             internalDateChange = false;
         });
@@ -310,6 +328,7 @@
 
                 var diffMin = secondOffset - firstOffset  ;
                  dateClone.addMinutes(diffMin);
+                 
                 return dateClone;
             }
             return dateToFix;

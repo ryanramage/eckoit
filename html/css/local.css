@@ -106,3 +106,28 @@ td.fc-header-right {
     margin-left: auto;
     margin-right: auto;
 }
+
+#playhead {
+    position: absolute;
+    width: 1px;
+    background-color:#6D84B4;
+    height: 450px;
+    z-index: 20;
+}
+
+.fc-labels {
+
+    font-size: 8px;
+    line-height: 9px;
+    padding-left: 1px;
+    float: left;
+    border: 1px solid #6D84B4;
+    background-color: #ffc;
+    border-radius: 3px;
+    height: 12px;
+    min-width: 10px;
+    margin-left: 2px;
+    margin-top: 1px;
+    opacity: .5;
+    filter: alpha(opacity=50); /* for IE */
+}
