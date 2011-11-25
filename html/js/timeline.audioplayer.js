@@ -316,10 +316,15 @@
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
             internalDateChange = true;
             if (!data._calupdate) {
+
+                // WARNING this will move the calendar bewteen months. Now what we ant.
+
                 settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, false);
                 data._calupdate = true;
             }
             if (data.source != 'calendar') {
+ 
+
                 settings.calendarDiv.fullCalendar('gotoDate', data.centreDate);
                 settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, false);
             }
