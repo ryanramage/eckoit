@@ -11,14 +11,12 @@
     var methods = {
         init : function(options) {
             return this.each(function() {
-                // sort out the options
-                if (!options || !options.db) {
-                    $.error( 'please provide a db in the options' );
-                }
+
 
                 var settings = {
                     // not sure what I need yet
                     swfPath: "/js/lib/jPlayer",
+                    documentPrefix : "api",
                     audioQuery : function(minDate, maxDate, centreDate, callback) {
                         callback([]);
                     },
@@ -33,10 +31,7 @@
                 // get the element
                 var $this = $(this);
                 $this.addClass('liferecorderplayer');
-                data = $this.data('liferecorderplayer', {
-                    element : $this,
-                    settings: settings
-                });
+
 
 
 
@@ -46,22 +41,35 @@
                     swfPath: settings.swPath,
                     ready : function() {
                         settings.onReady.call($this);
-                    }
+                    },
+                    supplied : "mp3",
+                    errorAlerts : true
                 }).bind($.jPlayer.event.ended, function(event) {
                     
                 });
 
 
+                data = $this.data('liferecorderplayer', {
+                    element : $this,
+                    player  : $player,
+                    settings: settings
+                });
+
             });
         },
 
         play : function(startTime, duration) {
-
-            var settings = $(this).data('liferecorderplayer').settings;
+            var data = $(this).data('liferecorderplayer');
+            var settings = data.settings;
             getAudioDocsForDate(startTime, settings, function(results) {
                 if (results.centerItem) {
                     // we have found it
-                    
+                    var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, startTime) / 1000;
+                    var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
+                    console.log('playing ' + mediaUrl + " at " + offsetSeconds + " seconds" );
+                    data.player.jPlayer("setMedia", {
+                        mp3: mediaUrl
+                    }).jPlayer("play", offsetSeconds);
                 }
             })
 
@@ -91,14 +99,26 @@
 
     // The static methods
     $.liferecorder = {
-        findAudioOffset : function(audioStartDate, audioEndDate, startDate ) {
+        findAudioOffset : function(audioStartTime, audioEndTime, startDate ) {
             // assert that the startDate is between the dates.
-            if (startDate.getTime() < audioStartDate.getTime()) $.error('startDate is less than audioStartDate');
-            if (startDate.getTime() > audioEndDate.getTime())   $.error('startDate is greater than audioEndDate');
+            if (startDate.getTime() < audioStartTime) $.error('startDate is less than audioStartDate');
+            if (startDate.getTime() > audioEndTime)   $.error('startDate is greater than audioEndDate');
 
-            return startDate.getTime() - audioStartDate.getTime();
+            return startDate.getTime() - audioStartTime;
+        },
+        urlForAudioView : function(item, prefix) {
+            if (!prefix) prefix = 'api';
 
+            var mediaName;
+            for (i in item.file) {
+                mediaName = i;
+                break;
+            }
+            item.file[0]
+            return prefix + '/' + item._id + '/' + mediaName ;
         }
+
+
     }
 
 

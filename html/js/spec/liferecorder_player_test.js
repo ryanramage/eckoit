@@ -8,7 +8,6 @@ describe("Liferecorder player", function() {
 
   it("element will get a jplayer, destroy removes", function() {
         $('#example').liferecorder({
-            db : 'sasa',
             swfPath : 'lib/jPlayer'
         });
 
@@ -23,7 +22,6 @@ describe("Liferecorder player", function() {
 
         var ready = false;
         $('#example').liferecorder({
-            db : 'sasa',
             swfPath : 'lib/jPlayer',
             onReady : function() {
                 ready = true;
@@ -95,7 +93,7 @@ describe("Liferecorder player", function() {
 
         var expected = requestedDate.getTime() - start.getTime();
 
-        var actual = $.liferecorder.findAudioOffset(start, end, requestedDate);
+        var actual = $.liferecorder.findAudioOffset(start.getTime(), end.getTime(), requestedDate);
         expect(actual).toEqual(expected);
    });
 
@@ -107,11 +105,11 @@ describe("Liferecorder player", function() {
         var expected = requestedDate.getTime() - start.getTime();
 
         expect(function() {
-            var actual = $.liferecorder.findAudioOffset(start, end, requestedDate);
+            var actual = $.liferecorder.findAudioOffset(start.getTime(), end.getTime(), requestedDate);
         }).toThrow('startDate is greater than audioEndDate');        
    });
 
-    it("checks for lower bound on the offset for an audio segment", function() {
+   it("checks for lower bound on the offset for an audio segment", function() {
         var start = new Date();
         var end = new Date(start.getTime() + (60 * 1000 * 10)); // 10 min later
         var requestedDate = new Date(start.getTime() -1 ); // 
@@ -119,9 +117,114 @@ describe("Liferecorder player", function() {
         var expected = requestedDate.getTime() - start.getTime();
 
         expect(function() {
-            var actual = $.liferecorder.findAudioOffset(start, end, requestedDate);
+            var actual = $.liferecorder.findAudioOffset(start.getTime(), end.getTime(), requestedDate);
         }).toThrow('startDate is less than audioStartDate');
    });
+
+   it("gets the right attachment for a file", function() {
+
+        var item = {
+            _id: "b739a5e5-1bd3-4211-a12a-4b2a3f0d3e2e",
+            type: "recording",
+            start: 1139659261000,
+            file: {
+                'R_MIC_060211-050101.mp3': {
+                    content_type: "audio/mp3",
+                    revpos: 2,
+                    digest: "md5-vRhPeQnuO+4ygwAKXD0K0Q==",
+                    length: 4800222,
+                    stub: true
+                }
+            },
+            end: 1139659860000
+        };
+        var expected = 'api/b739a5e5-1bd3-4211-a12a-4b2a3f0d3e2e/R_MIC_060211-050101.mp3';
+
+        expect($.liferecorder.urlForAudioView(item)).toEqual(expected);
+   });
+
+
+
+   it("plays audio!", function() {
+        var item = {
+            _id: "b739a5e5-1bd3-4211-a12a-4b2a3f0d3e2e",
+            type: "recording",
+            start: 1139659261000,
+            end : 1139659860000,
+            file: {
+                'R_MIC_110622-115822.mp3': {
+                       "content_type": "audio/mpeg",
+                       "revpos": 6,
+                       "digest": "md5-ApFceNvHKY91UtJWSaxxJw==",
+                       "length": 2840513,
+                       "stub": true
+                   }
+            }
+        };
+
+        var ready = false;
+        var audioStart = new Date(item.start);
+        $('#example').liferecorder({
+            swfPath : 'lib/jPlayer',
+            documentPrefix : '../api',
+            audioQuery : function(minDate, maxDate, centreDate, callback) {
+                callback({
+                    centerItem : item
+                });
+                ready = true;
+            },
+            onReady : function() {
+                this.liferecorder('play', audioStart);
+            }
+        });
+        waits(3000);
+
+        runs(function() {
+            $('#example').liferecorder('destroy');
+        });
+   })
+
+
+
+   it("plays audio, at an offset", function() {
+        var item = {
+            _id: "b739a5e5-1bd3-4211-a12a-4b2a3f0d3e2e",
+            type: "recording",
+            start: 1139659261000,
+            end : 1139659860000,
+            file: {
+                'R_MIC_110622-115822.mp3': {
+                       "content_type": "audio/mpeg",
+                       "revpos": 6,
+                       "digest": "md5-ApFceNvHKY91UtJWSaxxJw==",
+                       "length": 2840513,
+                       "stub": true
+                   }
+            }
+        };
+
+        var ready = false;
+        var audioStart = new Date(item.start + (60 * 1000 * 2) + 20000); //1:40 seconds
+        $('#example').liferecorder({
+            swfPath : 'lib/jPlayer',
+            documentPrefix : '../api',
+            audioQuery : function(minDate, maxDate, centreDate, callback) {
+                callback({
+                    centerItem : item
+                });
+                ready = true;
+            },
+            onReady : function() {
+                this.liferecorder('play', audioStart);
+            }
+        });
+        waits(3000);
+
+        runs(function() {
+            $('#example').liferecorder('destroy');
+        });
+   })
+
 
 
 
