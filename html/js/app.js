@@ -268,9 +268,9 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
             $.each(results.rows, function(i, item) {
                 if (app.controller.loadedAudio[item.id]) return;
 
-                //if (item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
-                //    centerItem = item;
-                //}
+                if (centreDate && item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
+                    centerItem = item;
+                }
 
                 var recording =  {
                     eventID: item.id,
