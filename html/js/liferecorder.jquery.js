@@ -18,7 +18,10 @@
                     swfPath: "/js/lib/jPlayer",
                     documentPrefix : "api",
                     audioQuery : function(minDate, maxDate, centreDate, callback) {
-                        callback([]);
+                        callback({});
+                    },
+                    audioNext : function(lastID, lastStartDate, lastEndDate, callback) {
+                       callback({});
                     },
                     onReady : function() {
 
@@ -35,6 +38,7 @@
 
 
 
+
                 $player = $('<div class="player"></div>');
                 $this.append($player);
                 $player.jPlayer({
@@ -45,7 +49,40 @@
                     supplied : "mp3",
                     errorAlerts : true
                 }).bind($.jPlayer.event.ended, function(event) {
+                    // we need to get the next
+                    var data = $this.data('liferecorderplayer');
                     
+                    data.settings.audioNext(data.lastID, data.lastStartDate, data.lastEndDate, function(results) {
+                        if (results.centerItem) {
+                            // we have found it
+
+                            
+                            data.lastID = results.centerItem._id;
+                            data.lastStartDate = results.centerItem.start;
+                            data.lastEndDate = results.centerItem.end;
+
+                            var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, new Date(results.centerItem.start)) / 1000;
+                            var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
+                            console.log('playing ' + mediaUrl + " at " + offsetSeconds + " seconds" );
+                            data.player.jPlayer("setMedia", {
+                                mp3: mediaUrl
+                            }).jPlayer("play", offsetSeconds);
+                            $this.trigger('liferecorder.update', results.centerItem.start);
+                        }
+                    });
+
+
+                }).bind($.jPlayer.event.timeupdate, function(event) {
+
+                    var data = $this.data('liferecorderplayer');
+                    var playingDate = new Date( data.startTime.getTime() +  ( event.jPlayer.status.currentTime * 1000));
+                    if (data.endTime && (data.endTime.getTime() < playingDate.getTime())) {
+                        // if we are past, end the audio
+                        data.player.jPlayer("stop");
+                        $this.trigger('liferecorder.stopped', playingDate);
+                    } else {
+                        $this.trigger('liferecorder.update', playingDate);
+                    }                    
                 });
 
 
@@ -58,12 +95,25 @@
             });
         },
 
-        play : function(startTime, duration) {
+        play : function(startTime, durationSeconds) {
             var data = $(this).data('liferecorderplayer');
+            data.startTime = startTime;
+            if (durationSeconds) {
+                data.endTime = new Date(startTime + (durationSeconds * 1000));
+            } else {
+                data.endTime = null;
+            }
+
+
+
             var settings = data.settings;
             getAudioDocsForDate(startTime, settings, function(results) {
                 if (results.centerItem) {
                     // we have found it
+                    data.lastID = results.centerItem._id;
+                    data.lastStartDate = results.centerItem.start;
+                    data.lastEndDate = results.centerItem.end;
+                    
                     var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, startTime) / 1000;
                     var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
                     console.log('playing ' + mediaUrl + " at " + offsetSeconds + " seconds" );

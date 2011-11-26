@@ -228,6 +228,114 @@ describe("Liferecorder player", function() {
 
 
 
+
+
+
+   it("when audio ends, it requests and plays the next one", function() {
+        var item = {
+            _id: "b739a5e5-1bd3-4211-a12a-4b2a3f0d3e2e",
+            type: "recording",
+            start: 1139659261000,
+            end : 1139659616000,
+            file: {
+                'R_MIC_110622-115822.mp3': {
+                       "content_type": "audio/mpeg",
+                       "revpos": 6,
+                       "digest": "md5-ApFceNvHKY91UtJWSaxxJw==",
+                       "length": 2840513,
+                       "stub": true
+                   }
+            }
+        };
+        var audioStart = new Date(item.end - 1000); //1 seconds from the end
+
+        var audioNextCalled = false;
+
+        $('#example').liferecorder({
+            swfPath : 'lib/jPlayer',
+            documentPrefix : '../api',
+            audioQuery : function(minDate, maxDate, centreDate, callback) {
+                callback({
+                    centerItem : item
+                });
+                ready = true;
+            },
+            onReady : function() {
+                this.liferecorder('play', audioStart); // play for two seconds
+            },
+            audioNext : function(lastID, lastStartDate, lastEndDate, callback) {
+                audioNextCalled = true;
+                expect(lastID).toEqual(item._id);
+                expect(lastStartDate).toEqual(item.start);
+                expect(lastEndDate).toEqual(item.end);
+
+                item.start = item.end  + 1;
+                item.end = item.start + 10000;
+                callback ({
+                    centerItem : item
+                });
+
+            }
+        });
+        waits(3000);
+
+        runs(function() {
+
+            expect(audioNextCalled).toBeTruthy();
+
+
+
+            $('#example').liferecorder('destroy');
+        });
+   })
+
+
+   it("plays audio, at an offset for a duration", function() {
+        var item = {
+            _id: "b739a5e5-1bd3-4211-a12a-4b2a3f0d3e2e",
+            type: "recording",
+            start: 1139659261000,
+            end : 1139659616000,
+            file: {
+                'R_MIC_110622-115822.mp3': {
+                       "content_type": "audio/mpeg",
+                       "revpos": 6,
+                       "digest": "md5-ApFceNvHKY91UtJWSaxxJw==",
+                       "length": 2840513,
+                       "stub": true
+                   }
+            }
+        };
+
+        var ready = false;
+        var stopped = false;
+
+        var audioStart = new Date(item.start + (60 * 1000 * 2) + 20000); //1:40 seconds
+        $('#example').liferecorder({
+            swfPath : 'lib/jPlayer',
+            documentPrefix : '../api',
+            audioQuery : function(minDate, maxDate, centreDate, callback) {
+                callback({
+                    centerItem : item
+                });
+                ready = true;
+            },
+            onReady : function() {
+                this.liferecorder('play', audioStart, 2); // play for two seconds
+            }
+        }).bind('liferecorder.stopped', function() {
+            stopped = true;
+        });
+        waits(3000);
+
+        runs(function() {
+
+            expect(stopped).toBeTruthy();
+
+            $('#example').liferecorder('destroy');
+        });
+   })
+
 });
 
 

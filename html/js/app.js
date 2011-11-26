@@ -253,8 +253,6 @@ app.controller.loadedAudio = {};
 
 app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) {
 
-
-
     $.couch.db('').view(app.ddoc + '/audio_by_time', {
         startkey :  minDate.getTime(),
         endkey : maxDate.getTime(),
@@ -269,7 +267,7 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
                 if (app.controller.loadedAudio[item.id]) return;
 
                 if (centreDate && item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
-                    centerItem = item;
+                    centerItem = item.value;
                 }
 
                 var recording =  {
@@ -291,6 +289,36 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
         }
     })
 }
+
+
+/**
+ * This version of audio next gets the next audio past the start date.
+ */
+app.controller.audioNext = function(lastID, lastStartDate, lastEndDate, callback) {
+    $.couch.db('').view(app.ddoc + '/audio_by_time', {
+        startkey :  lastStartDate.getTime() + 2, // some leeway
+        limit : 2,
+        error : function() {
+
+        },
+        success : function(results) {
+            var find = null;
+            $.each(results.rows, function(i, item) {
+                if (item.id != lastID) {
+                    find = item.value;
+                }
+            });
+            callback({
+                centerItem : find
+            });
+        }
+    })
+
+
+
+}
+
+
 
  app.controller.tagToTimelineMarkerTitle = function (tag) {
     var tagString = "Mark";
