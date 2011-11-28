@@ -46,8 +46,7 @@
                     ready : function() {
                         settings.onReady.call($this);
                     },
-                    supplied : "mp3",
-                    errorAlerts : true
+                    supplied : "mp3"
                 }).bind($.jPlayer.event.ended, function(event) {
                     // we need to get the next
                     var data = $this.data('liferecorderplayer');
