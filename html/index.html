@@ -41,6 +41,8 @@
                 "js/lib/geo.js",
                 "js/lib/date-utils.min.js",
                 "js/lib/fullcalendar.min.js",
+                "js/lib/jquery.jplayer.min.js",
+                "js/liferecorder.jquery.js",
                 "js/timeline.audioplayer.js",
                 "js/app.js",
                 "js/onready.js"
@@ -220,8 +222,8 @@
 
                 </div>
                 <div class="span2">
-                    <button class="btn">&#9654;</button>
-                    <div>
+                    <button class="btn playbutton"><img src="images/spinner.gif"/></button>
+                    <div class="markplayer">
                         30 seconds
                     </div>
                 </div>
@@ -374,14 +376,10 @@
 
         <script id="timelineTemplate" type="text/html">
   
-            <div id="calendar-ui">
+            <div id="calendar-ui"></div>
+            <div id="audio-ui"></div>
+            <div id="timeline-ui"></div>
 
-            </div>
-
-            <div id="timeline-ui" style="">
-
-
-            </div>
 
             <div class="timelineplayer"></div>
 

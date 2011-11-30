@@ -55,10 +55,15 @@
                     calendar = createCalendar(settings, $this);
                 }
 
+                var audioplayer;
+                if (settings.audioDiv) {
+                    audioplayer = createAudioPlayer(settings, $this);
+                }
+
                 wireupTimeline(settings, $this);
 
 
-                var debouncedBroadcastNewDate = _.debounce(broadcastNewDate, settings.debounceRate)
+                var debouncedBroadcastNewDate = _.throttle(broadcastNewDate, settings.debounceRate)
 
                 var lastDebouncedData;
 
@@ -76,6 +81,9 @@
 
 
                 function showEvents() {
+
+                    if (lastDebouncedData && lastDebouncedData.source == 'audioplayer') return;
+
                     // query the db
                     // get events for the widest net (usually just the calendar)
                     var eventwindow = findWidestEventWindow(settings.timeline, calendar, lastDebouncedData);
@@ -189,6 +197,64 @@
     }
 
 
+    function createAudioPlayer(settings, timelineElement) {
+
+        var internalDateChange = false;
+        var lastUpdateDate;
+
+
+        function dateBroadcaster() {
+            if (internalDateChange) return;
+            var update = {
+                  source : 'audioplayer',
+                  centreDate : lastUpdateDate,
+                  minDate : lastUpdateDate,
+                  maxDate : lastUpdateDate
+            }
+
+            timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+        }
+
+        var throttleDateBroadcaster = _.throttle(dateBroadcaster, 1000);
+
+
+        var button = $('<div class="playbutton">&#9658;</div>')
+        settings.audioDiv.append(button);
+
+
+        var state = 'loading';
+        button.bind('click', function() {
+            if (state == 'playing') {
+                settings.audioDiv.liferecorder('stop');
+                button.html('&#9654;');
+                state = 'stopped';
+            }
+            else if (state == 'ready' || state == 'stopped') {
+                button.html('&#9632;');
+                var centreDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+                settings.audioDiv.liferecorder('play', centreDate);
+                state = 'playing';
+            }
+        });
+
+
+        var startDate = settings.initialDate;
+        settings.audioDiv.liferecorder({
+            documentPrefix : 'api',
+            audioQuery : settings.audioQuery,
+            audioNext  : settings.audioNext,
+            onReady : function() {
+                state = 'ready';
+                button.html('&#9654;');
+            }
+        }).bind("liferecorder.update", function(e, date){
+            lastUpdateDate = date;
+            throttleDateBroadcaster();
+        });
+
+    }
+
+
 
     function createCalendar(settings, timelineElement) {
 
@@ -206,6 +272,12 @@
                     right: 'month,agendaWeek'
             },
             aspectRatio: 2,
+            buttonIcons : false,
+            buttonText : {
+              prev : '&lt;',
+              next : '&gt;'
+            },
+
             viewDisplay : function(view) {
                 if (internalDateChange) return;
 
@@ -342,8 +414,9 @@
 
             if (!dateToFix) return null;
             if (!initialDate) initialDate = new Date();
-            
-            var dateClone = new Date(dateToFix.getTime());
+
+            var dateClone = new Date(dateToFix);
+
 
             // if the offset is different than the inital date, we bump it
             var firstOffset = dateClone.getTimezoneOffset();

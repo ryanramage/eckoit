@@ -184,7 +184,46 @@ app.controller.showTopic = function(topic, div) {
         topic.datestamp_link = $.fullCalendar.formatDate(topic.datestamp, "d-MMM-yyyy_h:mm:ss_tt");
     }
 
-    div.append( ich[template](topic)  );
+    var rendered = ich[template](topic) ;
+    div.append( rendered );
+    if (topic.timestamp) {
+  
+
+        rendered.find('.markplayer').each(function(){
+            var markplayer = $(this);
+
+            var button = rendered.find('.playbutton');
+
+            var state = 'loading';
+            button.bind('click', function() {
+
+                if (state == 'playing') {
+                    markplayer.liferecorder('stop');
+                    button.html('&#9654;');
+                    state = 'stopped';
+                }
+                else if (state == 'ready' || state == 'stopped') {
+                    button.html('&#9632;');
+                    markplayer.liferecorder('play', new Date(topic.timestamp), 30);
+                    state = 'playing';
+                }
+            })
+
+            markplayer.liferecorder({
+                documentPrefix : 'api',
+                audioQuery : app.controller.audioQuery,
+                audioNext  : app.controller.audioNext,
+                onReady : function() {
+                    state = 'ready';
+                    button.html('&#9654;');
+                }
+            }).bind("liferecorder.stopped", function(e, date){
+                button.trigger('click');
+            });
+        });
+    }
+
+
     
 }
 
@@ -243,7 +282,7 @@ app.controller.parseRequestedDate = function(date) {
         if (!resultDate) {
             resultDate = new Date(date);
         }
-        console.log(resultDate.toString());
+
 
         return resultDate;
 	
@@ -253,6 +292,10 @@ app.controller.loadedAudio = {};
 
 app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) {
 
+    minDate = new Date(minDate);
+    maxDate = new Date(maxDate);
+    centreDate = new Date(centreDate);
+
     $.couch.db('').view(app.ddoc + '/audio_by_time', {
         startkey :  minDate.getTime(),
         endkey : maxDate.getTime(),
@@ -260,6 +303,7 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
 
         },
         success : function(results) {
+
 
             var centerItem;
             var recordings = [];
@@ -290,11 +334,55 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
     })
 }
 
+app.controller.audioQuery = function(minDate, maxDate, centreDate, callback) {
+
+    minDate = new Date(minDate);
+    maxDate = new Date(maxDate);
+    centreDate = new Date(centreDate);
+
+    $.couch.db('').view(app.ddoc + '/audio_by_time', {
+        startkey :  minDate.getTime(),
+        endkey : maxDate.getTime(),
+        error : function() {
+
+        },
+        success : function(results) {
+
+
+            var centerItem;
+            var recordings = [];
+            $.each(results.rows, function(i, item) {
+                if (centreDate && item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
+                    centerItem = item.value;
+                }
+
+                var recording =  {
+                    eventID: item.id,
+                    start: new Date(item.value.start),
+                    end: new Date(item.value.end),
+                    durationEvent : true,
+                    title : "",
+                    caption : "Recording",
+                    trackNum : 1
+                }
+                recordings.push(recording);
+            });
+            callback({
+                recordings: recordings,
+                centerItem : centerItem
+            });
+        }
+    })
+}
 
 /**
  * This version of audio next gets the next audio past the start date.
  */
 app.controller.audioNext = function(lastID, lastStartDate, lastEndDate, callback) {
+
+    lastStartDate = new Date(lastStartDate);
+    lastEndDate = new Date(lastEndDate);
+
     $.couch.db('').view(app.ddoc + '/audio_by_time', {
         startkey :  lastStartDate.getTime() + 2, // some leeway
         limit : 2,
@@ -593,6 +681,11 @@ app.controller.createTimeline = function(initialDate) {
 
 
 
+    // create an audio player
+
+
+
+
     // reset loaded events
     app.controller.loadedEvents = {};
 
@@ -600,10 +693,13 @@ app.controller.createTimeline = function(initialDate) {
         timeline: tl,
         initialDate : initialDate,
         calendarDiv : $('#calendar-ui'),
+        audioDiv : $('#audio-ui'),
         timelineEventSource : eventSource,
         audioProvider : audioProvider,
         eventProvider : eventProvider,
-        dayStatsProvider : app.controller.dayStatsProvider
+        dayStatsProvider : app.controller.dayStatsProvider,
+        audioQuery : app.controller.audioQuery,
+        audioNext  : app.controller.audioNext
     });
 }
 

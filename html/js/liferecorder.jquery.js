@@ -62,7 +62,7 @@
 
                             var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, new Date(results.centerItem.start)) / 1000;
                             var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
-                            console.log('playing ' + mediaUrl + " at " + offsetSeconds + " seconds" );
+
                             data.player.jPlayer("setMedia", {
                                 mp3: mediaUrl
                             }).jPlayer("play", offsetSeconds);
@@ -98,7 +98,7 @@
             var data = $(this).data('liferecorderplayer');
             data.startTime = startTime;
             if (durationSeconds) {
-                data.endTime = new Date(startTime + (durationSeconds * 1000));
+                data.endTime = new Date(startTime.getTime() + (durationSeconds * 1000));
             } else {
                 data.endTime = null;
             }
@@ -107,6 +107,7 @@
 
             var settings = data.settings;
             getAudioDocsForDate(startTime, settings, function(results) {
+
                 if (results.centerItem) {
                     // we have found it
                     data.lastID = results.centerItem._id;
@@ -115,7 +116,7 @@
                     
                     var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, startTime) / 1000;
                     var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
-                    console.log('playing ' + mediaUrl + " at " + offsetSeconds + " seconds" );
+
                     data.player.jPlayer("setMedia", {
                         mp3: mediaUrl
                     }).jPlayer("play", offsetSeconds);
@@ -124,6 +125,10 @@
 
 
 
+        },
+        stop : function() {
+            var data = $(this).data('liferecorderplayer');
+            data.player.jPlayer("stop");
         },
         destroy : function() {
             var player = $(this).data('liferecorderplayer').element.find('.player');

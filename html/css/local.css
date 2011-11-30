@@ -131,3 +131,13 @@ td.fc-header-right {
     opacity: .5;
     filter: alpha(opacity=50); /* for IE */
 }
+
+.playbutton {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    padding: 3px;
+    border-radius: 3px;
+    width: 15px;
+    display: inline;
+    float: left;
+}
