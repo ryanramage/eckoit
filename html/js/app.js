@@ -42,9 +42,11 @@ app.view.activeCategory = function(category) {
 app.onDomReady = function() {
     $('.votes').live('click', function() {
         var $me = $(this);
+        $me.find('.mini-counts').html('<img src="images/spinner.gif" />');
         var id = $me.data('id');
+
         app.controller.bumpVotes(id, function(newCount) {
-            $me.find('.mini-counts').text(newCount);
+            $me.find('.mini-counts').html(newCount);
         }, function(error) {
 
         });

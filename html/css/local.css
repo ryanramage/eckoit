@@ -42,10 +42,12 @@ body {
 
 .votes {
         color: #555;
+        cursor: pointer;
 }
 
 .views {
     color: #999;
+
 }
 
 .answers {
