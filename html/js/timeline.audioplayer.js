@@ -201,7 +201,7 @@
 
         var internalDateChange = false;
         var lastUpdateDate;
-
+        var aboutToUpdateDueToDragComplete = false;
 
         function dateBroadcaster() {
             if (internalDateChange) return;
@@ -211,8 +211,9 @@
                   minDate : lastUpdateDate,
                   maxDate : lastUpdateDate
             }
-
-            timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+            if (!aboutToUpdateDueToDragComplete) {
+                timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+            }
         }
 
         var throttleDateBroadcaster = _.throttle(dateBroadcaster, 1000);
@@ -223,6 +224,7 @@
 
 
         var state = 'loading';
+
         button.bind('click', function() {
             if (state == 'playing') {
                 settings.audioDiv.liferecorder('stop');
@@ -248,8 +250,33 @@
                 button.html('&#9654;');
             }
         }).bind("liferecorder.update", function(e, date){
+            if (aboutToUpdateDueToDragComplete) return;
             lastUpdateDate = date;
             throttleDateBroadcaster();
+        });
+
+        var lastTimelineDate;
+
+        function timelineDragFinished() {
+            
+            lastUpdateDate = lastTimelineDate;
+            settings.audioDiv.liferecorder('play', lastTimelineDate);
+            setTimeout(function() {
+                aboutToUpdateDueToDragComplete = false;
+                //dateBroadcaster();
+            }, 100)
+        }
+
+        var debouncedTimelineDragFinished = _.debounce(timelineDragFinished, 1000);
+
+        timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
+            if (data.source == 'audioplayer') return;
+            if (state != 'playing') return;
+            aboutToUpdateDueToDragComplete = true;
+            internalDateChange = true;
+            lastTimelineDate = data.centreDate;
+            debouncedTimelineDragFinished();
+            internalDateChange = false;
         });
 
     }
