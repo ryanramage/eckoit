@@ -50,13 +50,11 @@
                     preload:"auto"
                 }).bind($.jPlayer.event.ended, function(event) {
 
-                    console.log('Audio ended');
-
-                    // we need to get the next
+                   // we need to get the next
                     var data = $this.data('liferecorderplayer');
                     
                     data.settings.audioNext(data.lastID, data.lastStartDate, data.lastEndDate, function(results) {
-                        console.log(results);
+
                         if (results.centerItem) {
                             // we have found it
 
@@ -69,12 +67,7 @@
                             var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
 
 
-                            console.log('audio start date: ' + new Date(results.centerItem.start).toString());
-                            console.log('playing at offset: ' + offsetSeconds);
-
                             var playingDate = new Date(results.centerItem.start + (offsetSeconds * 1000));
-                            console.log('offset "Date": ' + playingDate.toString());
-                            console.log('audio ends at: ' + new Date(results.centerItem.end));
 
                             data.player.jPlayer("setMedia", {
                                 mp3: mediaUrl
@@ -88,26 +81,16 @@
 
                     var data = $this.data('liferecorderplayer');
                     var playingDate = new Date( data.lastStartDate +  ( event.jPlayer.status.currentTime * 1000));
-                    console.log('inside job: ' + event.jPlayer.status.currentTime);
-                    console.log('inside job: ' + playingDate.toString());
-                    console.log('inside job time: ' + playingDate.getTime());
+ 
                     if (data.endTime && (data.endTime.getTime() < playingDate.getTime())) {
-                        console.log('inside end');
+
                         // if we are past, end the audio
                         data.player.jPlayer("stop");
                         $this.trigger('liferecorder.stopped', playingDate);
                     } else {
                         $this.trigger('liferecorder.update', playingDate);
                     }                    
-                }).bind($.jPlayer.event.seeking, function(event) {
-                    console.log('seek');
-                }).bind($.jPlayer.event.play, function(event) { // Add a listener to report the time play began
-                  console.log("Play began at time = " + event.jPlayer.status.currentTime);
-                }).bind($.jPlayer.event.ended + ".jp-repeat", function(event) { // Using ".jp-repeat" namespace so we can easily remove this event
-                    console.log('ended');
-                }).bind($.jPlayer.event.warning, function(event){
-                    console.log('warning!', event);
-                })
+                });
 
 
                 data = $this.data('liferecorderplayer', {
@@ -130,7 +113,6 @@
 
             data.player.jPlayer("stop");
 
-            console.log('liferecorder start: ' + data.startTime.toString());
             var settings = data.settings;
             getAudioDocsForDate(startTime, settings, function(results) {
 
@@ -141,17 +123,12 @@
                     data.lastEndDate = results.centerItem.end;
 
 
-                    console.log('audio start date: ' + new Date(results.centerItem.start).toString());
-                    console.log('audio start mill: ' + results.centerItem.start);
 
                     var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, startTime) / 1000;
 
-                    console.log('playing at offset: ' + offsetSeconds);
 
                     var playingDate = new Date(results.centerItem.start + (offsetSeconds * 1000));
-                    console.log('offset "Date": ' + playingDate.toString());
 
-                    console.log('audio ends at: ' + new Date(results.centerItem.end));
                     var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
 
                     data.player.jPlayer("setMedia", {
