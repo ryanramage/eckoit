@@ -393,9 +393,15 @@ app.controller.audioNext = function(lastID, lastStartDate, lastEndDate, callback
         },
         success : function(results) {
             var find = null;
+            var closest = Number.MAX_VALUE;
+
             $.each(results.rows, function(i, item) {
                 if (item.id != lastID) {
-                    find = item.value;
+                    var howClose = item.value.start - lastEndDate.getTime()
+                    if (howClose < closest) {
+                        find = item.value;
+                        closest = howClose;
+                    }
                 }
             });
             callback({

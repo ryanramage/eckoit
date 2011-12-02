@@ -212,6 +212,7 @@
                   maxDate : lastUpdateDate
             }
             if (!aboutToUpdateDueToDragComplete) {
+                console.log('playing: ' + lastUpdateDate.toString());
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
             }
         }
@@ -234,6 +235,7 @@
             else if (state == 'ready' || state == 'stopped') {
                 button.html('&#9632;');
                 var centreDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+                console.log('click: ' + centreDate.toString());
                 settings.audioDiv.liferecorder('play', centreDate);
                 state = 'playing';
             }
@@ -258,7 +260,7 @@
         var lastTimelineDate;
 
         function timelineDragFinished() {
-            
+            console.log('setting audio to: ' + lastTimelineDate.toString());
             lastUpdateDate = lastTimelineDate;
             settings.audioDiv.liferecorder('play', lastTimelineDate);
             setTimeout(function() {
@@ -272,6 +274,7 @@
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
             if (data.source == 'audioplayer') return;
             if (state != 'playing') return;
+            console.log('about to chabge');
             aboutToUpdateDueToDragComplete = true;
             internalDateChange = true;
             lastTimelineDate = data.centreDate;
