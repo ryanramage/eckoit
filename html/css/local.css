@@ -135,11 +135,34 @@ td.fc-header-right {
 }
 
 .playbutton {
+
+
+    position: absolute;
     cursor: pointer;
-    border: 1px solid #ccc;
-    padding: 3px;
+    border: 1px solid #CCC;
+    
     border-radius: 3px;
-    width: 15px;
+    width: 35px;
     display: inline;
-    float: left;
+    z-index: 100;
+    
+    height: 35px;
+    background: #ffc;
+
+
+
+}
+
+.playbutton.playing {
+    font-size: 50px;
+    padding: 3px;
+}
+
+.playbutton.stopped {
+    font-size: 40px;
+    padding-top: 20px;
+}
+
+.playbutton.seeking {
+    padding: 10px;
 }

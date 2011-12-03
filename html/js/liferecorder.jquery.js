@@ -143,6 +143,8 @@
         stop : function() {
             var data = $(this).data('liferecorderplayer');
             data.player.jPlayer("stop");
+            data.element.trigger('liferecorder.stopped');
+            
         },
         destroy : function() {
             var player = $(this).data('liferecorderplayer').element.find('.player');

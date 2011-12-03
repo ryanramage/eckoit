@@ -7,6 +7,8 @@
 
     var UPDATE_DATE_VIEWS      = "timeline.audioplayer.views.updatedate";
     var USER_DATE_CHANGE_EVENT = "timeline.audioplayer.datechange";
+    var TIMELINE_DATE_EVENT = "timeline.audioplayer.date";
+
     var NEW_RESULTS_CHANGE_EVENT = "timeline.audioplayer.resultschange";
 
     var DATE_CHANGE_EVENT_TEMPLATE = {
@@ -180,6 +182,7 @@
             }
 
             timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+            timelineElement.trigger(TIMELINE_DATE_EVENT, update);
             
         });
 
@@ -202,6 +205,31 @@
         var internalDateChange = false;
         var lastUpdateDate;
         var aboutToUpdateDueToDragComplete = false;
+
+
+        function changeButtonDisplay(button, state) {
+            if (state == 'playing') {
+                button
+                    .html('&#9632;')
+                    .removeClass('seeking stopped ready')
+                    .addClass('playing')
+            }
+            else if (state == 'ready' || state == 'stopped') {
+                button
+                    .html('&#9654;')
+                    .removeClass('seeking playing  ready')
+                    .addClass('stopped')
+            }
+            else if (state == 'seeking') {
+                if (!button.hasClass('seeking')){
+                    button
+                        .html('<img src="images/spinner.gif" />')
+                        .removeClass('playing  ready stopped')
+                        .addClass('seeking')
+                }
+            }
+        }
+
 
         function dateBroadcaster() {
             if (internalDateChange) return;
@@ -229,15 +257,15 @@
         button.bind('click', function() {
             if (state == 'playing') {
                 settings.audioDiv.liferecorder('stop');
-                button.html('&#9654;');
                 state = 'stopped';
+
             }
             else if (state == 'ready' || state == 'stopped') {
-                button.html('&#9632;');
                 var centreDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
                 settings.audioDiv.liferecorder('play', centreDate);
                 state = 'playing';
             }
+            changeButtonDisplay(button, state);
         });
 
 
@@ -248,15 +276,28 @@
             audioNext  : settings.audioNext,
             onReady : function() {
                 state = 'ready';
-                button.html('&#9654;');
+                changeButtonDisplay(button, state);
             }
         }).bind("liferecorder.update", function(e, date){
             if (aboutToUpdateDueToDragComplete) return;
-            lastUpdateDate = date;
-            throttleDateBroadcaster();
-        });
+
+            if (state != 'stopped') { // there seems to be an update lagging
+                lastUpdateDate = date;
+                throttleDateBroadcaster();
+                state = 'playing';
+                changeButtonDisplay(button, state);
+            }
+
+        }).bind("liferecorder.stopped", function() {
+            if (aboutToUpdateDueToDragComplete) return;
+            state = 'stopped';
+            changeButtonDisplay(button, state);
+        })
 
         var lastTimelineDate;
+
+
+
 
         function timelineDragFinished() {
             lastUpdateDate = lastTimelineDate;
@@ -267,17 +308,32 @@
             }, 100)
         }
 
-        var debouncedTimelineDragFinished = _.debounce(timelineDragFinished, 1000);
+        var debouncedTimelineDragFinished = _.debounce(timelineDragFinished, 600);
 
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
             if (data.source == 'audioplayer') return;
             if (state != 'playing') return;
             aboutToUpdateDueToDragComplete = true;
-            internalDateChange = true;
-            lastTimelineDate = data.centreDate;
-            debouncedTimelineDragFinished();
-            internalDateChange = false;
         });
+
+        // wire right to timeline events
+        settings.timeline.getBand(1).addOnScrollListener(function(band) {
+            //if (state != 'playing') return;
+            if (!aboutToUpdateDueToDragComplete) return
+            aboutToUpdateDueToDragComplete = true;
+            internalDateChange = true;
+            lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+            debouncedTimelineDragFinished();
+
+            state = 'seeking';
+            changeButtonDisplay(button, state);
+
+            internalDateChange = false;
+
+
+        });
+
+
 
     }
 
