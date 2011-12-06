@@ -240,7 +240,6 @@
                   maxDate : lastUpdateDate
             }
             if (!aboutToUpdateDueToDragComplete) {
-
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
             }
         }
@@ -298,36 +297,50 @@
 
 
 
+        var justInCaseNoDragFired;
 
         function timelineDragFinished() {
+            internalDateChange = true;
+            clearTimeout(justInCaseNoDragFired);
             lastUpdateDate = lastTimelineDate;
+            if (!lastTimelineDate) {
+                lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+            }
             settings.audioDiv.liferecorder('play', lastTimelineDate);
-            setTimeout(function() {
-                aboutToUpdateDueToDragComplete = false;
-                //dateBroadcaster();
-            }, 100)
+            aboutToUpdateDueToDragComplete = false;
+            setTimeout(function() {                
+                internalDateChange = false
+            }, 50);
+            
+
+
         }
 
         var debouncedTimelineDragFinished = _.debounce(timelineDragFinished, 600);
+
+
 
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
             if (data.source == 'audioplayer') return;
             if (state != 'playing') return;
             aboutToUpdateDueToDragComplete = true;
+            //debouncedTimelineDragFinished();
+            justInCaseNoDragFired = setTimeout(timelineDragFinished, 500);
         });
 
         // wire right to timeline events
         settings.timeline.getBand(1).addOnScrollListener(function(band) {
             //if (state != 'playing') return;
-            if (!aboutToUpdateDueToDragComplete) return
+            lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+            if (!aboutToUpdateDueToDragComplete) return;
+            clearTimeout(justInCaseNoDragFired);
             aboutToUpdateDueToDragComplete = true;
             internalDateChange = true;
             lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
             debouncedTimelineDragFinished();
 
-            state = 'seeking';
+            state = 'seeking';            
             changeButtonDisplay(button, state);
-
             internalDateChange = false;
 
 
