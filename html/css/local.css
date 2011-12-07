@@ -42,10 +42,12 @@ body {
 
 .votes {
         color: #555;
+        cursor: pointer;
 }
 
 .views {
     color: #999;
+
 }
 
 .answers {
@@ -101,8 +103,66 @@ td.fc-header-right {
    
 }
 
-.calendar-ui {
+#calendar-ui {
     width: 800px;
     margin-left: auto;
     margin-right: auto;
+}
+
+#playhead {
+    position: absolute;
+    width: 1px;
+    background-color:#6D84B4;
+    height: 450px;
+    z-index: 20;
+}
+
+.fc-labels {
+
+    font-size: 8px;
+    line-height: 9px;
+    padding-left: 1px;
+    float: left;
+    border: 1px solid #6D84B4;
+    background-color: #ffc;
+    border-radius: 3px;
+    height: 12px;
+    min-width: 10px;
+    margin-left: 2px;
+    margin-top: 1px;
+    opacity: .5;
+    filter: alpha(opacity=50); /* for IE */
+}
+
+#audio-ui .playbutton {
+
+
+    position: absolute;
+    cursor: pointer;
+    border: 1px solid #CCC;
+    
+    border-radius: 3px;
+    width: 35px;
+    display: inline;
+    z-index: 100;
+    
+    height: 35px;
+    background: #ffc;
+
+
+
+}
+
+#audio-ui .playbutton.playing {
+    font-size: 50px;
+    padding: 3px;
+}
+
+#audio-ui .playbutton.stopped {
+    font-size: 40px;
+    padding-top: 20px;
+}
+
+#audio-ui .playbutton.seeking {
+    padding: 10px;
 }

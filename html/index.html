@@ -19,6 +19,7 @@
         Timeline_ajax_url = "js/lib/timeline_2.3.1/timeline_ajax/simile-ajax-api.js";
         Timeline_urlPrefix = 'js/lib/timeline_2.3.1/timeline_js/';
         Timeline_parameters = 'bundle=true';
+        
     </script>
 
     <script src="js/lib/timeline_2.3.1/timeline_js/timeline-api.js"></script>
@@ -40,6 +41,8 @@
                 "js/lib/geo.js",
                 "js/lib/date-utils.min.js",
                 "js/lib/fullcalendar.min.js",
+                "js/lib/jquery.jplayer.js",
+                "js/liferecorder.jquery.js",
                 "js/timeline.audioplayer.js",
                 "js/app.js",
                 "js/onready.js"
@@ -183,7 +186,7 @@
         <script id="timelineRowTemplate" type="text/html">
             <div class="row topic timeline" >
                 <div class="span2">
-                    <div class="votes" data-id="{{_id}}">
+                    <div class="votes" data-id="{{_id}}" title="+1 Vote">
                         <div class="mini-counts">{{#votes}}{{votes}}{{/votes}}{{^votes}}0{{/votes}}</div>
                         <div>Votes</div>
                     </div>
@@ -195,7 +198,7 @@
                 </div>
                 <div class="span8 ">
                     <div class="title">
-                        <a href="#/timeline/18-Jun-2011_7:43:14_PM"><time class="timeago" datetime="{{datestamp_iso}}">{{datestamp_string}}</time></a>
+                        <a href="#/timeline/{{datestamp_link}}"><time class="timeago" datetime="{{datestamp_iso}}">{{datestamp_string}}</time></a>
 
 
                     </div>
@@ -219,8 +222,8 @@
 
                 </div>
                 <div class="span2">
-                    <button class="btn">&#9654;</button>
-                    <div>
+                    <button class="btn playbutton"><img src="images/spinner.gif"/></button>
+                    <div class="markplayer">
                         30 seconds
                     </div>
                 </div>
@@ -373,14 +376,10 @@
 
         <script id="timelineTemplate" type="text/html">
   
-            <div class="calendar-ui">
+            <div id="calendar-ui"></div>
+            <div id="audio-ui"></div>
+            <div id="timeline-ui"></div>
 
-            </div>
-
-            <div id="timeline-ui" style="">
-
-
-            </div>
 
             <div class="timelineplayer"></div>
 

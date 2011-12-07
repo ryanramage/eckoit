@@ -24,6 +24,68 @@ var couchapp = require('couchapp')
 
 /** add views/shows/lists below **/
 
+
+  ddoc.views.audio_by_time = {
+     map: function(doc) {
+         if (doc.recording) {
+             var result = {
+                 _id: doc._id,
+                 type: 'recording',
+                 start : doc.recording.start,
+                 file : doc._attachments
+             };
+             if (doc.recording.length) {
+                 result.end = (doc.recording.length * 1000) + doc.recording.start;
+             }
+             emit(result.start, result);
+         }
+     }
+  }
+
+
+  ddoc.views.timeline_stuff = {
+      map: function(doc) {
+          if (doc.timestamp) {
+              emit(doc.timestamp, doc.type)
+          }
+      }
+  }
+
+
+  ddoc.views.mark_totals = {
+      map : function(doc) {
+          if (doc.timestamp) {
+             var start  = doc.timestamp;
+             var d = new Date(start);
+             var year = d.getFullYear();
+             var month = d.getMonth() + 1;
+             var day = d.getDate() ;
+             emit([year, month, day], 1);
+          }
+      },
+      reduce: '_sum'
+  }
+
+  ddoc.views.audio_totals = {
+      map : function(doc) {
+          if (doc.recording) {
+             var start  = doc.recording.start;
+             var length = doc.recording.length;
+             if (length == 0) return;
+             var d = new Date(start);
+             var year = d.getFullYear();
+             var month = d.getMonth() + 1;
+             if (month <= 9) month = '0' + month;
+             var day = d.getDate() ;
+             if (day <=9) day = '0' + day;
+             emit([year, month, day], length);
+          }
+      },
+      reduce: '_sum'
+  }
+
+
+
   ddoc.views.unfiltered = {
       map : function(doc) {
           if (doc.timestamp)                            emit([0, doc.timestamp], null);
@@ -155,5 +217,10 @@ var couchapp = require('couchapp')
           return [doc, doc.views + ""];
       }
   }
+
+
+
+
+
 
   couchapp.loadAttachments(ddoc, path.join(__dirname, 'html'));
