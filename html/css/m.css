@@ -1,0 +1,17 @@
+.hidden {
+    display: none;
+}
+
+.main-menu {
+    width: 200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ui-bar-f {
+    border: 1px solid #56A00E;
+    background: #74B042;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 -1px 1px #234403;
+}

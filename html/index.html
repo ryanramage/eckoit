@@ -1,26 +1,415 @@
-<!doctype html>
-<html>
+    <!doctype html>
 <head>
-  <meta charset="utf-8"/>
-  <title>Ecko-It</title>
+    <meta charset="utf-8">
+    <title>Ecko-It</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+        <script src="js/lib/html5.js"></script>
+      <![endif]-->
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <link rel="icon" type="image/vnd.microsoft.icon" href="images/ecko-it.ico">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fullcalendar.css">
+    <link rel="stylesheet" href="css/local.css">
+
+
+    <script>
+        Timeline_ajax_url = "js/lib/timeline_2.3.1/timeline_ajax/simile-ajax-api.js";
+        Timeline_urlPrefix = 'js/lib/timeline_2.3.1/timeline_js/';
+        Timeline_parameters = 'bundle=true';
+    </script>
+
+    <script src="js/lib/timeline_2.3.1/timeline_js/timeline-api.js"></script>
+    <script src="js/lib/head.min.js"></script>
+    <script>
+        head.js("js/lib/jquery-1.6.2.min.js",
+                "js/lib/jquery-ui-1.8.11.custom.min.js",
+                "js/lib/SS.min.js",
+                "js/lib/underscore.js",
+                "js/lib/json2.js",
+                "js/lib/jquery.couch.js",
+                "js/lib/ICanHaz.min.js",
+                "js/lib/bootstrap-alerts.js",
+                "js/lib/bootstrap-modal.js",
+                "js/lib/bootstrap-twipsy.js",
+                "js/lib/bootstrap-popover.js",
+                "js/lib/bootstrap-tabs.js",
+                "js/lib/jquery.timeago.js",
+                "js/lib/geo.js",
+                "js/lib/date-utils.min.js",
+                "js/lib/fullcalendar.min.js",
+                "js/timeline.audioplayer.js",
+                "js/app.js",
+                "js/onready.js"
+            );
+    </script>
 
 </head>
 
 <body>
-  <header>
-  </header>
+    <div class="topbar">
+        <div class="fill">
+            <div class="container">
+                <h3><a href="#">Ecko-It</a></h3>
+                <ul class="maintabs">
+                    <li class="dashboard"><a href="#/dashboard">Dashboard</a></li>
+                    <li class="timeline"><a href="#/timeline">Timeline</a></li>
+                    <li class="topics"><a href="#/topics">Topics</a></li>
+                    <li class="threads"><a href="#/threads">Threads</a></li>
+                    <li class="meetings"><a href="#/meetings">Meetings</a></li>
+                </ul>
+                <form action="">
+                    <input type="text" placeholder="Search">
+                </form>
+               <ul class="maintabs">
+                    <li class="dashboard"><a href="m.html">Mobile</a></li>
+                </ul>
+            </div>
+        </div> <!-- /fill -->
+    </div> <!-- /topbar -->
 
-  <div>
-      Holy Crap, its all gone!
-  </div>
+    <div class="container main">
 
-  <footer>
-  </footer>
+
+
+
+
+
+        <script id="dashboardTemplate" type="text/html">
+            <!-- Main hero unit for a primary marketing message or call to action -->
+            <div class="hero-unit">
+                <h1>Hello, world!</h1>
+                <p>Vestibulum id ligula porta felis euismod semper. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</p>
+                <p><a class="btn primary large">Learn more &raquo;</a></p>
+            </div>
+        </script>
+
+
+        <script id="bookmarkRowTemplate" type="text/html">
+            <div class="row topic bookmark">
+                <div class="span2">
+                    <div class="votes">
+                        <div class="mini-counts">0</div>
+                        <div>Votes</div>
+                    </div>
+                    <div class="views">
+                        <div class="mini-counts">0</div>
+                        <div>Views</div>
+                    </div>
+                </div>
+                <div class="span8 ">
+                    <div class="title">
+                        <a href="#/topic/2123131312321/raphael-javascript-library">Raphael JavaScript Library</a>
+                    </div>
+                    <p class="small">
+                        A really good vector graphics toolkit
+                    </p>
+                    <div class="tags">
+                        {{#tags}}
+                            <span class="label notice">{{.}}</span>
+                        {{/tags}}
+                    </div>
+                </div>
+                <div class="span2">
+                    <ul class="media-grid">
+                        <li>
+                            <a href="http://raphaeljs.com/">
+                                <img class="thumbnail" src="http://www.bitpixels.com/getthumbnail?code=7396&url=http://raphaeljs.com/" alt="">
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </script>
+        <script id="topicRowTemplate" type="text/html">
+            <div class="row topic agenda">
+                <div class="span2">
+                    <div class="votes">
+                        <div class="mini-counts">0</div>
+                        <div>Votes</div>
+                    </div>
+                    <div class="views">
+                        <div class="mini-counts">0</div>
+                        <div>Views</div>
+                    </div>
+                </div>
+                <div class="span8 ">
+                    <div class="title">
+                        <a href="#/topic/2123131312321/which-project-will-we-use-for-project-x">Which library will we use for Project x?</a>
+                    </div>
+                    <p class="small">
+
+                    </p>
+                    <div class="tags">
+                        <span class="label notice">javascript</span> <span class="label notice">libraries</span> <span class="label">project-x</span> <span class="label">working-group</span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="accepted">
+                        &#10003;
+                    </div>
+                    <div class="answers">
+                        <div class="mini-counts">5</div>
+                        <div>Answers</div>
+                    </div>
+                </div>
+            </div>
+        </script>
+         <script id="topicCreateTemplate" type="text/html">
+                  <div class="clearfix">
+                    <label id="optionsNewType">Title</label>
+                    <div class="input">
+                        <input type="text" name="Title" class="span9" placeholder="What's the title of the topic? Be specific."/>
+                    </div>
+                  </div> <!-- /clearfix -->
+
+                  <div class="clearfix">
+                    <label for="textarea">Textarea</label>
+                    <div class="input">
+                      <textarea class="xxlarge" id="textarea2" name="textarea2" rows="5"></textarea>
+                      <span class="help-block">
+                        Enter Topic Details.
+                      </span>
+                    </div>
+                  <!-- /clearfix -->
+                  </div>
+
+
+        </script>
+
+        <script id="timelineRowTemplate" type="text/html">
+            <div class="row topic timeline" >
+                <div class="span2">
+                    <div class="votes" data-id="{{_id}}">
+                        <div class="mini-counts">{{#votes}}{{votes}}{{/votes}}{{^votes}}0{{/votes}}</div>
+                        <div>Votes</div>
+                    </div>
+                    <div class="views" data-id="{{_id}}">
+                        <div class="mini-counts">0</div>
+                        <div>Views</div>
+                    </div>
+
+                </div>
+                <div class="span8 ">
+                    <div class="title">
+                        <a href="#/timeline/18-Jun-2011_7:43:14_PM"><time class="timeago" datetime="{{datestamp_iso}}">{{datestamp_string}}</time></a>
+
+
+                    </div>
+                    <p class="small">
+                        {{note}}
+                    </p>
+                    <div class="tagholder">
+                        <span class="tags">
+                            {{#tags}}
+                            <a href="#/topics/tagged/{{.}}"><span class="label notice">{{.}}</span></a>
+                            {{/tags}}
+                        </span>
+                        {{#position}}
+                        <span class="position">
+                            {{#geohash}}
+                            <a href="#/topics/located/{{geohash}}">&#8853;</a><span></span>
+                            {{/geohash}}
+                        </span>
+                        {{/position}}
+                    </div>
+
+                </div>
+                <div class="span2">
+                    <button class="btn">&#9654;</button>
+                    <div>
+                        30 seconds
+                    </div>
+                </div>
+            </div>
+        </script>
+        <script id="pictureRowTemplate" type="text/html">
+            <div class="row topic picture">
+                <div class="span2">
+                    <div class="votes">
+                        <div class="mini-counts">0</div>
+                        <div>Votes</div>
+                    </div>
+                    <div class="views">
+                        <div class="mini-counts">0</div>
+                        <div>Views</div>
+                    </div>
+
+                </div>
+                <div class="span8 ">
+                    <div class="title">
+                        <a href="#/topics/12345/img_232323">img 2323232</a>
+                    </div>
+                    <p class="small">
+                        A shot of the whiteboard.
+                    </p>
+                    <div class="tags">
+                        <span class="label notice">javascript</span> <span class="label notice">libraries</span> <span class="label">jquery</span> <span class="label">html5</span> <span class="label">history</span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <ul class="media-grid">
+                        <li>
+                            <a href="db/1221212121/img_2323232.jpg">
+                                <img class="thumbnail" src="http://placehold.it/100x75" alt="">
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+        </script>
+        <script id="relatedTagsTemplate" type="text/html">
+            {{#tags}}
+                 <li>{{.}}</li>
+            {{/tags}}
+        </script>
+
+        <script id="topicsTemplate" type="text/html">
+            <div class="row">
+                <div class="span13">
+                    <div class="row">
+                        <div class="span13">
+                            <ul class="breadcrumb">
+                                <li>Tags <span class="divider">&gt;</span></li>
+                                {{#tags}}
+                                    <li><a href="#/topics/tagged/{{.}}">{{.}}</a> <span class="divider">|</span></li>
+                                {{/tags}}
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="span=2">
+                            <a href="#/topics/new/topic" class="btn success">New Topic</a>
+                        </div>
+                        <div class="span10 offset1">
+                            <ul class="pills topicFilter " data-pills="pills">
+                                <li class="active" data-sort="0"><a href="#">Recent</a></li>
+                                <li  data-sort="1"><a href="#">Votes</a></li>
+                                <li  data-sort="2"><a href="#">Views</a></li>
+                                <li  data-sort="3"><a href="#">Undiscussed</a></li>
+                                <li  data-sort="4"><a href="#">Unresolved</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row topics">
+                    </div>
+                </div>
+                <div class="span3">
+                    <h5>
+                        Related Tags
+                    </h5>
+                    <ul class="related unstyled">
+
+                    </ul>
+                    <p>
+                        <a href="#/tags">all tags &raquo;</a>
+                    </p>
+                </div>
+            </div>
+            <footer>
+                <p>&copy; Eckoit Inc. 2011</p>
+            </footer>
+        </script>
+
+        <script id="topicNewTemplate" type="text/html">
+            <!-- Main hero unit for a primary marketing message or call to action -->
+            <form class="newForm">
+                <fieldset>
+                  <legend>Add New</legend>
+                  <div class="clearfix">
+                    <label id="optionsNewType">Type</label>
+                    <div class="input">
+                        <ul class="inputs-list newTopicType">
+                            <li>
+                                <label>
+                                    <input type="radio" name="optionsType"  id="topicType"  value="topic" />
+                                    <span>Topic</span>
+                                </label>
+                            </li>
+                            <li> 
+                                <label>
+                                    <input type="radio" name="optionsType" id="bookmarkType"  value="bookmark" />
+                                    <span>Bookmark</span>
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="radio" name="optionsType" id="pictureType"  value="picture" />
+                                    <span>Picture</span>
+                                </label>
+                            </li>
+
+
+                        </ul>
+                    </div>
+                  </div> <!-- /clearfix -->
+
+                  <div class="topicTypeForm">
+                      
+                  </div>
+
+                  <div class="clearfix">
+                    <label id="optionsNewType">Tags</label>
+                    <div class="input">
+                        <input type="text" name="dsadas" />
+                    </div>
+                  </div> <!-- /clearfix -->
+                  
+
+                  <div class="actions">
+                      <button class="save btn primary">Save</button>
+                      <a href="#/topics" class="btn">Cancel</a>
+                  </div>
+                </fieldset>
+            </form>
+        </script>
+
+
+        <script id="timelineTemplate" type="text/html">
+  
+            <div class="calendar-ui">
+
+            </div>
+
+            <div id="timeline-ui" style="">
+
+
+            </div>
+
+            <div class="timelineplayer"></div>
+
+
+            <footer>
+                <p>&copy; Eckoit Inc. 2011</p>
+            </footer>
+
+        </script>
+
+
+        <script id="topicTemplate" type="text/html">
+
+        </script>
+        <script id="bookmarkTemplate" type="text/html">
+
+        </script>
+
+
+
+
+
+        <footer>
+            <p>&copy; Eckoit Inc. 2011</p>
+        </footer>
+
+    </div> <!-- /container -->
+
 
 
 </body>
-
 </html>
