@@ -287,7 +287,7 @@ return false;
 };
 Timeline._Band.prototype._autoScroll=function(D,C){var A=this;
 var B=SimileAjax.Graphics.createAnimation(function(E,F){A._moveEther(F);
-},0,D,1000,C);
+},0,D,100,C);
 B.run();
 };
 Timeline._Band.prototype._moveEther=function(A){this.closeBubble();
@@ -1769,6 +1769,7 @@ if(B==null){B=Timeline.GregorianDateLabeller.prototype.defaultLabelInterval;
 }return B.call(this,A,C);
 };
 Timeline.GregorianDateLabeller.prototype.labelPrecise=function(A){return SimileAjax.DateTime.removeTimeZoneOffset(A,this._timeZone).toUTCString();
+//Timeline.GregorianDateLabeller.prototype.labelPrecise=function(A){return SimileAjax.DateTime.removeTimeZoneOffset(A,this._timeZone).toLocaleDateString();
 };
 Timeline.GregorianDateLabeller.prototype.defaultLabelInterval=function(B,F){var C;
 var E=false;
@@ -1787,7 +1788,14 @@ case SimileAjax.DateTime.HOUR:
     if (hr === 0) {
         C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();
     } else {
-        C=B.getUTCHours()+"hr";
+        var ampm = 'am';
+        var hrs = B.getUTCHours();
+        var hrs12 = hrs % 12;
+        if (hrs >= 12) ampm = 'pm';
+        if (hrs == 12) hrs12 = 12;
+        C=hrs12 + ampm;
+
+        //C=B.getUTCHours()+"hr";
     }
     break;
 case SimileAjax.DateTime.DAY:C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();

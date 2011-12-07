@@ -42,9 +42,11 @@ app.view.activeCategory = function(category) {
 app.onDomReady = function() {
     $('.votes').live('click', function() {
         var $me = $(this);
+        $me.find('.mini-counts').html('<img src="images/spinner.gif" />');
         var id = $me.data('id');
+
         app.controller.bumpVotes(id, function(newCount) {
-            $me.find('.mini-counts').text(newCount);
+            $me.find('.mini-counts').html(newCount);
         }, function(error) {
 
         });
@@ -157,7 +159,8 @@ app.view.showTopics = function(results) {
 
 
 app.view.typeToTemplate = {
-    "com.eckoit.utag" : "timelineRowTemplate"
+    "com.eckoit.utag" : "timelineRowTemplate",
+    "com.eckoit.liferecorder.mark" : "timelineRowTemplate"
 }
 
 
@@ -180,9 +183,49 @@ app.controller.showTopic = function(topic, div) {
         topic.datestamp = new Date(topic.timestamp);
         topic.datestamp_iso = iso8601(topic.datestamp);
         topic.datestamp_string = topic.datestamp.toLocaleString();
+        topic.datestamp_link = $.fullCalendar.formatDate(topic.datestamp, "d-MMM-yyyy_h:mm:ss_tt");
     }
 
-    div.append( ich[template](topic)  );
+    var rendered = ich[template](topic) ;
+    div.append( rendered );
+    if (topic.timestamp) {
+  
+
+        rendered.find('.markplayer').each(function(){
+            var markplayer = $(this);
+
+            var button = rendered.find('.playbutton');
+
+            var state = 'loading';
+            button.bind('click', function() {
+
+                if (state == 'playing') {
+                    markplayer.liferecorder('stop');
+                    button.html('&#9654;');
+                    state = 'stopped';
+                }
+                else if (state == 'ready' || state == 'stopped') {
+                    button.html('&#9632;');
+                    markplayer.liferecorder('play', new Date(topic.timestamp), 30);
+                    state = 'playing';
+                }
+            })
+
+            markplayer.liferecorder({
+                documentPrefix : 'api',
+                audioQuery : app.controller.audioQuery,
+                audioNext  : app.controller.audioNext,
+                onReady : function() {
+                    state = 'ready';
+                    button.html('&#9654;');
+                }
+            }).bind("liferecorder.stopped", function(e, date){
+                button.trigger('click');
+            });
+        });
+    }
+
+
     
 }
 
@@ -242,20 +285,340 @@ app.controller.parseRequestedDate = function(date) {
             resultDate = new Date(date);
         }
 
+
         return resultDate;
 	
 }
+
+app.controller.loadedAudio = {};
+
+app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) {
+
+    minDate = new Date(minDate);
+    maxDate = new Date(maxDate);
+    centreDate = new Date(centreDate);
+
+    $.couch.db('').view(app.ddoc + '/audio_by_time', {
+        startkey :  minDate.getTime(),
+        endkey : maxDate.getTime(),
+        error : function() {
+
+        },
+        success : function(results) {
+
+
+            var centerItem;
+            var recordings = [];
+            $.each(results.rows, function(i, item) {
+                if (app.controller.loadedAudio[item.id]) return;
+
+                if (centreDate && item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
+                    centerItem = item.value;
+                }
+
+                var recording =  {
+                    eventID: item.id,
+                    start: new Date(item.value.start),
+                    end: new Date(item.value.end),
+                    durationEvent : true,
+                    title : "",
+                    caption : "Recording",
+                    trackNum : 1
+                }
+                recordings.push(recording);
+                app.controller.loadedAudio[item.id] = true;
+            });
+            callback({
+                recordings: recordings,
+                centerItem : centerItem
+            });
+        }
+    })
+}
+
+app.controller.audioQuery = function(minDate, maxDate, centreDate, callback) {
+
+    minDate = new Date(minDate);
+    maxDate = new Date(maxDate);
+    centreDate = new Date(centreDate);
+
+    $.couch.db('').view(app.ddoc + '/audio_by_time', {
+        startkey :  minDate.getTime(),
+        endkey : maxDate.getTime(),
+        error : function() {
+
+        },
+        success : function(results) {
+
+
+            var centerItem;
+            var recordings = [];
+            $.each(results.rows, function(i, item) {
+                if (centreDate && item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
+                    centerItem = item.value;
+                }
+
+                var recording =  {
+                    eventID: item.id,
+                    start: new Date(item.value.start),
+                    end: new Date(item.value.end),
+                    durationEvent : true,
+                    title : "",
+                    caption : "Recording",
+                    trackNum : 1
+                }
+                recordings.push(recording);
+            });
+            callback({
+                recordings: recordings,
+                centerItem : centerItem
+            });
+        }
+    })
+}
+
+/**
+ * This version of audio next gets the next audio past the start date.
+ */
+app.controller.audioNext = function(lastID, lastStartDate, lastEndDate, callback) {
+
+    lastStartDate = new Date(lastStartDate);
+    lastEndDate = new Date(lastEndDate);
+
+    $.couch.db('').view(app.ddoc + '/audio_by_time', {
+        startkey :  lastStartDate.getTime() + 2, // some leeway
+        limit : 2,
+        error : function() {
+
+        },
+        success : function(results) {
+            var find = null;
+            var closest = Number.MAX_VALUE;
+
+            $.each(results.rows, function(i, item) {
+                if (item.id != lastID) {
+                    var howClose = item.value.start - lastEndDate.getTime()
+                    if (howClose < closest) {
+                        find = item.value;
+                        closest = howClose;
+                    }
+                }
+            });
+            callback({
+                centerItem : find
+            });
+        }
+    })
+
+
+
+}
+
+
+
+ app.controller.tagToTimelineMarkerTitle = function (tag) {
+    var tagString = "Mark";
+    if (tag.tags) {
+        tagString = _.reduce(tag.tags, function(memo, tag){return memo + ',' + tag}, '').substring(1);
+
+    }
+    var title = " [" + tagString +"]";
+    if (tag.text) {
+        title = tag.text + " [" + tagString +"]";
+    }
+    return title;
+}
+
+app.controller.typeToTimelineModel = {
+    "com.eckoit.utag" : function(doc) {
+        var base = {
+            eventID: doc._id,
+            start: new Date(doc.timestamp),
+            durationEvent : false,
+            //end : new Date(item.value.end),
+            title : app.controller.tagToTimelineMarkerTitle(doc),
+
+            caption : "uTag"
+
+        };
+        if (doc.duration) {
+            base.end = new Date(doc.timestamp + doc.length);
+        }
+
+        
+        //if(isTagNotEdited(item.value)) {
+        //    base.classname = 'untagged';
+       // }
+        return base;
+    },
+    "com.eckoit.liferecorder.mark" : function(doc) {
+
+        var base = {
+            eventID: doc._id,
+            start: new Date(doc.timestamp),
+            end :  new Date(doc.timestamp + doc.mark.length),
+            durationEvent : false,
+            //end : new Date(item.value.end),
+            title : app.controller.tagToTimelineMarkerTitle(doc),
+            
+            caption : "Liferecorder Mark"
+
+        };
+        //if(isTagNotEdited(item.value)) {
+        //    base.classname = 'untagged';
+       // }
+
+        return base;
+    }
+}
+
+
+app.controller.isEventLength = function(start, end) {
+    return true;
+    if (!end) return false;
+    // if it is greater than 15 min, that is event for me.
+    if ((end.getTime() - start.getTime()) > (15 * 60 * 1000)) {
+        return true;
+    }
+    return false;
+}
+
+
+app.controller.typeToCalendarModel = {
+    "com.eckoit.utag" : function(doc) {
+
+        var base = {
+            id: doc._id,
+            title : app.controller.tagToTimelineMarkerTitle(doc),
+            start: new Date(doc.timestamp),
+            allDay : false
+        }
+        if (doc.duration) {
+            base.end = new Date(doc.timestamp + doc.length)
+        }
+        if (app.controller.isEventLength(base.start, base.end)) {
+            return base;
+        }
+   
+    },
+    "com.eckoit.liferecorder.mark" : function(doc) {
+        var base = {
+            id: doc._id,
+            title : app.controller.tagToTimelineMarkerTitle(doc),
+            start: new Date(doc.timestamp),
+            end :  new Date(doc.timestamp + doc.mark.length),
+            allDay : false
+        }
+
+        if (app.controller.isEventLength(base.start, base.end)) {
+            return base;
+        }
+
+        
+    }
+}
+
+
+app.controller.loadedEvents = {};
+
+app.controller.timelineEvents = function(minDate, maxDate, callback, reload) {
+   $.couch.db('').view(app.ddoc + '/timeline_stuff', {
+        startkey :  minDate.getTime(),
+        endkey : maxDate.getTime(),
+        include_docs : true,
+        error : function() {
+
+        },
+        success : function(results) {
+
+            var timelineModel = [];
+            var calendarModel = [];
+            $.each(results.rows, function(i, row) {
+
+
+                if(app.controller.loadedEvents[row.id]) return;
+
+                var test = app.controller.typeToTimelineModel[row.value];
+                var tl  = app.controller.typeToTimelineModel[row.value](row.doc);
+                var cal = app.controller.typeToCalendarModel[row.value](row.doc);
+                timelineModel.push(tl);
+                if (cal) {
+                    calendarModel.push(cal);
+                }
+                app.controller.loadedEvents[row.id] = true;
+            });
+
+            callback({
+                timelineModel: timelineModel,
+                calendarModel : calendarModel
+            });
+        }
+    })
+}
+
+
+app.controller.dayStatsProvider = function(startDate, endDate, tagCountsCallback, audioCountsCallback) {
+    var startkey = [startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()];
+    var endkey = [endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate()]
+
+   $.couch.db('').view(app.ddoc + '/mark_totals', {
+        startkey :  startkey,
+        endkey : endkey,
+        reduce : true,
+        group_level : 3,
+        error : function() {
+        },
+        success : function(results) {
+            var normal = _.map(results.rows, function(row) {
+                var date = new Date(row.key[0],row.key[1] -1,row.key[2]);
+                return {
+                   date : date,
+                   count : row.value
+
+                };
+            });
+            tagCountsCallback(normal);
+        }
+    });    
+   $.couch.db('').view(app.ddoc + '/audio_totals', {
+        startkey :  startkey,
+        endkey : endkey,
+        reduce : true,
+        group_level : 3,
+        error : function() {
+        },
+        success : function(results) {
+            var normal = _.map(results.rows, function(row) {
+                var date = new Date(row.key[0],row.key[1]-1,row.key[2]);
+                return {
+                   date : date,
+                   count : row.value
+
+                };
+            });
+            audioCountsCallback(normal);
+        }
+    });
+    
+
+
+
+
+}
+
 
 
 app.controller.createTimeline = function(initialDate) {
 
     if (!initialDate) initialDate = new Date();
 
+
     var utcOffset = initialDate.getUTCOffset();
 
     // hack attack. Not sure what timeline really wants?
     var timeZoneOffset = parseInt(utcOffset[0] + utcOffset[2]);
     var eventSource = new Timeline.DefaultEventSource();
+    SimileAjax.History.enabled = false;
     var theme = Timeline.ClassicTheme.create();
     var bandInfos = [
         Timeline.createBandInfo({
@@ -284,15 +647,67 @@ app.controller.createTimeline = function(initialDate) {
     bandInfos[0].highlight = true;
     bandInfos[0].syncWith = 1;
 
+
+    var earliest = null;
+    var latest   = null;
+
     var tl = Timeline.create(document.getElementById("timeline-ui"), bandInfos);
 
+    // add a playhead
+    var playhead = $('<div id="playhead"></div>');
+    $('#timeline-ui').append(playhead);
+    var where = $('#timeline-ui').width() / 2;
+    playhead.css('margin-left', where + 'px');
 
 
+    var audioProvider = function(date_change_event, callback) {
+
+        // first query
+        if (earliest == null && latest == null) {
+            earliest = date_change_event.minDate;
+            latest   = date_change_event.maxDate;
+            app.controller.timelineAudio(date_change_event.minDate, date_change_event.maxDate, date_change_event.centreDate ,callback, false);
+        } else if (date_change_event.minDate && date_change_event.minDate.isBefore(earliest)) {
+            // we need before
+            var endForThisQuery = earliest;
+            earliest = date_change_event.minDate;
+            app.controller.timelineAudio(earliest, endForThisQuery, date_change_event.centreDate ,callback, false);
+         } else if (date_change_event.maxDate && date_change_event.maxDate.isAfter(latest)) {
+             var beginOfThisQuery = latest;
+             latest = date_change_event.maxDate;
+             app.controller.timelineAudio(beginOfThisQuery, latest, date_change_event.centreDate ,callback, false);
+         }
+    }
+
+
+    var seen = {};
+    // no cache for events
+    var eventProvider = function(date_change_event, callback) {
+        app.controller.timelineEvents(date_change_event.minDate, date_change_event.maxDate,callback);
+
+    }
+
+
+
+    // create an audio player
+
+
+
+
+    // reset loaded events
+    app.controller.loadedEvents = {};
 
     $('.timelineplayer').timelineaudioplayer({
         timeline: tl,
         initialDate : initialDate,
-        calendarDiv : $('.calendar-ui')
+        calendarDiv : $('#calendar-ui'),
+        audioDiv : $('#audio-ui'),
+        timelineEventSource : eventSource,
+        audioProvider : audioProvider,
+        eventProvider : eventProvider,
+        dayStatsProvider : app.controller.dayStatsProvider,
+        audioQuery : app.controller.audioQuery,
+        audioNext  : app.controller.audioNext
     });
 }
 

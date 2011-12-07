@@ -7,6 +7,9 @@
 
     var UPDATE_DATE_VIEWS      = "timeline.audioplayer.views.updatedate";
     var USER_DATE_CHANGE_EVENT = "timeline.audioplayer.datechange";
+    var TIMELINE_DATE_EVENT = "timeline.audioplayer.date";
+
+    var NEW_RESULTS_CHANGE_EVENT = "timeline.audioplayer.resultschange";
 
     var DATE_CHANGE_EVENT_TEMPLATE = {
         source : 'timeline',
@@ -14,6 +17,8 @@
         minDate : null,
         maxDate : null
     }
+
+
 
 
     var methods = {
@@ -28,9 +33,17 @@
                 var settings = {
                     swfPath: "/js/jPlayer",
                     initialDate : new Date(),
-                    eventProvider : function(startDate, endDate) {
-                        return [];
-                    }
+                    eventProvider : function(date_change_event, callback) {
+                        callback([]);
+                    },
+                    audioProvider : function(date_change_event, callback) {
+                        callback([]);
+                    },
+                    dayStatsProvider : function(startDate, endDate, tagCountsCallback, audioCountsCallback) {
+                        tagCountsCallback([]);
+                        audioCountsCallback([]);
+                    },
+                    debounceRate : 300
                 }
 
                 $.extend( settings, options );
@@ -39,27 +52,20 @@
                 var $this = $(this);
 
                 
-
+                var calendar;
                 if (settings.calendarDiv) {
-                    createCalendar(settings, $this);
+                    calendar = createCalendar(settings, $this);
                 }
 
-                options.timeline.getBand(0).addOnScrollListener(function(band) {
+                var audioplayer;
+                if (settings.audioDiv) {
+                    audioplayer = createAudioPlayer(settings, $this);
+                }
 
-                    var update = {
-                          centreDate : options.timeline.getBand(0).getCenterVisibleDate(),
-                          minDate : options.timeline.getBand(0).getMinDate(),
-                          maxDate : options.timeline.getBand(0).getMaxDate()
-                    }
-
-                    $.extend(DATE_CHANGE_EVENT_TEMPLATE, update);
-                    $this.trigger(USER_DATE_CHANGE_EVENT, update);
+                wireupTimeline(settings, $this);
 
 
-                });
-
-
-                var debouncedBroadcastNewDate = _.debounce(broadcastNewDate, 500)
+                var debouncedBroadcastNewDate = _.throttle(broadcastNewDate, settings.debounceRate)
 
                 var lastDebouncedData;
 
@@ -70,79 +76,274 @@
                     
                 })
 
-                function broadcastNewDate() {
-                    console.log('user date change', lastDebouncedData);
-                    $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
+                var event_data = {
+                    events : [
+                    ]
+                };
+
+
+                function showEvents() {
+
+                    if (lastDebouncedData && lastDebouncedData.source == 'audioplayer') return;
+
+                    // query the db
+                    // get events for the widest net (usually just the calendar)
+                    var eventwindow = findWidestEventWindow(settings.timeline, calendar, lastDebouncedData);
+                    settings.audioProvider(eventwindow, function(results) {
+                        // show dem
+                        //settings.timelineEventSource..clear();
+
+                        // normalize
+                        $.each(results, function(i, recording) {
+
+                            if (!recording) return;
+                            recording.start = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(recording.start,settings.initalDate);
+                            recording.end =   $.timelineaudioplayer.normalizeTimelineForDaylightSavings(recording.end,  settings.initalDate);
+
+                        });
+
+
+                        event_data.events = event_data.events.concat(results.recordings);
+                        settings.timelineEventSource.clear();
+                        settings.timelineEventSource.loadJSON(event_data, document.location.href);
+                        $this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
+                    })
+
+                    settings.eventProvider(eventwindow, function(results) {
+                        if (results.timelineModel.length == 0) return;
+
+                        // normalize
+                        $.each(results, function(i, event) {
+                            event.start = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.start,settings.initalDate);
+                            event.end =   $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.end,  settings.initalDate);
+
+                        });
+
+
+                        event_data.events = event_data.events.concat(results.timelineModel);
+                        settings.timelineEventSource.clear();
+                        settings.timelineEventSource.loadJSON(event_data, document.location.href);
+                        //$this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
+                        calendar.fullCalendar('addEventSource',results.calendarModel).fullCalendar( 'rerenderEvents' )
+                    });
                 }
 
 
-
+                function broadcastNewDate() {
+                    $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
+                    showEvents();
+                }
+                // onload, show envents
+                showEvents();
+                data = $this.data('timelineplayer', {
+                    element : $this,
+                    settings: settings
+                });
             });
+        },
+        timeline : function() {
+             return $(this).data('timelineplayer').settings.timeline;
+        },
+        destroy : function() {
+            $(this).data('timelineplayer').settings.calendarDiv.fullCalendar('destroy');
         }
+    }
+
+
+    function findWidestEventWindow(timeline, calendar, lastDebouncedData) {
+        if (!lastDebouncedData) lastDebouncedData = {};
+
+        if (calendar) {
+            var view = calendar.fullCalendar( 'getView' );
+            lastDebouncedData.minDate = view.visStart;
+            lastDebouncedData.maxDate = view.visEnd;
+        } else {
+            
+        }
+        return lastDebouncedData;
     }
 
 
 
 
 
+    function wireupTimeline(settings, timelineElement) {
 
+        var startDate = settings.initialDate;
+        var internalDateChange = false;
 
-    function createCalendar(settings, timelineElement) {
+        settings.timeline.getBand(1).addOnScrollListener(function(band) {
+            if (internalDateChange) return;
+            var update = {
+                  source : 'timeline',
+                  centreDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate),
+                  minDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMinDate(), startDate),
+                  maxDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMaxDate(), startDate)
+            }
 
-        var CALENDAR_SOURCE = "calendar";
-
-
-        var initialDate = settings.initialDate;
-
-        settings.calendarDiv.fullCalendar({
-            header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek'
-            },
-
-            viewDisplay : function(view) {
-                // called when the view is shown AND changed
-                //console.log(view.start.toString());
-                //console.log(view.end.toString());
-
-                var update = {
-                      source : CALENDAR_SOURCE,
-                      centreDate : view.start,
-                      minDate : view.start,
-                      maxDate : view.end
-                }
-
-                $.extend(DATE_CHANGE_EVENT_TEMPLATE, update);
-                timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
-                
-            },
-            select : function(startDate, endDate, allDay, jsEvent, view) {
-                var update = {
-                      source : CALENDAR_SOURCE,
-                      centreDate : startDate,
-                      minDate : startDate,
-                      maxDate : endDate
-                }
-
-                $.extend(DATE_CHANGE_EVENT_TEMPLATE, update);
-
-
-                timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
-            },
-
-            selectable: true,
-            unselectAuto: false,
-            editable: true
-
-
-        }).fullCalendar('gotoDate', initialDate);
+            timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+            timelineElement.trigger(TIMELINE_DATE_EVENT, update);
+            
+        });
 
         timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
-            if (data.source !== CALENDAR_SOURCE) {
-                settings.calendarDiv.fullCalendar('gotoDate', data.centreDate);
-                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, true);
+            if (data.source != 'timeline') {
+                internalDateChange = true;
+                //this is a hack around timeline. 
+                var normal = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(data.centreDate, startDate);
+                settings.timeline.getBand(1).setCenterVisibleDate(normal);
+                //settings.timeline.getBand(0).scrollToCenter(normal);
+                internalDateChange = false;
             }
+        });
+
+    }
+
+
+    function createAudioPlayer(settings, timelineElement) {
+
+        var internalDateChange = false;
+        var lastUpdateDate;
+        var aboutToUpdateDueToDragComplete = false;
+
+
+        function changeButtonDisplay(button, state) {
+            if (state == 'playing') {
+                button
+                    .html('&#9632;')
+                    .removeClass('seeking stopped ready')
+                    .addClass('playing')
+            }
+            else if (state == 'ready' || state == 'stopped') {
+                button
+                    .html('&#9654;')
+                    .removeClass('seeking playing  ready')
+                    .addClass('stopped')
+            }
+            else if (state == 'seeking') {
+                if (!button.hasClass('seeking')){
+                    button
+                        .html('<img src="images/spinner.gif" />')
+                        .removeClass('playing  ready stopped')
+                        .addClass('seeking')
+                }
+            }
+        }
+
+
+        function dateBroadcaster() {
+            if (internalDateChange) return;
+            var update = {
+                  source : 'audioplayer',
+                  centreDate : lastUpdateDate,
+                  minDate : lastUpdateDate,
+                  maxDate : lastUpdateDate
+            }
+            if (!aboutToUpdateDueToDragComplete) {
+                timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+            }
+        }
+
+        var throttleDateBroadcaster = _.throttle(dateBroadcaster, 1000);
+
+
+        var button = $('<div class="playbutton">&#9658;</div>')
+        settings.audioDiv.append(button);
+
+
+        var state = 'loading';
+
+        button.bind('click', function() {
+            if (state == 'playing') {
+                settings.audioDiv.liferecorder('stop');
+                state = 'stopped';
+
+            }
+            else if (state == 'ready' || state == 'stopped') {
+                var centreDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+                settings.audioDiv.liferecorder('play', centreDate);
+                state = 'playing';
+            }
+            changeButtonDisplay(button, state);
+        });
+
+
+        var startDate = settings.initialDate;
+        settings.audioDiv.liferecorder({
+            documentPrefix : 'api',
+            audioQuery : settings.audioQuery,
+            audioNext  : settings.audioNext,
+            onReady : function() {
+                state = 'ready';
+                changeButtonDisplay(button, state);
+            }
+        }).bind("liferecorder.update", function(e, date){
+            if (aboutToUpdateDueToDragComplete) return;
+
+            if (state != 'stopped') { // there seems to be an update lagging
+                lastUpdateDate = date;
+                throttleDateBroadcaster();
+                state = 'playing';
+                changeButtonDisplay(button, state);
+            }
+
+        }).bind("liferecorder.stopped", function() {
+            if (aboutToUpdateDueToDragComplete) return;
+            state = 'stopped';
+            changeButtonDisplay(button, state);
+        })
+
+        var lastTimelineDate;
+
+
+
+        var justInCaseNoDragFired;
+
+        function timelineDragFinished() {
+            internalDateChange = true;
+            clearTimeout(justInCaseNoDragFired);
+            lastUpdateDate = lastTimelineDate;
+            if (!lastTimelineDate) {
+                lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+            }
+            settings.audioDiv.liferecorder('play', lastTimelineDate);
+            aboutToUpdateDueToDragComplete = false;
+            setTimeout(function() {                
+                internalDateChange = false
+            }, 50);
+            
+
+
+        }
+
+        var debouncedTimelineDragFinished = _.debounce(timelineDragFinished, 600);
+
+
+
+        timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
+            if (data.source == 'audioplayer') return;
+            if (state != 'playing') return;
+            aboutToUpdateDueToDragComplete = true;
+            //debouncedTimelineDragFinished();
+            justInCaseNoDragFired = setTimeout(timelineDragFinished, 500);
+        });
+
+        // wire right to timeline events
+        settings.timeline.getBand(1).addOnScrollListener(function(band) {
+            //if (state != 'playing') return;
+            lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+            if (!aboutToUpdateDueToDragComplete) return;
+            clearTimeout(justInCaseNoDragFired);
+            aboutToUpdateDueToDragComplete = true;
+            internalDateChange = true;
+            lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
+            debouncedTimelineDragFinished();
+
+            state = 'seeking';            
+            changeButtonDisplay(button, state);
+            internalDateChange = false;
+
+
         });
 
 
@@ -151,7 +352,195 @@
 
 
 
+    function createCalendar(settings, timelineElement) {
 
+
+        var internalDateChange = false;
+        var CALENDAR_SOURCE = "calendar";
+
+
+        var initialDate = settings.initialDate;
+
+        var calendar = settings.calendarDiv.fullCalendar({
+            header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek'
+            },
+            aspectRatio: 2,
+            buttonIcons : false,
+            buttonText : {
+              prev : '&lt;',
+              next : '&gt;'
+            },
+
+            viewDisplay : function(view) {
+                if (internalDateChange) return;
+
+                var offsetHrs = 16;
+
+                var date = new Date(view.start.getTime()).addHours(offsetHrs);
+
+
+                var update = {
+                      source : CALENDAR_SOURCE,
+                      centreDate : date,
+                      minDate : view.start,
+                      maxDate : view.end
+                }
+
+                if (view && view.name == "agendaWeek") {
+                    var today = new Date();
+                    if (today.between(view.start,  view.end)) {
+                        update.centreDate = today;
+                    }
+                }
+                timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+
+                // update the stats
+                settings.dayStatsProvider(view.visStart, view.visEnd, 
+                    function(tagCounts) {
+
+                        $('.fc-labels').remove();
+                        $.each(tagCounts, function(i, count){
+
+                           var calDayNum = view.visStart.getDaysBetween(count.date);
+                           var baseDiv = $('.fc-day' + calDayNum);
+
+                           var child = baseDiv.find('.fc-labels');
+                           if (child.length == 0) {
+                               child = $('<div class="fc-labels"></div>');
+                               baseDiv.children().first().prepend(child);
+                           }
+                           child.text(count.count);
+
+                        });
+
+                    },
+                    function(audioCounts) {
+
+                    }
+                );
+
+
+                
+            },
+            select : function(startDate, endDate, allDay, jsEvent, view) {
+                if (internalDateChange) return;
+
+                var offsetHrs = 0;
+
+                if (view && view.name == "month") {
+                    // add 16hrs. Shows 4pm to give best full view of day
+                    offsetHrs = 16;
+                }
+                var update = {
+                      source : CALENDAR_SOURCE,
+                      centreDate : startDate.addHours(offsetHrs),
+                      minDate : view.start,
+                      maxDate : view.end
+                }
+
+                timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+            },
+            eventClick: function(calEvent, jsEvent, view) {
+
+                var offsetHrs = 0;
+
+                if (calEvent.allDay) {
+                    // add 9hrs. gives a good start to the day
+                    offsetHrs = 9;
+                }
+
+                var date = new Date(calEvent.start.getTime()).addHours(offsetHrs);
+
+                var update = {
+                      source : CALENDAR_SOURCE,
+                      centreDate : date,
+                      minDate : date,
+                      maxDate : null
+                }
+
+
+
+                timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
+            },
+            selectable: true,
+            unselectAuto: false,
+            editable: true,
+            events: [
+
+                // more events here
+            ],
+            // can alter the event here
+            eventRender: function(event, element) {
+                
+            }
+
+
+        }).fullCalendar('gotoDate', initialDate)
+          .fullCalendar('select', initialDate, initialDate, true);
+
+        timelineElement.bind(UPDATE_DATE_VIEWS, function(e, data) {
+            internalDateChange = true;
+            if (!data._calupdate) {
+
+                // WARNING this will move the calendar bewteen months. Now what we ant.
+
+                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, false);
+                data._calupdate = true;
+            }
+            if (data.source != 'calendar') {
+ 
+
+                settings.calendarDiv.fullCalendar('gotoDate', data.centreDate);
+                settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, false);
+            }
+            internalDateChange = false;
+        });
+        return calendar;
+
+
+    }
+
+
+
+    $.timelineaudioplayer = {
+         normalizeTimelineForDaylightSavings : function(dateToFix, initialDate) {
+
+            if (!dateToFix) return null;
+            if (!initialDate) initialDate = new Date();
+
+            var dateClone = new Date(dateToFix);
+
+
+            // if the offset is different than the inital date, we bump it
+            var firstOffset = dateClone.getTimezoneOffset();
+            var secondOffset = initialDate.getTimezoneOffset();
+            if (firstOffset != secondOffset) {
+
+                var diffMin = secondOffset - firstOffset  ;
+                 dateClone.addMinutes(diffMin);
+                 
+                return dateClone;
+            }
+            return dateToFix;
+        },
+
+        denormalize : function(dateToFix, initialDate) {
+            // if the offset is different than the inital date, we bump it
+            var dateClone = new Date(dateToFix.getTime());
+            var firstOffset = dateClone.getTimezoneOffset();
+            var secondOffset = initialDate.getTimezoneOffset();
+            if (firstOffset != secondOffset) {
+
+                var diffMin = secondOffset - firstOffset  ;
+                 dateClone.addMinutes(-diffMin);
+                return dateClone;
+            }
+            return dateToFix;
+        }
+    }
 
 
 
