@@ -134,7 +134,7 @@ td.fc-header-right {
     filter: alpha(opacity=50); /* for IE */
 }
 
-.playbutton {
+#audio-ui .playbutton {
 
 
     position: absolute;
@@ -153,16 +153,16 @@ td.fc-header-right {
 
 }
 
-.playbutton.playing {
+#audio-ui .playbutton.playing {
     font-size: 50px;
     padding: 3px;
 }
 
-.playbutton.stopped {
+#audio-ui .playbutton.stopped {
     font-size: 40px;
     padding-top: 20px;
 }
 
-.playbutton.seeking {
+#audio-ui .playbutton.seeking {
     padding: 10px;
 }
