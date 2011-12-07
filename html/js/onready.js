@@ -1,6 +1,11 @@
 $(document).ready(function(){
 
+
+    // some global settings
     jQuery.couch.urlPrefix = 'api';
+    $.jPlayer.timeFormat.showHour = true;
+
+    
     app.router = Router(app.routes).init('/dashboard');
 
 

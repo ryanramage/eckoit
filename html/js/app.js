@@ -702,6 +702,7 @@ app.controller.createTimeline = function(initialDate) {
         initialDate : initialDate,
         calendarDiv : $('#calendar-ui'),
         audioDiv : $('#audio-ui'),
+        statsDiv: $('#stats'),
         timelineEventSource : eventSource,
         audioProvider : audioProvider,
         eventProvider : eventProvider,

@@ -121,7 +121,7 @@ td.fc-header-right {
 
     font-size: 8px;
     line-height: 9px;
-    padding-left: 1px;
+    padding: 1px;
     float: left;
     border: 1px solid #6D84B4;
     background-color: #ffc;
@@ -130,6 +130,19 @@ td.fc-header-right {
     min-width: 10px;
     margin-left: 2px;
     margin-top: 1px;
+    opacity: .5;
+    filter: alpha(opacity=50); /* for IE */
+}
+
+.fc-labels-audio {
+    font-size: 8px;
+    line-height: 9px;
+    padding: 1px 3px;
+    float: left;
+    background-color: #fff;
+    height: 12px;
+    min-width: 10px;
+    margin: 1px 3px;
     opacity: .5;
     filter: alpha(opacity=50); /* for IE */
 }
@@ -165,4 +178,9 @@ td.fc-header-right {
 
 #audio-ui .playbutton.seeking {
     padding: 10px;
+}
+
+#stats {
+    position: absolute;
+    right: 20px;
 }

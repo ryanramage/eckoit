@@ -401,6 +401,7 @@
                 settings.dayStatsProvider(view.visStart, view.visEnd, 
                     function(tagCounts) {
 
+                        var periodTotal = 0;
                         $('.fc-labels').remove();
                         $.each(tagCounts, function(i, count){
 
@@ -413,12 +414,33 @@
                                baseDiv.children().first().prepend(child);
                            }
                            child.text(count.count);
-
+                           periodTotal+=count.count;
                         });
+
+                        $('.tag-total').text(periodTotal);
 
                     },
                     function(audioCounts) {
+                        var periodTotal = 0;
 
+                        $('.fc-labels-audio').remove();
+                        $.each(audioCounts, function(i, count){
+
+                           var calDayNum = view.visStart.getDaysBetween(count.date);
+                           var baseDiv = $('.fc-day' + calDayNum);
+
+                           var child = baseDiv.find('.fc-labels-audio');
+                           if (child.length == 0) {
+                               child = $('<div class="fc-labels-audio"></div>');
+                               baseDiv.children().first().prepend(child);
+                           }
+                           periodTotal+=count.count;
+                           child.text($.jPlayer.convertTime(count.count));
+                        });
+
+                        var hrs = Math.round(periodTotal / (60 * 60))
+
+                        $('.audio-total').text(hrs);
                     }
                 );
 
