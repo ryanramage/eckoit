@@ -1,10 +1,54 @@
 {
-   "autolinks": [
+   autolinks: [
        {
-           "name": "gmail tag",
-           "url": "https://mail.google.com/mail/?shva=1#label/<%=_id%>"
+           name: "gmail tag",
+           url: "https://mail.google.com/mail/?shva=1#label/<%=_id%>"
        }
    ],
-   "name": "life",
-   "description": "A place to keep all your stuff."
+   name: "life",
+   description: "A place to keep all your stuff.",
+   tag_groups: [
+            {
+                name: "Home",
+                tags : [
+                    {
+                        name: "Funny",
+                        id : "12345"
+                    },
+                    {
+                        name : "Helarity"
+                    } 
+                ]
+            },
+            {
+                name : "Work",  
+                always_tag: ['work'],
+                tags : [
+                    {
+                        name : "Todo"
+                    },
+                    {
+                        name : "Delegate"
+                    },
+                    {
+                        name : "Earthy"
+                    }
+                ]
+            },
+            {
+                name : "Phone",
+                always_tag: [],
+                tags : [
+                    {
+                        name : "mamba"
+                    },
+                    {
+                        name : "baba"
+                    },
+                    {
+                        name : "nobo"
+                    }
+                ]
+            }
+        ]
 }

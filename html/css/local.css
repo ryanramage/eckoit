@@ -1,0 +1,108 @@
+body {
+    padding-top: 60px;
+}
+
+.topicFilter > li > a {
+    line-height: 20px;
+
+}
+
+
+
+.topics .row  {
+    margin: 5px 0 5px 15px;
+    border-top: 1px solid #eee;
+    padding: 10px;
+}
+
+.topic .title a{
+    font-size: 17px;
+    color: #1259C7;
+}
+
+.topic .media-grid img {
+    width: 100px;
+    height: 75px;
+}
+
+.topic .media-grid a {
+    margin: 0;
+}
+
+.votes,.views,.answers {
+    float: left;
+    width: 38px;
+    height: 38px;
+    margin: 0 3px 0 0;
+    padding: 5px;
+
+    padding: 0 0 7px 0;
+    text-align: center;
+}
+
+.votes {
+        color: #555;
+}
+
+.views {
+    color: #999;
+}
+
+.answers {
+    float: right;
+    color: #75845C;
+    width: 48px;
+
+}
+.accepted {
+        font-size: 190%;
+        color: #75845C;
+        float: right;
+}
+
+.mini-counts {
+    height: 25px;
+    font-size: 190%;
+    font-weight: bold;
+}
+
+
+
+.tagholder .position {
+    font-size: 18px;
+}
+
+
+
+
+table.fc-header {
+    border: none !important;
+    margin-bottom: 3px;
+}
+
+table.fc-border-separate {
+    border: none !important;
+    margin-bottom: 0px;
+}
+
+td.fc-header-center {
+    border-left: none !important;
+}
+
+td.fc-header-right {
+    border-left: none !important;
+}
+
+
+
+#timeline-ui {
+   height: 252px;
+   border: 1px solid #aaa;
+   
+}
+
+.calendar-ui {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
