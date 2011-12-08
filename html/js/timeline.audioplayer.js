@@ -302,11 +302,14 @@
         function timelineDragFinished() {
             internalDateChange = true;
             clearTimeout(justInCaseNoDragFired);
+
             lastUpdateDate = lastTimelineDate;
             if (!lastTimelineDate) {
                 lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
             }
             settings.audioDiv.liferecorder('play', lastTimelineDate);
+
+
             aboutToUpdateDueToDragComplete = false;
             setTimeout(function() {                
                 internalDateChange = false
