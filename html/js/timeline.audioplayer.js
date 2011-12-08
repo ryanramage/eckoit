@@ -366,9 +366,9 @@
 
         var calendar = settings.calendarDiv.fullCalendar({
             header: {
-                    left: 'prev,next ',
+                    left: 'prev ',
                     center: 'title',
-                    right: ''
+                    right: 'next'
             },
             aspectRatio: 2,
             buttonIcons : false,
@@ -424,8 +424,8 @@
 
                     },
                     function(audioCounts) {
-                        var periodTotal = 0;
 
+                        var periodTotal = 0;
                         $('.fc-labels-audio').remove();
                         $.each(audioCounts, function(i, count){
 

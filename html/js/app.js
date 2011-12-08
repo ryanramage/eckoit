@@ -625,9 +625,9 @@ app.controller.createTimeline = function(initialDate) {
             overview:       true,
             layout:         'overview',
             eventSource:    eventSource,
-            width:          "35%",
+            width:          "18%",
             intervalUnit:   Timeline.DateTime.HOUR,
-            intervalPixels: 50,
+            intervalPixels: 40,
             theme: theme,
             date : initialDate,
             timeZone: timeZoneOffset
@@ -635,7 +635,7 @@ app.controller.createTimeline = function(initialDate) {
 
         Timeline.createBandInfo({
             eventSource:    eventSource,
-            width:          "65%",
+            width:          "82%",
             intervalUnit:   Timeline.DateTime.MINUTE,
             intervalPixels: 30,
             theme: theme,
