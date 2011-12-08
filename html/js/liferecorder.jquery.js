@@ -117,7 +117,6 @@
             var settings = data.settings;
             getAudioDocsForDate(startTime, settings, function(results) {
 
-                //console.log(results);
                 if (!results.centerItem) {
                     data.element.trigger('liferecorder.stopped', playingDate);
                     return;

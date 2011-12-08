@@ -366,9 +366,9 @@
 
         var calendar = settings.calendarDiv.fullCalendar({
             header: {
-                    left: 'prev,next today',
+                    left: 'prev,next ',
                     center: 'title',
-                    right: 'month,agendaWeek'
+                    right: ''
             },
             aspectRatio: 2,
             buttonIcons : false,
@@ -416,7 +416,7 @@
                                child = $('<div class="fc-labels"></div>');
                                baseDiv.children().first().prepend(child);
                            }
-                           child.text(count.count);
+                           child.text(count.count + ' tags');
                            periodTotal+=count.count;
                         });
 
@@ -438,7 +438,7 @@
                                baseDiv.children().first().prepend(child);
                            }
                            periodTotal+=count.count;
-                           child.text($.jPlayer.convertTime(count.count));
+                           child.text($.jPlayer.convertTime(count.count) + ' hrs');
                         });
 
                         var hrs = Math.round(periodTotal / (60 * 60))
