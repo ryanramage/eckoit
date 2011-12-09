@@ -62,7 +62,7 @@
                     audioplayer = createAudioPlayer(settings, $this);
                 }
 
-                wireupTimeline(settings, $this);
+                wireupTimeline(settings, $this, calendar);
 
 
                 var debouncedBroadcastNewDate = _.throttle(broadcastNewDate, settings.debounceRate)
@@ -76,69 +76,98 @@
                     
                 })
 
-                var event_data = {
-                    events : [
-                    ]
-                };
 
+
+
+                var lastMonthMin;
+                var lastMonthMax;
+                var cachedEventIDs = {};
 
                 function showEvents() {
 
-                    if (lastDebouncedData && lastDebouncedData.source == 'audioplayer') return;
 
+                   // if (lastDebouncedData && lastDebouncedData.source == 'audioplayer') return;
+                    var event_data = {
+                        events : [
+                        ]
+                    };
                     // query the db
                     // get events for the widest net (usually just the calendar)
                     var eventwindow = findWidestEventWindow(settings.timeline, calendar, lastDebouncedData);
+
+
+                    var updateData = _.after(2, function() {         
+                        settings.timelineEventSource.clear();
+                        settings.timelineEventSource.loadJSON(event_data, document.location.href);
+                        //$this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
+                    });
+
+                    
                     settings.audioProvider(eventwindow, function(results) {
                         // show dem
                         //settings.timelineEventSource..clear();
-
                         // normalize
                         $.each(results, function(i, recording) {
-
                             if (!recording) return;
                             recording.start = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(recording.start,settings.initalDate);
                             recording.end =   $.timelineaudioplayer.normalizeTimelineForDaylightSavings(recording.end,  settings.initalDate);
 
                         });
 
-
                         event_data.events = event_data.events.concat(results.recordings);
-                        settings.timelineEventSource.clear();
-                        settings.timelineEventSource.loadJSON(event_data, document.location.href);
-                        $this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
+                        updateData();
+                        
                     })
 
                     settings.eventProvider(eventwindow, function(results) {
-                        if (results.timelineModel.length == 0) return;
+                        if (results.timelineModel.length != 0) {
 
-                        // normalize
-                        $.each(results, function(i, event) {
-                            event.start = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.start,settings.initalDate);
-                            event.end =   $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.end,  settings.initalDate);
+                            var finalCalendarModel = _.reject(results.calendarModel, function(event){ return cachedEventIDs[event.id] })
+                            calendar.fullCalendar('addEventSource',finalCalendarModel).fullCalendar( 'rerenderEvents' );
 
-                        });
+                            var finalTimelineModel = [];
+                            // normalize
+                            $.each(results.timelineModel, function(i, event) {
+            
+                                    event.start = $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.start,settings.initalDate);
+                                    event.end =   $.timelineaudioplayer.normalizeTimelineForDaylightSavings(event.end,  settings.initalDate);
+                                    finalTimelineModel.push(event);
+                                    cachedEventIDs[event.eventID] = true;
+
+                            });
+                            event_data.events = event_data.events.concat(finalTimelineModel);
 
 
-                        event_data.events = event_data.events.concat(results.timelineModel);
-                        settings.timelineEventSource.clear();
-                        settings.timelineEventSource.loadJSON(event_data, document.location.href);
-                        //$this.trigger(NEW_RESULTS_CHANGE_EVENT, results);
-                        calendar.fullCalendar('addEventSource',results.calendarModel).fullCalendar( 'rerenderEvents' )
+                        }
+
+                        
+                        updateData();
+                        
                     });
                 }
 
 
+
                 function broadcastNewDate() {
                     $this.trigger(UPDATE_DATE_VIEWS, lastDebouncedData);
-                    showEvents();
+
+                    if (lastDebouncedData && lastDebouncedData.source == 'audioplayer') return;
+
+                    if (lastMonthMin != lastDebouncedData.minDate.getMonth() || lastMonthMax != lastDebouncedData.maxDate.getMonth()) {
+                        showEvents();
+                        lastMonthMin = lastDebouncedData.minDate.getMonth();
+                        lastMonthMax = lastDebouncedData.maxDate.getMonth();
+                    }
                 }
-                // onload, show envents
-                showEvents();
+
                 data = $this.data('timelineplayer', {
                     element : $this,
                     settings: settings
                 });
+
+
+                // onload, show envents
+                showEvents();
             });
         },
         timeline : function() {
@@ -167,18 +196,26 @@
 
 
 
-    function wireupTimeline(settings, timelineElement) {
+    function wireupTimeline(settings, timelineElement, calendar) {
 
         var startDate = settings.initialDate;
         var internalDateChange = false;
 
         settings.timeline.getBand(1).addOnScrollListener(function(band) {
             if (internalDateChange) return;
+            var minDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMinDate(), startDate);
+            var maxDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMaxDate(), startDate);
+
+            if (calendar) {
+                var view = calendar.fullCalendar( 'getView' );
+                minDate = view.visStart;
+                maxDate = view.visEnd;
+            }
             var update = {
                   source : 'timeline',
                   centreDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate),
-                  minDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMinDate(), startDate),
-                  maxDate : $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getMaxDate(), startDate)
+                  minDate : minDate,
+                  maxDate : maxDate
             }
 
             timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
@@ -302,11 +339,14 @@
         function timelineDragFinished() {
             internalDateChange = true;
             clearTimeout(justInCaseNoDragFired);
+
             lastUpdateDate = lastTimelineDate;
             if (!lastTimelineDate) {
                 lastTimelineDate = $.timelineaudioplayer.denormalize(settings.timeline.getBand(1).getCenterVisibleDate(), startDate);
             }
             settings.audioDiv.liferecorder('play', lastTimelineDate);
+
+
             aboutToUpdateDueToDragComplete = false;
             setTimeout(function() {                
                 internalDateChange = false
@@ -363,9 +403,9 @@
 
         var calendar = settings.calendarDiv.fullCalendar({
             header: {
-                    left: 'prev,next today',
+                    left: 'prev ',
                     center: 'title',
-                    right: 'month,agendaWeek'
+                    right: 'next'
             },
             aspectRatio: 2,
             buttonIcons : false,
@@ -373,6 +413,7 @@
               prev : '&lt;',
               next : '&gt;'
             },
+            weekMode : 'liquid',
 
             viewDisplay : function(view) {
                 if (internalDateChange) return;
@@ -385,8 +426,8 @@
                 var update = {
                       source : CALENDAR_SOURCE,
                       centreDate : date,
-                      minDate : view.start,
-                      maxDate : view.end
+                      minDate : view.visStart,
+                      maxDate : view.visEnd
                 }
 
                 if (view && view.name == "agendaWeek") {
@@ -401,6 +442,7 @@
                 settings.dayStatsProvider(view.visStart, view.visEnd, 
                     function(tagCounts) {
 
+                        var periodTotal = 0;
                         $('.fc-labels').remove();
                         $.each(tagCounts, function(i, count){
 
@@ -412,13 +454,34 @@
                                child = $('<div class="fc-labels"></div>');
                                baseDiv.children().first().prepend(child);
                            }
-                           child.text(count.count);
-
+                           child.text(count.count + ' tags');
+                           periodTotal+=count.count;
                         });
+
+                        $('.tag-total').text(periodTotal);
 
                     },
                     function(audioCounts) {
 
+                        var periodTotal = 0;
+                        $('.fc-labels-audio').remove();
+                        $.each(audioCounts, function(i, count){
+
+                           var calDayNum = view.visStart.getDaysBetween(count.date);
+                           var baseDiv = $('.fc-day' + calDayNum);
+
+                           var child = baseDiv.find('.fc-labels-audio');
+                           if (child.length == 0) {
+                               child = $('<div class="fc-labels-audio"></div>');
+                               baseDiv.children().first().prepend(child);
+                           }
+                           periodTotal+=count.count;
+                           child.text($.jPlayer.convertTime(count.count) + ' hrs');
+                        });
+
+                        var hrs = Math.round(periodTotal / (60 * 60))
+
+                        $('.audio-total').text(hrs);
                     }
                 );
 
@@ -437,8 +500,8 @@
                 var update = {
                       source : CALENDAR_SOURCE,
                       centreDate : startDate.addHours(offsetHrs),
-                      minDate : view.start,
-                      maxDate : view.end
+                      minDate : view.visStart,
+                      maxDate : view.visEnd
                 }
 
                 timelineElement.trigger(USER_DATE_CHANGE_EVENT, update);
@@ -457,8 +520,8 @@
                 var update = {
                       source : CALENDAR_SOURCE,
                       centreDate : date,
-                      minDate : date,
-                      maxDate : null
+                      minDate : view.visStart,
+                      maxDate : view.visEnd
                 }
 
 
@@ -485,7 +548,7 @@
             internalDateChange = true;
             if (!data._calupdate) {
 
-                // WARNING this will move the calendar bewteen months. Now what we ant.
+                // WARNING this will move the calendar bewteen months. Not what we ant.
 
                 settings.calendarDiv.fullCalendar('select', data.centreDate, data.endDate, false);
                 data._calupdate = true;
