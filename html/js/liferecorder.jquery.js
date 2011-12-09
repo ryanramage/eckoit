@@ -74,6 +74,7 @@
                             }).jPlayer("play", offsetSeconds);
                             $this.trigger('liferecorder.update', results.centerItem.start);
                         }
+                        
                     });
 
 
@@ -116,25 +117,31 @@
             var settings = data.settings;
             getAudioDocsForDate(startTime, settings, function(results) {
 
-                if (results.centerItem) {
-                    // we have found it
-                    data.lastID = results.centerItem._id;
-                    data.lastStartDate = results.centerItem.start;
-                    data.lastEndDate = results.centerItem.end;
-
-
-
-                    var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, startTime) / 1000;
-
-
-                    var playingDate = new Date(results.centerItem.start + (offsetSeconds * 1000));
-
-                    var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
-
-                    data.player.jPlayer("setMedia", {
-                        mp3: mediaUrl
-                    }).jPlayer("play", offsetSeconds);
+                if (!results.centerItem) {
+                    data.element.trigger('liferecorder.stopped', playingDate);
+                    return;
                 }
+
+
+                // we have found it
+                data.lastID = results.centerItem._id;
+                data.lastStartDate = results.centerItem.start;
+                data.lastEndDate = results.centerItem.end;
+
+
+
+                var offsetSeconds = $.liferecorder.findAudioOffset(results.centerItem.start, results.centerItem.end, startTime) / 1000;
+
+
+                var playingDate = new Date(results.centerItem.start + (offsetSeconds * 1000));
+
+                var mediaUrl = $.liferecorder.urlForAudioView(results.centerItem, settings.documentPrefix);
+
+                data.player.jPlayer("setMedia", {
+                    mp3: mediaUrl
+                }).jPlayer("play", offsetSeconds);
+
+
             })
 
 

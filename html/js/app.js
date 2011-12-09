@@ -197,8 +197,11 @@ app.controller.showTopic = function(topic, div) {
             var button = rendered.find('.playbutton');
 
             var state = 'loading';
-            button.bind('click', function() {
 
+
+
+
+            button.bind('click', function() {
                 if (state == 'playing') {
                     markplayer.liferecorder('stop');
                     button.html('&#9654;');
@@ -220,7 +223,8 @@ app.controller.showTopic = function(topic, div) {
                     button.html('&#9654;');
                 }
             }).bind("liferecorder.stopped", function(e, date){
-                button.trigger('click');
+                button.html('&#9654;');
+                state = 'stopped';
             });
         });
     }
@@ -290,7 +294,7 @@ app.controller.parseRequestedDate = function(date) {
 	
 }
 
-app.controller.loadedAudio = {};
+
 
 app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) {
 
@@ -310,7 +314,6 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
             var centerItem;
             var recordings = [];
             $.each(results.rows, function(i, item) {
-                if (app.controller.loadedAudio[item.id]) return;
 
                 if (centreDate && item.value.start <= centreDate.getTime() && centreDate.getTime() <= item.value.end ) {
                     centerItem = item.value;
@@ -326,7 +329,6 @@ app.controller.timelineAudio = function(minDate, maxDate, centreDate, callback) 
                     trackNum : 1
                 }
                 recordings.push(recording);
-                app.controller.loadedAudio[item.id] = true;
             });
             callback({
                 recordings: recordings,
@@ -519,9 +521,8 @@ app.controller.typeToCalendarModel = {
 }
 
 
-app.controller.loadedEvents = {};
-
 app.controller.timelineEvents = function(minDate, maxDate, callback, reload) {
+
    $.couch.db('').view(app.ddoc + '/timeline_stuff', {
         startkey :  minDate.getTime(),
         endkey : maxDate.getTime(),
@@ -531,21 +532,17 @@ app.controller.timelineEvents = function(minDate, maxDate, callback, reload) {
         },
         success : function(results) {
 
+
             var timelineModel = [];
             var calendarModel = [];
             $.each(results.rows, function(i, row) {
-
-
-                if(app.controller.loadedEvents[row.id]) return;
-
-                var test = app.controller.typeToTimelineModel[row.value];
+                //var test = app.controller.typeToTimelineModel[row.value];
                 var tl  = app.controller.typeToTimelineModel[row.value](row.doc);
                 var cal = app.controller.typeToCalendarModel[row.value](row.doc);
                 timelineModel.push(tl);
                 if (cal) {
                     calendarModel.push(cal);
                 }
-                app.controller.loadedEvents[row.id] = true;
             });
 
             callback({
@@ -625,9 +622,9 @@ app.controller.createTimeline = function(initialDate) {
             overview:       true,
             layout:         'overview',
             eventSource:    eventSource,
-            width:          "20%",
+            width:          "18%",
             intervalUnit:   Timeline.DateTime.HOUR,
-            intervalPixels: 50,
+            intervalPixels: 40,
             theme: theme,
             date : initialDate,
             timeZone: timeZoneOffset
@@ -635,9 +632,9 @@ app.controller.createTimeline = function(initialDate) {
 
         Timeline.createBandInfo({
             eventSource:    eventSource,
-            width:          "80%",
+            width:          "82%",
             intervalUnit:   Timeline.DateTime.MINUTE,
-            intervalPixels: 30,
+            intervalPixels: 50,
             theme: theme,
             date : initialDate,
             timeZone: timeZoneOffset
@@ -648,8 +645,7 @@ app.controller.createTimeline = function(initialDate) {
     bandInfos[0].syncWith = 1;
 
 
-    var earliest = null;
-    var latest   = null;
+
 
     var tl = Timeline.create(document.getElementById("timeline-ui"), bandInfos);
 
@@ -660,27 +656,14 @@ app.controller.createTimeline = function(initialDate) {
     playhead.css('margin-left', where + 'px');
 
 
-    var audioProvider = function(date_change_event, callback) {
 
-        // first query
-        if (earliest == null && latest == null) {
-            earliest = date_change_event.minDate;
-            latest   = date_change_event.maxDate;
-            app.controller.timelineAudio(date_change_event.minDate, date_change_event.maxDate, date_change_event.centreDate ,callback, false);
-        } else if (date_change_event.minDate && date_change_event.minDate.isBefore(earliest)) {
-            // we need before
-            var endForThisQuery = earliest;
-            earliest = date_change_event.minDate;
-            app.controller.timelineAudio(earliest, endForThisQuery, date_change_event.centreDate ,callback, false);
-         } else if (date_change_event.maxDate && date_change_event.maxDate.isAfter(latest)) {
-             var beginOfThisQuery = latest;
-             latest = date_change_event.maxDate;
-             app.controller.timelineAudio(beginOfThisQuery, latest, date_change_event.centreDate ,callback, false);
-         }
+
+
+    var audioProvider = function(date_change_event, callback) {
+        app.controller.timelineAudio(date_change_event.minDate, date_change_event.maxDate, date_change_event.centreDate ,callback, false);
     }
 
 
-    var seen = {};
     // no cache for events
     var eventProvider = function(date_change_event, callback) {
         app.controller.timelineEvents(date_change_event.minDate, date_change_event.maxDate,callback);
@@ -702,6 +685,7 @@ app.controller.createTimeline = function(initialDate) {
         initialDate : initialDate,
         calendarDiv : $('#calendar-ui'),
         audioDiv : $('#audio-ui'),
+        statsDiv: $('#stats'),
         timelineEventSource : eventSource,
         audioProvider : audioProvider,
         eventProvider : eventProvider,
