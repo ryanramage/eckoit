@@ -196,3 +196,22 @@ td.fc-header-right {
 #stats li {
     list-style-type: none;
 }
+
+
+.people [class*="span"] {
+
+    text-align: center;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    min-height: 30px;
+
+}
+
+.importLinks a {
+    margin-left: 15px;
+}
+
+.help-block.photourl img{
+    margin-top: 7px !important;
+}

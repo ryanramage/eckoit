@@ -60,6 +60,7 @@
                     <li class="dashboard"><a href="#/dashboard">Dashboard</a></li>
                     <li class="timeline"><a href="#/timeline">Timeline</a></li>
                     <li class="topics"><a href="#/topics">Topics</a></li>
+                    <li class="people"><a href="#/people">People</a></li>
                     <li class="threads"><a href="#/threads">Threads</a></li>
                     <li class="meetings"><a href="#/meetings">Meetings</a></li>
                 </ul>
@@ -406,13 +407,96 @@
 
         </script>
 
+        <script id="peopleTemplate" type="text/html">
 
 
 
+            <div class="row peoplesource">
+                <div class="span2 offset4"><button class="add btn success ">New Person</button></div>
+                <div class="span6 offset2 importLinks">
+                    Import:
+                    <a href="google.html">Google</a>
+                    <a href="facebook.html">Facebook</a>
+                    <a href="twitter.html">Twitter</a>
+                </div>
+            </div>
+            <form class="newPerson" style="display: none;">
+                <fieldset>
+                  <div class="clearfix">
+                    <label>Name</label>
+                    <div class="input">
+                        <input type="text" name="DisplayName" />
+                    </div>
+                  </div> <!-- /clearfix -->
 
-        <footer>
-            <p>&copy; Eckoit Inc. 2011</p>
-        </footer>
+                  <div class="newPersonPart2">
+                      <div class="clearfix">
+                        <label>Email</label>
+                        <div class="input">
+                            <input type="text" name="email" />
+                        </div>
+                      </div> <!-- /clearfix -->
+
+
+                      <div class="clearfix">
+                        <label for="nametag">Name Tag</label>
+                        <div class="input">
+                          <div class="input-prepend">
+                            <span class="add-on">@</span>
+                            <input class="medium" id="nametag" name="nametag" size="16" type="text">
+                          </div>
+                          <span class="help-block">When entering text, use this to reference this person</span>
+                        </div>
+                      </div>
+
+
+                      <div class="clearfix">
+                        <label>First Name</label>
+                        <div class="input">
+                            <input type="text" name="firstName" />
+                        </div>
+                      </div> <!-- /clearfix -->
+
+                      <div class="clearfix">
+                        <label>Picture url</label>
+                        <div class="input">
+                            <input  name="photo-url" type="text">
+                            <span class="help-block photourl">
+                                <img class="thumbnail" src="http://placehold.it/90x90" alt="" />
+                            </span>
+                        </div>
+                             
+                      </div> <!-- /clearfix -->
+
+
+                      <div class="clearfix">
+                        <label id="optionsNewType">Tags</label>
+                        <div class="input">
+                            <input type="text" name="tags" />
+                        </div>
+                      </div> <!-- /clearfix -->
+                  </div>
+
+
+
+                  <div class="actions">
+                      <button class="save btn large primary">Next</button>
+                      <a href="#" class="cancel">Cancel</a>
+                  </div>
+                </fieldset>
+            </form>
+
+            <div class="people">
+
+            </div>
+            
+
+        </script>
+        <script id="personForm" type="text/html">
+
+        </script>
+
+
 
     </div> <!-- /container -->
 

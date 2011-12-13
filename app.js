@@ -24,6 +24,25 @@ var couchapp = require('couchapp')
 
 /** add views/shows/lists below **/
 
+  ddoc.views.people = {
+      map : function(doc) {
+          if (doc.type && doc.type == 'person') {
+              var result = {
+                  pic : doc.picture,
+                  name : doc.fullName
+              }
+              if (doc._attachments) {
+                  result.pic = doc._attachments;
+              }
+
+              emit(doc.slug, result);
+              
+              
+          }
+      }
+  }
+
+
 
   ddoc.views.audio_by_time = {
      map: function(doc) {

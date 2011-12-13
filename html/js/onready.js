@@ -24,6 +24,60 @@ $(document).ready(function(){
 
 
 
+
+
+    // ******************* New Person Stuff. Should be modularized **********//
+    $('.peoplesource button.add').live('click', function() {
+        $(this).attr('disabled', 'disabled');
+        $('form.newPerson').show();
+        $('form .newPersonPart2').hide();
+
+    });
+
+    $('form.newPerson  a.cancel').live('click', function() {
+        $('form.newPerson').hide(300);
+        $('.peoplesource button.add').removeAttr('disabled');
+        $('form.newPerson  button.save').text('Next');
+        return false;
+
+    });
+
+    $('form.newPerson  button.save').live('click', function() {
+
+            if ($(this).text() == 'Next') {
+                try {
+                    var nameSplit = app.parseName($('.newPerson input[name="DisplayName"]').val())
+                    var nameTag   = app.nameTag(nameSplit);
+
+                    $('.newPerson input[name="nametag"]').val(nameTag);
+                    $('.newPerson input[name="firstName"]').val(nameSplit.first);
+                } catch(e) {console.log(e)}
+                $(this).text('Save');
+                $('form .newPersonPart2').show(300);
+            } else {
+                try {
+                     var person = {
+                        fullName :  $('.newPerson input[name="DisplayName"]').val(),
+                        email :     $('.newPerson input[name="email"]').val(),
+                        slug :      $('.newPerson input[name="nametag"]').val(),
+                        firstName : $('.newPerson input[name="firstName"]').val(),
+                        tags :      $('.newPerson input[name="tags"]').val(),
+                        picture:    $('.newPerson input[name="photo-url"]').val()
+                    }
+                    app.savePerson(person, function() {
+
+                    });
+                } catch (e) {console.log(e)}
+                return false;
+
+            }
+
+
+        return false;
+    });
+    // ********************** End New Person Stuff *************************/
+
+
     app.onDomReady();
 
     $("time.timeago").timeago();

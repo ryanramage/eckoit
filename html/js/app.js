@@ -72,6 +72,40 @@ app.controller.bumpViews = function(id, callback, error) {
 
 
 
+app.parseName = function(name) {
+    var divided = name.split(/[\s_]/g);
+    var first;
+    var last;
+    if (_.isArray(divided) && divided.length > 1) {
+        first = _.first(divided, divided.length -1).join(' ');
+        last = _.last(divided);
+    } else {
+        first = name;
+        last = '';
+    }
+    return {
+        first : first,
+        last: last
+    }
+}
+
+app.savePerson = function(person, callback) {
+    person.type = 'person';
+    $.couch.db('').saveDoc(person, {
+        success : callback
+    });
+    
+}
+
+
+
+app.nameTag = function(nameSplit) {
+    return (nameSplit.first + nameSplit.last).toLowerCase();
+}
+
+
+
+
 app.findBestTag = function(tags) {
 
     if (!tags || tags.length == 0) return null;
@@ -702,6 +736,12 @@ app.routes = {
             on : function() {
                 app.view.activeCategory('dashboard');
                 app.view.mainPageChange('dashboard');
+            }
+        },
+        '/people' : {
+            on : function() {
+                app.view.activeCategory('people');
+                app.view.mainPageChange('people');
             }
         },
         '/timeline' : {
