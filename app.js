@@ -34,6 +34,9 @@ var couchapp = require('couchapp')
               if (doc._attachments) {
                   result.pic = doc._attachments;
               }
+              if (!result.pic || result.pic == '') {
+                  result.pic = 'http://placehold.it/90x90';
+              }
 
               emit(doc.slug, result);
               

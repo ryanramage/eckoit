@@ -198,14 +198,23 @@ td.fc-header-right {
 }
 
 
-.people [class*="span"] {
+ul.people  {
+    margin-top: 40px;
 
-    text-align: center;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    min-height: 30px;
+}
 
+
+
+.people .person img {
+    width: 90px;
+    height: 90px;
+}
+
+
+.people .person .name {
+    width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis clip;
 }
 
 .importLinks a {
@@ -215,3 +224,4 @@ td.fc-header-right {
 .help-block.photourl img{
     margin-top: 7px !important;
 }
+

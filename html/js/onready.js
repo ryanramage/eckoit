@@ -42,6 +42,13 @@ $(document).ready(function(){
 
     });
 
+    $('.newPerson input[name="photo-url"]').live('change', function() {
+        var imgUrl = $(this).val();
+        if(!imgUrl) imgUrl = 'http://placehold.it/90x90';
+        $('.newPerson span.photourl img').attr('src', imgUrl);
+    });
+
+
     $('form.newPerson  button.save').live('click', function() {
 
             if ($(this).text() == 'Next') {
@@ -65,7 +72,12 @@ $(document).ready(function(){
                         picture:    $('.newPerson input[name="photo-url"]').val()
                     }
                     app.savePerson(person, function() {
-
+                        $('form.newPerson').hide(300);
+                        $('.peoplesource button.add').removeAttr('disabled');
+                        $('form.newPerson  button.save').text('Next');
+                        app.controller.findPeople(function(results){
+                           app.view.showPeople(results);
+                        });
                     });
                 } catch (e) {console.log(e)}
                 return false;

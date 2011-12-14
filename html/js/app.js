@@ -163,6 +163,12 @@ app.controller.findTopics = function(tags, callback, sort) {
 }
 
 
+app.controller.findPeople = function(callback) {
+    $.couch.db('').view(app.ddoc + '/people', {
+       success : callback
+    });
+}
+
 
 app.controller.findDistinctTags = function(results, filterTags) {
     var tag_arr = _.map(results.rows, function(row){return row.doc.tags});
@@ -189,6 +195,16 @@ app.view.showTopics = function(results) {
     var div = $('.row.topics');
     app.controller.showTopics(results, div);
     $("time.timeago").timeago();
+}
+
+app.view.showPeople = function(results) {
+    var div = $('.main .people');
+    div.empty();
+    if (!results.rows) return;
+    $.each(results.rows, function(i, person) {
+        div.append(ich['personTemplate'](person));
+    });
+
 }
 
 
@@ -742,6 +758,9 @@ app.routes = {
             on : function() {
                 app.view.activeCategory('people');
                 app.view.mainPageChange('people');
+                app.controller.findPeople(function(results){
+                   app.view.showPeople(results);
+                });
             }
         },
         '/timeline' : {
