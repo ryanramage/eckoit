@@ -1,0 +1,98 @@
+    <!doctype html>
+<head>
+    <meta charset="utf-8">
+    <title>Ecko-It</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+        <script src="js/lib/html5.js"></script>
+      <![endif]-->
+
+    <link rel="shortcut icon" href="images/icon.png" />
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/local.css">
+
+    <script src="js/lib/jquery-1.6.2.min.js"></script>
+    <script src="js/lib/ICanHaz.min.js"></script>
+    <script src="http://google.com/jsapi"></script>
+    <script src="js/google.js"></script>
+</head>
+<body>
+
+    <div class="container main">
+        <div class="hero-unit">
+            <h1>Google Import</h1>
+            <p>Import your google calendar, and contacts into Ecko-It. </p>
+            <p>
+
+            </p>
+        </div>
+        <div class="row">
+            <div class="span8 offset4 offline alert-message error"  style="display: none">
+                <p>
+                    <strong>Oh noes!</strong> You appear to be offline. Please try again when online.
+                </p>
+            </div>
+        </div>
+
+
+        <div class="action">
+             <a class="btn  large calendar">Import Calendar &raquo;</a>
+             <a class="btn  large contacts">Import Contacts &raquo;</a>
+
+             <a class="cancel" href="#">Cancel</a>
+        </div>
+
+
+        <div class="calendarImportStages row" style="display: none;">
+            <div class="stage1 span8">
+                <img src="images/spinner.gif" /> Loading Calendar...
+            </div>
+        </div>
+
+        <div class="contactImportStages row" style="display: none">
+            <div class="stage1 span8">
+                <img src="images/spinner.gif" /> Loading Contacts...
+            </div>
+            <div class="stage2 span10" style="display: none">
+                <table class="zebra-striped">
+                    <thead>
+                        <tr>
+                            <th>Import</th>
+                            <th>Full Name</th>
+                            <th>First Name</th>
+                            <th>Email</th>
+                            <th>Id</th>
+                        </tr>
+                    </thead>
+                    <tbody class="precontacts">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <!-- Templates -->
+
+    <script id="personRow" type="text/html">
+        {{#people}}
+        <tr>
+            <td><input type="checkbox" checked="checked" /></td>
+            <td>{{fullName}}</td>
+            <td>{{firstName}}</td>
+            <td>{{email}}</td>
+            <td>{{image}}</td>
+            <td><a href="https://mail.google.com/mail/#contact/{{relativeId}}" target="contactWin">Contact</a></td>
+        </tr>
+        {{/people}}
+    </script>
+
+
+</body>
+</html>
