@@ -32,14 +32,40 @@ $(function(){
             importContacts();
         });
 
+        var contactSortTextExtract = function(node) {
+            return $(node).find('input').val();
+        }
+
+
         $('.action a.contacts').live('click', function() {
             $('.action').hide(300);
             $('.contactImportStages').show(300);
             loginContacts();
             importContacts(showContacts, function() {
                 $('.contactImportStages .stage1').hide();
+                //$('.editable').toggleEdit();
+                $('.zebra-striped').tablesorter( {textExtraction: contactSortTextExtract} );
+                $('.btn').twipsy();
+
             });
         });
+
+
+        $('input.fullName').live('change', function() {
+            var slug = makeSlug($(this).val());
+
+           $(this).parent().parent().find('input.slug').val(slug);
+        });
+
+
+
+
+        $('a.remove').live('click', function() {
+            console.log('click');
+            var cb = $(this).parent().parent().hide(200);
+
+        })
+
 
 
       function showContacts(contacts) {
@@ -48,6 +74,9 @@ $(function(){
       }
 
 
+      function makeSlug(fullName) {
+          return fullName.replace(' ', '.').toLowerCase();
+      }
 
 
       function loginContacts() {
@@ -89,13 +118,13 @@ $(function(){
                 $.each( result.feed.entry, function( i, entry ){
 
                       var contact = {};
-                      var id = entry.getId().$t;
-                      console.log(id);
+                      contact.google_id = entry.getId().$t;
 
-                      var parts = id.split('/');
+
+                      var parts = contact.google_id.split('/');
                       contact.relativeId = parts[parts.length -1 ];
 
-                      console.log(entry);
+
                       var name = 0;
 
                       if (entry.gd$name && entry.gd$name.gd$givenName && entry.gd$name.gd$givenName.$t) {
@@ -114,6 +143,12 @@ $(function(){
                         name = 'Untitled Contact';
                       }
                       contact.fullName = name;
+                      if (contact.fullName) {
+                          contact.slug = makeSlug(contact.fullName);
+                      }
+
+
+
                       // Call getEmailAddresses() on each entry, and iterate
                       $.each( entry.getEmailAddresses(), function( j, address ){
                           contact.email = address.address;
@@ -124,21 +159,8 @@ $(function(){
                       if (entry.link) {
                           $.each(entry.link, function(i, link) {
                                 if (link.type && link['gd$etag'] && link.type == 'image/*') {
-
                                     var feedLink = entry.getLink('http://schemas.google.com/contacts/2008/rel#photo', 'image/*');
-
                                     contact.image = feedLink.getHref();
-
-                                    //$.ajax({
-                                    //  url: contact.image ,
-                                    //  success: function(data) {
-                                    //      console.log(data);
-                                    //  }
-
-                                    //});
-
-                                    //var imageQuery =  new google.gdata.contacts.ContactQuery( feedLink.getHref() );
-                                   // contactsService.getFeed(feedLink.getHref(), parseImage, function() { console.log('error')});
                                 }
                           });
                       }
@@ -148,8 +170,14 @@ $(function(){
 
                 var nextFeed =  result.feed.getNextLink();
                 if (nextFeed) {
-                    var nextQuery = new google.gdata.contacts.ContactQuery( nextFeed.getHref());
-                    contactsService.getContactFeed(nextQuery, parseResults);
+
+                    var nextFunction = function() {
+                        var nextQuery = new google.gdata.contacts.ContactQuery( nextFeed.getHref());
+                        contactsService.getContactFeed(nextQuery, parseResults);
+                    }
+                    setTimeout(nextFunction, 100);
+                    //completeCallback();
+
                 } else {
                     completeCallback();
                 }

@@ -11,10 +11,14 @@
 
     <link rel="shortcut icon" href="images/icon.png" />
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/local.css">
+    <link rel="stylesheet" href="css/import.css">
 
     <script src="js/lib/jquery-1.6.2.min.js"></script>
+    <script src="js/lib/jquery-ui-1.8.11.custom.min.js"></script>
+    <script src="js/lib/jquery.tablesorter.min.js"></script>
+    <script src="js/lib/bootstrap-twipsy.js"></script>
     <script src="js/lib/ICanHaz.min.js"></script>
+    <script src="js/lib/jquery.toggleedit.js"></script>
     <script src="http://google.com/jsapi"></script>
     <script src="js/google.js"></script>
 </head>
@@ -55,15 +59,16 @@
             <div class="stage1 span8">
                 <img src="images/spinner.gif" /> Loading Contacts...
             </div>
-            <div class="stage2 span10" style="display: none">
+            <div class="stage2 span12" style="display: none">
                 <table class="zebra-striped">
                     <thead>
                         <tr>
                             <th>Import</th>
                             <th>Full Name</th>
                             <th>First Name</th>
+                            <th>NameTag</th>
                             <th>Email</th>
-                            <th>Id</th>
+                            
                         </tr>
                     </thead>
                     <tbody class="precontacts">
@@ -82,12 +87,20 @@
 
     <script id="personRow" type="text/html">
         {{#people}}
-        <tr>
-            <td><input type="checkbox" checked="checked" /></td>
-            <td>{{fullName}}</td>
-            <td>{{firstName}}</td>
-            <td>{{email}}</td>
-            <td>{{image}}</td>
+        <tr >
+            <td><a class="btn remove" title="Don't import this row.">Skip</a></td>
+            <td><a class="btn tag" title="Push this button, speak about this contact.">Audio Note</a></td>
+            <td class="personRow "><input type="text" class="editable fullName" value="{{fullName}}"  /></td>
+            <td class="personRow "><input type="text" class="editable firstName" value="{{firstName}}" /></td>
+            <td class="personRow">
+                <div class="input">
+                    <div class="input-prepend">
+                        <span class="add-on">@</span>
+                        <input type="text" class="editable slug medium" size="16" value="{{slug}}" />
+                    </div>
+                </div>
+            </td>
+            <td class="personRow">{{email}}</td>            
             <td><a href="https://mail.google.com/mail/#contact/{{relativeId}}" target="contactWin">Contact</a></td>
         </tr>
         {{/people}}
