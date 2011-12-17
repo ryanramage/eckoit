@@ -7,6 +7,7 @@ try {
     offline = false;
 } catch (e) {}
 
+
     
 // Wait for the document to be ready
 $(function(){
@@ -52,8 +53,7 @@ $(function(){
 
 
         $('input.fullName').live('change', function() {
-            var slug = makeSlug($(this).val());
-
+            var slug = importSupport.makeSlug($(this).val());
            $(this).parent().parent().find('input.slug').val(slug);
         });
 
@@ -61,9 +61,7 @@ $(function(){
 
 
         $('a.remove').live('click', function() {
-            console.log('click');
-            var cb = $(this).parent().parent().hide(200);
-
+            var cb = $(this).parent().parent().hide(500);
         })
 
 
@@ -74,9 +72,6 @@ $(function(){
       }
 
 
-      function makeSlug(fullName) {
-          return fullName.replace(' ', '.').toLowerCase();
-      }
 
 
       function loginContacts() {
@@ -93,101 +88,34 @@ $(function(){
 
 
       function importContacts(callback, completeCallback) {
-            // instantiate google gdata contacts api,
-            // and call the gdata list all contacts code
-            // Note: user must be logged in for this to work
-
-            // Instantiate a new ContactsService which we will use to
-            // request the users contacts
             var contactsService = new google.gdata.contacts.ContactsService( 'Contacts Viewer' ),
-
-            // Create a query for the full contacts list
             query = new google.gdata.contacts.ContactQuery( 'https://www.google.com/m8/feeds/contacts/default/full' );
 
 
-            var parseImage = function(result) {
-                console.log(result);
-            }
-
-
             var parseResults = function( result ){
-
                 var contacts = [];
-
                 // Iterate over the entries that came back
                 $.each( result.feed.entry, function( i, entry ){
-
-                      var contact = {};
-                      contact.google_id = entry.getId().$t;
-
-
-                      var parts = contact.google_id.split('/');
-                      contact.relativeId = parts[parts.length -1 ];
-
-
-                      var name = 0;
-
-                      if (entry.gd$name && entry.gd$name.gd$givenName && entry.gd$name.gd$givenName.$t) {
-                          contact.firstName = entry.gd$name.gd$givenName.$t;
-                      }
-
-                      if (entry.gd$name && entry.gd$name.gd$fullName && entry.gd$name.gd$fullName.$t) {
-                          name = entry.gd$name.gd$fullName.$t;
-                      } else if (entry.getTitle() && entry.getTitle().getText()) {
-                        name = entry.getTitle().getText();
-                      } else if (entry.getEmailAddresses()) {
-                        name = entry.getEmailAddresses()[0].getAddress();
-                      } else {
-                        // This should never actually be reached, since users are currently
-                        // required to have either a name or an email address
-                        name = 'Untitled Contact';
-                      }
-                      contact.fullName = name;
-                      if (contact.fullName) {
-                          contact.slug = makeSlug(contact.fullName);
-                      }
-
-
-
-                      // Call getEmailAddresses() on each entry, and iterate
-                      $.each( entry.getEmailAddresses(), function( j, address ){
-                          contact.email = address.address;
-                        // Append each address to the off DOM <ul> we made
-                        //$contactsHolder.append( '<li>' + address.address + '</li>' );
-                      });
-
-                      if (entry.link) {
-                          $.each(entry.link, function(i, link) {
-                                if (link.type && link['gd$etag'] && link.type == 'image/*') {
-                                    var feedLink = entry.getLink('http://schemas.google.com/contacts/2008/rel#photo', 'image/*');
-                                    contact.image = feedLink.getHref();
-                                }
-                          });
-                      }
+                      var contact = importSupport.parseGoogleContact(entry);
                       contacts.push(contact);
                 });
+
                 callback(contacts);
+
+                
 
                 var nextFeed =  result.feed.getNextLink();
                 if (nextFeed) {
-
-                    var nextFunction = function() {
+                    setTimeout(function() {
                         var nextQuery = new google.gdata.contacts.ContactQuery( nextFeed.getHref());
                         contactsService.getContactFeed(nextQuery, parseResults);
-                    }
-                    setTimeout(nextFunction, 100);
-                    //completeCallback();
-
+                    }, 100);
                 } else {
                     completeCallback();
                 }
-
-
             };
 
-
-            // Request the contacts feed with
-            // getContactFeed( query, successCallback, errorCallback )
+            // start the ball rolling
             contactsService.getContactFeed(query, parseResults);
         }
 

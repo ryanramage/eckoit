@@ -71,3 +71,29 @@ scenario "All Liferecorder Player Specs Pass", {
     }
 
 }
+
+
+scenario "All Import Specs Pass", {
+
+    given "On the default page", {
+        baseUrl = System.getProperty("geb.build.baseUrl")
+    }
+    when "we open the index page", {
+        baseUrl += 'js/spec/ImportSupportRunner.html'
+        go baseUrl
+
+    }
+    then "The title shown is Jasmine Test Runner", {
+        page.title.shouldBe "Jasmine Test Runner"
+    }
+    and "runner passed", {
+        waitFor(20) {
+
+            $(".runner").classes().contains("passed")
+        };
+
+       //assert $("div.runner").classes().contains("passed");
+
+    }
+
+}
