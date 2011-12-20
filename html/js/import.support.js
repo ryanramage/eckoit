@@ -39,13 +39,24 @@ importSupport.cleanUpFullName = function(fullName) {
 
 
 
+
+
 importSupport.parseGoogleContact = function(entry) {
       var contact = {};
-      contact.google_id = entry.getId().$t;
+
+      var google_id = entry.getId().$t;
+      var parts = google_id.split('/');
+      var relative_id = parts[parts.length -1 ];
 
 
-      var parts = contact.google_id.split('/');
-      contact.relativeId = parts[parts.length -1 ];
+      contact._id = "com.eckoit.person.google:" + relative_id;
+
+      contact.importInfo = {
+          source   : 'google',
+          source_id: google_id,
+          relative_id : relative_id,
+          date : new Date().getTime()
+      };
 
 
       var name = 0;
@@ -85,4 +96,23 @@ importSupport.parseGoogleContact = function(entry) {
       }
 
       return contact;
+}
+
+
+importSupport.convertToPreexistingContactMap = function(couchResults) {
+    var contactMap = {};
+    if (!couchResults.rows) return contactMap;
+    $.each(couchResults.rows, function(i, row) {
+        contactMap[row.key[1]] = true;
+    });
+    return contactMap;
+}
+
+
+
+importSupport.isPreexisting = function(contact, preexistingContactMap) {
+    if (contact.importInfo && contact.importInfo.source_id) {
+        if (preexistingContactMap[contact.importInfo.source_id]) return true;
+    }
+    return false;
 }

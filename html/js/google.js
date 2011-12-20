@@ -12,6 +12,12 @@ try {
 // Wait for the document to be ready
 $(function(){
 
+    // global config for the page
+    jQuery.couch.urlPrefix = 'api';
+    humane.clickToClose = false;
+    humane.timeout = 500;
+
+
         $('.action a.cancel').live('click', function() {
             history.go(-1);
             return false;
@@ -41,13 +47,69 @@ $(function(){
         $('.action a.contacts').live('click', function() {
             $('.action').hide(300);
             $('.contactImportStages').show(300);
-            loginContacts();
-            importContacts(showContacts, function() {
-                $('.contactImportStages .stage1').hide();
-                //$('.editable').toggleEdit();
-                $('.zebra-striped').tablesorter( {textExtraction: contactSortTextExtract} );
-                $('.btn').twipsy();
 
+        });
+
+
+
+        $('.contactImportStages .stage0 .btn').live('click', function() {
+            $('.stage0').hide(300);
+            $('.stage1').show(300);
+
+
+
+            loginContacts();
+
+
+            // a place to store results
+            var peopleSlugs = {};
+            var googleContacts;
+            
+
+            // some awesome aysnc
+            async.auto({
+                get_imported_allready : function(callback) {
+                    app.controller.peopleByImport('google', function(results) {
+
+                        googleContacts = importSupport.convertToPreexistingContactMap(results);
+                        callback();
+                    });
+                },
+                get_people_slugs : function(callback) {
+                    app.controller.peopleSlugCount(function(results) {
+                         $.each(results.rows, function(i, row) {
+                                peopleSlugs[row.key] = row.value;
+                         });
+                         callback();
+                    });
+                },
+                call_google : ['get_imported_allready', function(callback) {
+                        importContacts(googleContacts,
+                            function(contacts){
+                                // a batch is complete
+                                // filter any that we already have
+
+                                if (!contacts || contacts.length == 0) return;
+                                async.filter(contacts,
+                                    function(contact, okToImportCallback){
+                                        okToImportCallback(!importSupport.isPreexisting(contact, googleContacts))
+                                    },
+                                    function(filteredContacts) {
+                                        showContacts(filteredContacts);
+                                    }
+                                );
+                            
+                            }, function() {
+                                // all importing is complete
+                                $('.contactImportStages .stage1').hide();
+                                $('.zebra-striped').tablesorter( {textExtraction: contactSortTextExtract} );
+                                $('.btn').twipsy();
+                                callback();
+                            });
+                }],
+                higlight_duplicate_slugs : ['call_google', 'get_people_slugs', function(callback) {
+                    
+                }]
             });
         });
 
@@ -84,10 +146,16 @@ $(function(){
 
 
 
+      function findExistingPeople() {
+          app.controller.peopleByImport('google', function(results) {
+
+          });
+      }
 
 
 
-      function importContacts(callback, completeCallback) {
+
+      function importContacts(googleContacts, batchComplete, allComplete) {
             var contactsService = new google.gdata.contacts.ContactsService( 'Contacts Viewer' ),
             query = new google.gdata.contacts.ContactQuery( 'https://www.google.com/m8/feeds/contacts/default/full' );
 
@@ -95,24 +163,32 @@ $(function(){
             var parseResults = function( result ){
                 var contacts = [];
                 // Iterate over the entries that came back
-                $.each( result.feed.entry, function( i, entry ){
-                      var contact = importSupport.parseGoogleContact(entry);
-                      contacts.push(contact);
-                });
 
-                callback(contacts);
-
-                
-
-                var nextFeed =  result.feed.getNextLink();
-                if (nextFeed) {
-                    setTimeout(function() {
-                        var nextQuery = new google.gdata.contacts.ContactQuery( nextFeed.getHref());
-                        contactsService.getContactFeed(nextQuery, parseResults);
-                    }, 100);
-                } else {
-                    completeCallback();
-                }
+                async.forEach(result.feed.entry,
+                    function(entry, callback) {
+                            var contact = importSupport.parseGoogleContact(entry);
+                            if(!importSupport.isPreexisting(contact, googleContacts)) {
+                                app.savePerson(contact, function() {
+                                    contacts.push(contact);
+                                    callback();
+                                }, function(err){
+                                    callback();
+                                });
+                            } else callback();
+                           
+                    }, function(err) {
+                        batchComplete(contacts);
+                        var nextFeed =  result.feed.getNextLink();
+                        if (nextFeed) {
+                            setTimeout(function() {
+                                var nextQuery = new google.gdata.contacts.ContactQuery( nextFeed.getHref());
+                                contactsService.getContactFeed(nextQuery, parseResults);
+                            }, 100);
+                        } else {
+                            allComplete();
+                        }
+                    }
+                );
             };
 
             // start the ball rolling

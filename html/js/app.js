@@ -89,10 +89,13 @@ app.parseName = function(name) {
     }
 }
 
-app.savePerson = function(person, callback) {
+app.savePerson = function(person, success, error) {
     person.type = 'person';
     $.couch.db('').saveDoc(person, {
-        success : callback
+        success : success,
+        error : function(msg) {
+            if (error) error(msg);
+        }
     });
     
 }
@@ -165,9 +168,31 @@ app.controller.findTopics = function(tags, callback, sort) {
 
 app.controller.findPeople = function(callback) {
     $.couch.db('').view(app.ddoc + '/people', {
+       reduce: false,
        success : callback
     });
 }
+
+
+app.controller.peopleSlugCount = function(callback) {
+    $.couch.db('').view(app.ddoc + '/people', {
+       reduce: true,
+       group_level : 1,
+       success : callback
+    });
+}
+
+
+app.controller.peopleByImport = function(importName, callback) {
+    $.couch.db('').view(app.ddoc + '/peopleByImport', {
+
+       startkey : [importName],
+       endkey : [importName, {}],
+       success : callback
+    });
+}
+
+
 
 
 app.controller.findDistinctTags = function(results, filterTags) {
@@ -204,7 +229,6 @@ app.view.showPeople = function(results) {
     $.each(results.rows, function(i, person) {
         div.append(ich['personTemplate'](person));
     });
-
 }
 
 

@@ -26,7 +26,7 @@ var couchapp = require('couchapp')
 
   ddoc.views.people = {
       map : function(doc) {
-          if (doc.type && doc.type == 'person') {
+          if (doc.type && doc.type == 'person' && !doc.tombstone) {
               var result = {
                   pic : doc.picture,
                   name : doc.fullName
@@ -42,8 +42,20 @@ var couchapp = require('couchapp')
               
               
           }
+      },
+      reduce: '_count'
+  }
+
+
+  ddoc.views.peopleByImport = {
+      map : function(doc) {
+          if (doc.type && doc.type == 'person' && doc.importInfo) {
+              emit([doc.importInfo.source, doc.importInfo.source_id], null);
+          }
       }
   }
+
+
 
 
 

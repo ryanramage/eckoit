@@ -10,8 +10,11 @@
       <![endif]-->
 
     <link rel="shortcut icon" href="images/icon.png" />
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/import.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/libnotify.css" />
+    <link rel="stylesheet" href="css/import.css" />
+
+
 
     <script src="js/lib/jquery-1.6.2.min.js"></script>
     <script src="js/lib/jquery-ui-1.8.11.custom.min.js"></script>
@@ -19,8 +22,12 @@
     <script src="js/lib/bootstrap-twipsy.js"></script>
     <script src="js/lib/ICanHaz.min.js"></script>
     <script src="js/lib/jquery.toggleedit.js"></script>
+    <script src="js/lib/humane.min.js"></script>
+    <script src="js/lib/jquery.couch.js"></script>
+    <script src="js/lib/async.min.js"></script>
     <script src="http://google.com/jsapi"></script>
     <script src="js/import.support.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/google.js"></script>
 </head>
 <body>
@@ -57,7 +64,23 @@
         </div>
 
         <div class="contactImportStages row" style="display: none">
-            <div class="stage1 span8">
+            <div class="stage0 span12">
+                  <div class="alert-message block-message warning">
+                    <p>
+                        <strong>Do you want to record audio!?</strong>
+                        <p>
+                        During the contact import process you can record audio notes of your contacts.
+                        Since you will be scanning through your contacts, at the same time you can click
+                        on a contact, and speak a few words about them.
+                        </p>
+                    <div class="alert-actions">
+                      <a class="btn small startAudio" href="#">Start Audio Recording</a>
+                      <a class="btn small noThanks" href="#">No Thanks</a>
+                    </div>
+                  </div>
+            </div>
+
+            <div class="stage1 span8"  style="display: none;">
                 <img src="images/spinner.gif" /> Loading Contacts...
             </div>
             <div class="stage2 span12" style="display: none">
@@ -102,8 +125,10 @@
                     </div>
                 </div>
             </td>
-            <td class="personRow">{{email}}</td>            
-            <td><a href="https://mail.google.com/mail/#contact/{{relativeId}}" target="contactWin">Contact</a></td>
+            <td class="personRow">{{email}}</td>
+            {{#importInfo}}
+            <td><a href="https://mail.google.com/mail/#contact/{{relative_id}}" target="contactWin">Contact</a></td>
+            {{/importInfo}}
         </tr>
         {{/people}}
     </script>

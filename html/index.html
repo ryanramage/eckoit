@@ -486,21 +486,24 @@
                 </fieldset>
             </form>
 
-            <ul class="media-grid people">
+            <div id="people-list">
+                <div class="people list">
 
-            </ul>
+                </div>
+            </div>
+
             
 
         </script>
         <script id="personTemplate" type="text/html">
-            <li class="person">
+            <div class="person">
                 <a href="#/people/{{key}}">
                     {{#value}}
                     <img src="{{pic}}" />
-                    <div class="name">{{name}}</div>
+                    <span class="name">{{name}}</span>
                     {{/value}}
                 </a>
-            </li>
+            </div>
         </script>
 
 
