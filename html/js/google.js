@@ -57,8 +57,7 @@ $(function(){
             $('.stage1').show(300);
 
 
-
-            loginContacts();
+            if (!offline) loginContacts();
 
 
             // a place to store results
@@ -69,8 +68,7 @@ $(function(){
             // some awesome aysnc
             async.auto({
                 get_imported_allready : function(callback) {
-                    app.controller.peopleByImport('google', function(results) {
-
+                    app.controller.peopleByImport('google', {}, function(results) {
                         googleContacts = importSupport.convertToPreexistingContactMap(results);
                         callback();
                     });
@@ -84,28 +82,42 @@ $(function(){
                     });
                 },
                 call_google : ['get_imported_allready', function(callback) {
-                        importContacts(googleContacts,
-                            function(contacts){
+
+                        var batch = function(contacts){
                                 // a batch is complete
                                 // filter any that we already have
 
                                 if (!contacts || contacts.length == 0) return;
                                 async.filter(contacts,
                                     function(contact, okToImportCallback){
-                                        okToImportCallback(!importSupport.isPreexisting(contact, googleContacts))
+                                        //okToImportCallback(!importSupport.isPreexisting(contact, googleContacts))
+                                        okToImportCallback(true);
                                     },
                                     function(filteredContacts) {
                                         showContacts(filteredContacts);
                                     }
                                 );
-                            
-                            }, function() {
+
+                        };
+                        var allDone = function() {
                                 // all importing is complete
                                 $('.contactImportStages .stage1').hide();
                                 $('.zebra-striped').tablesorter( {textExtraction: contactSortTextExtract} );
                                 $('.btn').twipsy();
                                 callback();
-                            });
+                        };
+
+
+                        if (offline) {
+                            mockImportContacts(googleContacts, batch, allDone);
+                        } else {
+                            importContacts(googleContacts, batch, allDone );
+                        }
+
+
+
+
+                        
                 }],
                 higlight_duplicate_slugs : ['call_google', 'get_people_slugs', function(callback) {
                     
@@ -119,14 +131,67 @@ $(function(){
            $(this).parent().parent().find('input.slug').val(slug);
         });
 
-
+        // add dirty
+        $('input').live('change', function() {
+            $(this).parent().parent().children('td').addClass('dirty');
+        });
 
 
         $('a.remove').live('click', function() {
-            var cb = $(this).parent().parent().hide(500);
+            var me = $(this);
+            var contactID = me.parent().parent().data("id");
+
+            app.controller.tombstonePerson(contactID, function() {
+                me.parent().parent().hide(500);
+            });
+
+            //var cb = $(this).parent().parent().hide(500);
         })
 
 
+        $('.actions button.finish').live('click', function() {
+
+
+            var toUpdate = [];
+
+            $('.dirty').parent().each(function() {
+               var me = $(this);
+               var update = {
+                   id : $(this).data("id"),
+                   fullName : me.find('input.fullName').val(),
+                   firstName : me.find('input.firstName').val(),
+                   slug : me.find('input.slug').val()
+               };
+               toUpdate.push(update);               
+            });
+
+
+            async.forEach(toUpdate,
+                function(item, callback){
+                   app.controller.getPerson(item.id, function(doc) {
+                        doc.fullName = item.fullName;
+                        doc.firstName = item.firstName;
+                        doc.slug = item.slug;
+                        app.controller.savePerson(doc, function() {
+                            callback();
+                        });
+                   });
+
+                }, function() {
+                    window.location = '.#/people';
+                }
+            );
+               
+
+
+
+
+
+            
+
+
+
+        });
 
       function showContacts(contacts) {
         $('.contactImportStages .stage2').show();
@@ -147,11 +212,24 @@ $(function(){
 
 
       function findExistingPeople() {
-          app.controller.peopleByImport('google', function(results) {
+          app.controller.peopleByImport('google', {}, function(results) {
 
           });
       }
 
+
+      function mockImportContacts(googleContacts, batchComplete, allComplete) {
+          // simply load all the contacts we have
+          app.controller.findPeople(function(results){
+              var contacts = [];
+              $.each(results.rows, function(i,row){
+                  var contact = row.doc;
+                  contacts.push(contact);
+              });
+              batchComplete(contacts);
+              allComplete();
+          }, true);
+      }
 
 
 

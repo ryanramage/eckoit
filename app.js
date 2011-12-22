@@ -50,9 +50,10 @@ var couchapp = require('couchapp')
   ddoc.views.peopleByImport = {
       map : function(doc) {
           if (doc.type && doc.type == 'person' && doc.importInfo) {
-              emit([doc.importInfo.source, doc.importInfo.source_id], null);
+              emit([doc.importInfo.source, doc.importInfo.date, doc.importInfo.source_id], null);
           }
-      }
+      },
+      reduce : '_count'
   }
 
 

@@ -53,8 +53,12 @@ $(document).ready(function(){
 
             if ($(this).text() == 'Next') {
                 try {
+
+                    var cleanName = importSupport.cleanUpFullName($('.newPerson input[name="DisplayName"]').val());
+
+                    
                     var nameSplit = app.parseName($('.newPerson input[name="DisplayName"]').val())
-                    var nameTag   = app.nameTag(nameSplit);
+                    var nameTag   = importSupport.makeSlug(cleanName);
 
                     $('.newPerson input[name="nametag"]').val(nameTag);
                     $('.newPerson input[name="firstName"]').val(nameSplit.first);

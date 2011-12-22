@@ -84,6 +84,9 @@
                 <img src="images/spinner.gif" /> Loading Contacts...
             </div>
             <div class="stage2 span12" style="display: none">
+
+
+
                 <table class="zebra-striped">
                     <thead>
                         <tr>
@@ -100,6 +103,11 @@
                         
                     </tbody>
                 </table>
+
+                <div class="actions">
+                    <button class="btn large primary finish">Done!</button>
+                </div>
+
             </div>
         </div>
 
@@ -112,7 +120,7 @@
 
     <script id="personRow" type="text/html">
         {{#people}}
-        <tr >
+        <tr data-id="{{_id}}" >
             <td><a class="btn remove" title="Don't import this row.">Skip</a></td>
             <td><a class="btn tag" title="Push this button, speak about this contact.">Audio Note</a></td>
             <td class="personRow "><input type="text" class="editable fullName" value="{{fullName}}"  /></td>

@@ -29,3 +29,8 @@ td.personRow div.input {
     width: 200px;
 }
 
+
+td.dirty {
+    background-color: #8CDFFF !important;
+}
+

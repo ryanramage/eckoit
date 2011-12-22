@@ -44,6 +44,7 @@
                 "js/lib/jquery.jplayer.js",
                 "js/liferecorder.jquery.js",
                 "js/timeline.audioplayer.js",
+                "js/import.support.js",
                 "js/app.js",
                 "js/onready.js"
             );
@@ -412,8 +413,8 @@
 
 
             <div class="row peoplesource">
-                <div class="span2 offset4"><button class="add btn success ">New Person</button></div>
-                <div class="span6 offset2 importLinks">
+                <div class="span2 offset1"><button class="add btn success ">New Person</button></div>
+                <div class="span6 offset5 importLinks">
                     Import:
                     <a href="google.html">Google</a>
                     <a href="facebook.html">Facebook</a>
@@ -486,7 +487,7 @@
                 </fieldset>
             </form>
 
-            <div id="people-list">
+            <div class="people-list topics">
                 <div class="people list">
 
                 </div>
@@ -496,14 +497,44 @@
 
         </script>
         <script id="personTemplate" type="text/html">
-            <div class="person">
-                <a href="#/people/{{key}}">
-                    {{#value}}
-                    <img src="{{pic}}" />
-                    <span class="name">{{name}}</span>
-                    {{/value}}
-                </a>
+
+
+            <div class="row topic person">
+
+
+                <div class="span2">
+                    <ul class="media-grid">
+                        <li>
+                            <a href="#/people/{{key}}">
+                                {{#value}}
+                                <img src="{{pic}}" />
+                                {{/value}}
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+                <div class="span6 ">
+                    <div class="title">
+                        <a href="#/people/{{key}}">{{#value}}{{name}}{{/value}}</a>
+                    </div>
+                    <p class="small">
+  
+                    </p>
+                    <div class="tags">
+                        <span class="label notice">Famous</span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="views">
+                        <div class="mini-counts">0</div>
+                        <div>Tags</div>
+                    </div>
+
+                </div>
             </div>
+
         </script>
 
 

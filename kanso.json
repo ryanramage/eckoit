@@ -1,0 +1,10 @@
+{
+    "name": "eckoit",
+    "version": "0.0.1",
+    "description": "Keep what you hear.",
+    "app": "app",
+    "dependencies": {
+        "couchaudiorecorder" : null,
+        "node-couchapp": null
+    }
+}

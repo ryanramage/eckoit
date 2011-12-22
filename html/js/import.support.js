@@ -103,7 +103,7 @@ importSupport.convertToPreexistingContactMap = function(couchResults) {
     var contactMap = {};
     if (!couchResults.rows) return contactMap;
     $.each(couchResults.rows, function(i, row) {
-        contactMap[row.key[1]] = true;
+        contactMap[row.key[2]] = true;
     });
     return contactMap;
 }

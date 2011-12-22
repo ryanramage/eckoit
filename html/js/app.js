@@ -166,12 +166,48 @@ app.controller.findTopics = function(tags, callback, sort) {
 }
 
 
-app.controller.findPeople = function(callback) {
+app.controller.findPeople = function(callback, include_docs) {
+    if (!include_docs) {
+        include_docs = false;
+    }
     $.couch.db('').view(app.ddoc + '/people', {
        reduce: false,
+       include_docs : include_docs,
        success : callback
     });
 }
+
+
+app.controller.getPerson = function(personId, callback) {
+   $.couch.db('').openDoc(personId, {
+       success : function(doc) {
+           callback(doc);
+       }
+    });
+}
+
+
+app.controller.tombstonePerson = function(personId, callback) {
+
+    app.controller.getPerson(personId, function(doc) {
+           doc.tombstone = true;
+           app.controller.savePerson(doc, callback);
+    });
+}
+
+
+app.controller.savePerson = function(person, callback) {
+   $.couch.db('').saveDoc(person, {
+       success : function() {
+           callback();
+       }
+   });
+}
+
+
+
+
+
 
 
 app.controller.peopleSlugCount = function(callback) {
@@ -183,11 +219,12 @@ app.controller.peopleSlugCount = function(callback) {
 }
 
 
-app.controller.peopleByImport = function(importName, callback) {
+app.controller.peopleByImport = function(importName, options, callback) {
     $.couch.db('').view(app.ddoc + '/peopleByImport', {
-
+       reduce: false,
+       include_docs : true,
        startkey : [importName],
-       endkey : [importName, {}],
+       endkey : [importName, {}, {}],
        success : callback
     });
 }
@@ -779,6 +816,12 @@ app.routes = {
             }
         },
         '/people' : {
+            "/([^/]+)" : {
+               on : function(nametag) {
+                   app.view.activeCategory('people');
+                   app.view.mainPageChange('people');
+               }
+            },
             on : function() {
                 app.view.activeCategory('people');
                 app.view.mainPageChange('people');
