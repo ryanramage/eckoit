@@ -178,6 +178,18 @@ app.controller.findPeople = function(callback, include_docs) {
 }
 
 
+app.controller.searchPeople = function(query, callback) {
+    $.couch.db('').view(app.ddoc + '/people', {
+       reduce: false,
+       startkey : query,
+       endkey : query + '\ufff0',
+       include_docs : false,
+       success : callback
+    });
+}
+
+
+
 app.controller.getPerson = function(personId, callback) {
    $.couch.db('').openDoc(personId, {
        success : function(doc) {
@@ -813,6 +825,9 @@ app.routes = {
             on : function() {
                 app.view.activeCategory('dashboard');
                 app.view.mainPageChange('dashboard');
+                $('textarea').eckoitMentionsInput({
+                    app: app
+                });
             }
         },
         '/people' : {
