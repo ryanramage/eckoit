@@ -7,6 +7,9 @@ These are developer instuctions. If you would just like to install Ecko-It, plea
 http://eckoit.com
 
 
+Build Status: <img src="https://eckoit.ci.cloudbees.com/job/Eckoit%20Couchapp/lastBuild/buildStatus" width="20" height="20" /> 
+
+
 Development Prerequisites
 -------------
 
