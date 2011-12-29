@@ -845,28 +845,28 @@ app.routes = {
                 });
             }
         },
-        '/timeline' : {
+        '/calendar' : {
             "/([^/]+)" : {
                 on : function(textDate) {
                     var actualDate = app.controller.parseRequestedDate(textDate);
-                    app.view.activeCategory('timeline');
-                    app.view.mainPageChange('timeline');
+                    app.view.activeCategory('calendar');
+                    app.view.mainPageChange('calendar');
                     app.controller.createTimeline(actualDate);
                 }
             },
             on : function() {
-                app.view.activeCategory('timeline');
-                app.view.mainPageChange('timeline');
+                app.view.activeCategory('calendar');
+                app.view.mainPageChange('calendar');
                 //$('.timeline-ui').timeline();
                 app.controller.createTimeline();
             }
         },
-        '/topics': {
+        '/timeline': {
           '/tagged/([^/]+)': {
                 on: function(tags) {
                     _tags = app.view.splitTags(tags);
-                    app.view.activeCategory('topics');
-                    app.view.mainPageChange('topics', {tags:_tags});
+                    app.view.activeCategory('timeline');
+                    app.view.mainPageChange('timeline', {tags:_tags});
                     app.controller.findTopics(_tags, function(results) {
                         app.view.showTopics(results);
                         var tags = app.controller.findDistinctTags(results, _tags);
@@ -877,8 +877,8 @@ app.routes = {
           },
           '/located/([^/]+)' : {
               on: function(geohash) {
-                app.view.activeCategory('topics');
-                app.view.mainPageChange('topics');
+                app.view.activeCategory('timeline');
+                app.view.mainPageChange('timeline');
                 var memo = [];
                 var neighborsCount = 0;
                 if (geohash.length >= 8) {
@@ -908,7 +908,7 @@ app.routes = {
           '/new' : {
                 "/([^/]+)" : {
                     on : function(newType) {
-                        app.view.activeCategory('topics');
+                        app.view.activeCategory('timeline');
                         app.view.mainPageChange('topicNew', {type : newType});
                         // set the radio
                         
@@ -937,8 +937,8 @@ app.routes = {
                 }
           },
           on: function() {
-              app.view.activeCategory('topics');
-              app.view.mainPageChange('topics');
+              app.view.activeCategory('timeline');
+              app.view.mainPageChange('timeline');
               app.controller.findTopics(null, function(results) {
                   app.view.showTopics(results);
                   var tags = app.controller.findDistinctTags(results);
