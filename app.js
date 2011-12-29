@@ -121,6 +121,20 @@ var couchapp = require('couchapp')
 
 
 
+  ddoc.views.audio_md5s = {
+      map : function(doc) {
+          if (doc.liferecorder && doc._attachments) {
+              for (i in doc._attachments) {
+                  var attach = doc._attachments[i];
+                  emit(attach.digest, null);
+              }
+          }
+      },
+      reduce: '_count'
+  }
+
+
+
   ddoc.views.unfiltered = {
       map : function(doc) {
           if (doc.timestamp)                            emit([0, doc.timestamp], null);
