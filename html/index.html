@@ -221,7 +221,7 @@
                 </div>
             </div>
         </script>
-         <script id="topicCreateTemplate" type="text/html">
+        <script id="topicCreateTemplate" type="text/html">
                   <div class="clearfix">
                     <label id="optionsNewType">Title</label>
                     <div class="input">
@@ -229,19 +229,49 @@
                     </div>
                   </div> <!-- /clearfix -->
 
-                  <div class="clearfix">
-                    <label for="textarea">Textarea</label>
-                    <div class="input">
-                      <textarea class="xxlarge" id="textarea2" name="textarea2" rows="5"></textarea>
-                      <span class="help-block">
-                        Enter Topic Details.
-                      </span>
-                    </div>
-                  <!-- /clearfix -->
-                  </div>
+
 
 
         </script>
+        <script id="bookmarkCreateTemplate" type="text/html">
+                  <div class="clearfix">
+                    <label>url</label>
+                    <div class="input">
+                        <input type="text" name="url"  class="span9 url" placeholder="Bookmark url, please..."/>
+                    </div>
+                  </div> <!-- /clearfix -->
+
+
+
+
+
+                  <div class="clearfix">
+                    <label>Title</label>
+                    <div class="input">
+                        <input type="text" name="name" class="span9" placeholder="Title" />
+                    </div>
+                  </div> <!-- /clearfix -->
+
+
+                  <div class="clearfix">
+                    <label>Thumbnail</label>
+                    <div class="input">
+                          <ul class="media-grid">
+                            <li>
+                              <a href="#">
+                                <img class="thumbnail" src="http://placehold.it/90x90" alt="">
+                              </a>
+                            </li>
+                          </ul>
+                    </div>
+                  </div> <!-- /clearfix -->
+
+
+
+
+        </script>
+
+
 
         <script id="timelineRowTemplate" type="text/html">
             <div class="row topic timeline" >
@@ -366,7 +396,7 @@
             </footer>
         </script>
 
-        <script id="timelineNewTemplate" type="text/html">
+        <script id="topicNewTemplate" type="text/html">
             <!-- Main hero unit for a primary marketing message or call to action -->
             <form class="newForm">
                 <fieldset>
@@ -393,8 +423,6 @@
                                     <span>Picture</span>
                                 </label>
                             </li>
-
-
                         </ul>
                     </div>
                   </div> <!-- /clearfix -->
@@ -404,12 +432,15 @@
                   </div>
 
                   <div class="clearfix">
-                    <label id="optionsNewType">Tags</label>
+                    <label for="textarea">Description</label>
                     <div class="input">
-                        <input type="text" name="dsadas" />
+                      <textarea class="xxlarge description" name="description" rows="5"></textarea>
+                      <span class="help-block">
+                        Enter Topic Details.
+                      </span>
                     </div>
-                  </div> <!-- /clearfix -->
-                  
+                  <!-- /clearfix -->
+                  </div>
 
                   <div class="actions">
                       <button class="save btn primary">Save</button>

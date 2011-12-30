@@ -728,6 +728,12 @@ app.controller.dayStatsProvider = function(startDate, endDate, tagCountsCallback
 
 
 
+app.createBitPixelUrl = function(url) {
+    var random = Math.floor(Math.random()*10000);
+    return "http://www.bitpixels.com/getthumbnail?code="+random+"&url="+url ;
+}
+
+
 app.controller.createTimeline = function(initialDate) {
 
     if (!initialDate) initialDate = new Date();
@@ -942,6 +948,11 @@ app.routes = {
                         var template = newType + 'CreateTemplate';
                         try {
                             $('.topicTypeForm').html( ich[template]()  );
+
+                            $('.description').eckoitMentionsInput({
+                                app: app
+                            });
+                            
                         } catch(e) {}
                         $('form.newForm .save').click(function() {
 
