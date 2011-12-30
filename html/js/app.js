@@ -905,22 +905,46 @@ app.routes = {
 
               }
           },
+          on: function() {
+              app.view.activeCategory('timeline');
+              app.view.mainPageChange('timeline');
+              app.controller.findTopics(null, function(results) {
+                  app.view.showTopics(results);
+                  var tags = app.controller.findDistinctTags(results);
+                  app.view.showDistinctTags(tags);
+              });
+          }
+        },
+        '/topics': {
+          '/tagged/([^/]+)': {
+                on: function(tags) {
+                    _tags = app.view.splitTags(tags);
+                    app.view.activeCategory('topics');
+                    app.view.mainPageChange('topics', {tags:_tags});
+                    app.controller.findTopics(_tags, function(results) {
+                        app.view.showTopics(results);
+                        var tags = app.controller.findDistinctTags(results, _tags);
+                        app.view.showDistinctTags(tags);
+                    });
+
+                }
+          },
           '/new' : {
                 "/([^/]+)" : {
                     on : function(newType) {
-                        app.view.activeCategory('timeline');
+                        app.view.activeCategory('topics');
                         app.view.mainPageChange('topicNew', {type : newType});
                         // set the radio
-                        
+
 
                         $('#' + newType + 'Type').attr('checked', true);
-                        
+
                         var template = newType + 'CreateTemplate';
                         try {
                             $('.topicTypeForm').html( ich[template]()  );
                         } catch(e) {}
                         $('form.newForm .save').click(function() {
-        
+
                             app.controller.save[newType]();
                             return false;
                         });
@@ -931,14 +955,11 @@ app.routes = {
                 on: function() {
                     app.view.activeCategory('topics');
                     app.view.mainPageChange('topicNew');
-                    
-                    
-
                 }
           },
           on: function() {
-              app.view.activeCategory('timeline');
-              app.view.mainPageChange('timeline');
+              app.view.activeCategory('topics');
+              app.view.mainPageChange('topics');
               app.controller.findTopics(null, function(results) {
                   app.view.showTopics(results);
                   var tags = app.controller.findDistinctTags(results);
