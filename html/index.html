@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/fullcalendar.css" />
     <link rel="stylesheet" href="css/jquery.mentionsInput.css" />
+    <link rel="stylesheet" href="images/fugue/fugue-sprite.css"  />
     <link rel="stylesheet" href="css/local.css" />
 
 
@@ -119,7 +120,7 @@
                     </div>
                     <div class="row">
                         <div class="span=2">
-                            <a href="#/topics/new/topic" class="btn success">New Topic</a>
+                            <a href="#/topics/new" class="btn success">New Topic</a>
                         </div>
                         <div class="span10 offset1">
                             <ul class="pills topicFilter " data-pills="pills">
@@ -221,7 +222,15 @@
                 </div>
             </div>
         </script>
-        <script id="topicCreateTemplate" type="text/html">
+        
+        <!-- ********************* New Topic Stuff ********** -->
+        
+        <script id="topicNewTemplate" type="text/html">
+            <!-- Main hero unit for a primary marketing message or call to action -->
+            <form class="newForm">
+                <fieldset>
+                  <legend>Add Topic</legend>
+
                   <div class="clearfix">
                     <label id="optionsNewType">Title</label>
                     <div class="input">
@@ -229,6 +238,66 @@
                     </div>
                   </div> <!-- /clearfix -->
 
+                <div class="clearfix">
+                    <label id="optionsCheckboxes">Options</label>
+                    <div class="input">
+                      <ul class="inputs-list">
+                        <li>
+                          <label>
+                            <input type="checkbox" name="optionsCheckboxes" value="option1">
+                            <span>General conversation topic </span><span class="help" title="Show on your list of general topics so you can discuss this with people">?</span>
+                          </label>
+                        </li>
+                        <li>
+                          <label>
+                            <input type="checkbox" name="optionsCheckboxes" value="option1">
+                            <span>Topic needs resolution</span><span class="help" title="This helps you track topics that need something done.">?</span>
+                          </label>
+                        </li>
+                        <li>
+                          <label>
+                            <input type="checkbox" name="optionsCheckboxes" value="option2">
+                            <span>Agenda item</span><span class="help" title="Make this topic available in meetings">?</span>
+                          </label>
+                        </li>
+                        <li>
+                          <label>
+                            <input type="checkbox" name="optionsCheckboxes" value="option2">
+                            <span>Create opinion categories</span><span class="help" title="For example (Agrees/Disagrees). Allows you to group peoples opinion into different categories.">?</span>
+                          </label>
+                        </li>
+                      </ul>
+                    </div>
+                </div>
+
+                  <div class="clearfix">
+                    <label id="optionsNewType">Longevity</label>
+                    <div class="input">
+                        <div class="slider"></div>
+                    </div>
+                  </div> <!-- /clearfix -->
+
+
+                  <div class="clearfix">
+                    <label for="textarea">Description</label>
+                    <div class="input">
+                      <textarea class="xxlarge description" name="description" rows="5"></textarea>
+                      <span class="help-block">
+                        Enter Topic Details.
+                      </span>
+                    </div>
+                  <!-- /clearfix -->
+                  </div>
+
+                  <div class="actions">
+                      <button class="save btn primary">Save</button>
+                      <a href="#/topics" class="btn">Cancel</a>
+                  </div>
+                </fieldset>
+            </form>
+        </script>
+
+        <script id="topicCreateTemplate" type="text/html">
 
 
 
@@ -409,59 +478,7 @@
             </footer>
         </script>
 
-        <script id="topicNewTemplate" type="text/html">
-            <!-- Main hero unit for a primary marketing message or call to action -->
-            <form class="newForm">
-                <fieldset>
-                  <legend>Add New</legend>
-                  <div class="clearfix">
-                    <label id="optionsNewType">Type</label>
-                    <div class="input">
-                        <ul class="inputs-list newTopicType">
-                            <li>
-                                <label>
-                                    <input type="radio" name="optionsType"  id="topicType"  value="topic" />
-                                    <span>Topic</span>
-                                </label>
-                            </li>
-                            <li> 
-                                <label>
-                                    <input type="radio" name="optionsType" id="bookmarkType"  value="bookmark" />
-                                    <span>Bookmark</span>
-                                </label>
-                            </li>
-                            <li>
-                                <label>
-                                    <input type="radio" name="optionsType" id="pictureType"  value="picture" />
-                                    <span>Picture</span>
-                                </label>
-                            </li>
-                        </ul>
-                    </div>
-                  </div> <!-- /clearfix -->
 
-                  <div class="topicTypeForm">
-                      
-                  </div>
-
-                  <div class="clearfix">
-                    <label for="textarea">Description</label>
-                    <div class="input">
-                      <textarea class="xxlarge description" name="description" rows="5"></textarea>
-                      <span class="help-block">
-                        Enter Topic Details.
-                      </span>
-                    </div>
-                  <!-- /clearfix -->
-                  </div>
-
-                  <div class="actions">
-                      <button class="save btn primary">Save</button>
-                      <a href="#/topics" class="btn">Cancel</a>
-                  </div>
-                </fieldset>
-            </form>
-        </script>
 
 
         <script id="calendarTemplate" type="text/html">
