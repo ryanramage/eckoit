@@ -92,9 +92,9 @@ var couchapp = require('couchapp')
           if (doc.timestamp) {
              var start  = doc.timestamp;
              var d = new Date(start);
-             var year = d.getFullYear();
-             var month = d.getMonth() + 1;
-             var day = d.getDate() ;
+             var year = Number(d.getFullYear());
+             var month = Number(d.getMonth()) + 1;
+             var day = Number(d.getDate()) ;
              emit([year, month, day], 1);
           }
       },
@@ -108,12 +108,12 @@ var couchapp = require('couchapp')
              var length = doc.recording.length;
              if (length == 0) return;
              var d = new Date(start);
-             var year = d.getFullYear();
+             var year = Number(d.getFullYear());
              var month = d.getMonth() + 1;
              if (month <= 9) month = '0' + month;
              var day = d.getDate() ;
              if (day <=9) day = '0' + day;
-             emit([year, month, day], length);
+             emit([Number(year), Number(month), Number(day)], length);
           }
       },
       reduce: '_sum'
