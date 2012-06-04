@@ -225,3 +225,9 @@ div.people  {
     margin-top: 7px !important;
 }
 
+
+span.help {
+    border: 1px solid lightblue;
+    border-radius: 3px;
+    background-color: lightblue;    
+}

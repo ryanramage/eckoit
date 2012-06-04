@@ -936,36 +936,27 @@ app.routes = {
                 }
           },
           '/new' : {
-                "/([^/]+)" : {
-                    on : function(newType) {
+                on: function() {
                         app.view.activeCategory('topics');
-                        app.view.mainPageChange('topicNew', {type : newType});
-                        // set the radio
+                        app.view.mainPageChange('topicNew', {type : 'topic'});
 
 
-                        $('#' + newType + 'Type').attr('checked', true);
-
-                        var template = newType + 'CreateTemplate';
+                        var template = 'topicCreateTemplate';
                         try {
                             $('.topicTypeForm').html( ich[template]()  );
 
                             $('.description').eckoitMentionsInput({
                                 app: app
                             });
-                            
+
+                            $('.help').twipsy();
+
                         } catch(e) {}
                         $('form.newForm .save').click(function() {
 
                             app.controller.save[newType]();
                             return false;
                         });
-
-
-                    }
-                },
-                on: function() {
-                    app.view.activeCategory('topics');
-                    app.view.mainPageChange('topicNew');
                 }
           },
           on: function() {
