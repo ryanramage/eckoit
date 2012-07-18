@@ -11,6 +11,7 @@
 
     <link rel="shortcut icon" href="images/icon.png" />
     <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/dashboard/_design/dashboard/_rewrite/_topbar.css" />
     <link rel="stylesheet" href="css/fullcalendar.css" />
     <link rel="stylesheet" href="css/jquery.mentionsInput.css" />
     <link rel="stylesheet" href="images/fugue/fugue-sprite.css"  />
@@ -28,6 +29,7 @@
     <script src="js/lib/head.min.js"></script>
     <script>
         head.js("js/lib/jquery-1.6.2.min.js",
+                "/dashboard/_design/dashboard/_rewrite/static/js/topbar.js",
                 "js/lib/jquery-ui-1.8.11.custom.min.js",
                 "js/lib/SS.min.js",
                 "js/lib/underscore.js",
@@ -59,28 +61,9 @@
 </head>
 
 <body>
-    <div class="topbar">
-        <div class="fill">
-            <div class="container">
-                <h3><a href="#">Ecko-It</a></h3>
-                <ul class="maintabs">
-                    <li class="dashboard"><a href="#/dashboard">Dashboard</a></li>
-                    <li class="calendar"><a href="#/calendar">Calendar</a></li>
-                    <li class="timeline"><a href="#/timeline">Timeline</a></li>
-                    <li class="topics"><a href="#/topics">Topics</a></li>
-                    <li class="people"><a href="#/people">People</a></li>
-                    <li class="threads"><a href="#/threads">Threads</a></li>
-                    <li class="meetings"><a href="#/meetings">Meetings</a></li>
-                </ul>
-                <form action="">
-                    <input type="text" placeholder="Search">
-                </form>
-               <ul class="maintabs">
-                    <li class="dashboard"><a href="m.html">Mobile</a></li>
-                </ul>
-            </div>
-        </div> <!-- /fill -->
-    </div> <!-- /topbar -->
+    <div id="dashboard-topbar">
+
+    </div>
 
     <div class="container main">
 
