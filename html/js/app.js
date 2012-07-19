@@ -404,17 +404,13 @@ app.controller.findClosest =  function getClosest(geohash, resolution, callbackB
 
 
 app.controller.parseRequestedDate = function(date) {
+    console.log(date);
+	return moment(date, 'YYYY-MM-DDTHH:mm:ssZZ').toDate();
+}
 
-	date = unescape(date);
-        date = date.replace(/_/g," ");
-        var resultDate = new Date(Date.parse(date));
-        if (!resultDate) {
-            resultDate = new Date(date);
-        }
-
-
-        return resultDate;
-	
+app.controller.stringifyDate = function(date) {
+    var m = moment(date);
+    return m.format('YYYY-MM-DDTHH:mm:ssZZ');
 }
 
 
@@ -739,13 +735,14 @@ app.controller.createTimeline = function(initialDate) {
     if (!initialDate) initialDate = new Date();
 
 
-    var utcOffset = initialDate.getUTCOffset();
+    var utcOffset = new Date().getUTCOffset();
 
     // hack attack. Not sure what timeline really wants?
     var timeZoneOffset = parseInt(utcOffset[0] + utcOffset[2]);
     var eventSource = new Timeline.DefaultEventSource();
     SimileAjax.History.enabled = false;
     var theme = Timeline.ClassicTheme.create();
+    var tempStartDate = new Date();
     var bandInfos = [
         Timeline.createBandInfo({
             overview:       true,
@@ -777,6 +774,10 @@ app.controller.createTimeline = function(initialDate) {
 
 
     var tl = Timeline.create(document.getElementById("timeline-ui"), bandInfos);
+
+    tl.getBand(0).setCenterVisibleDate(initialDate);
+
+
 
     // add a playhead
     var playhead = $('<div id="playhead"></div>');
@@ -821,6 +822,11 @@ app.controller.createTimeline = function(initialDate) {
         dayStatsProvider : app.controller.dayStatsProvider,
         audioQuery : app.controller.audioQuery,
         audioNext  : app.controller.audioNext
+    });
+    $('.timelineplayer').bind('timeline.audioplayer.views.updatedate', function(e, data) {
+        var date = app.controller.stringifyDate(data.centreDate);
+        history.replaceState({}, date, "#/calendar/" + date);
+
     });
 }
 

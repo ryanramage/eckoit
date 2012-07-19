@@ -583,7 +583,7 @@
             if (firstOffset != secondOffset) {
 
                 var diffMin = secondOffset - firstOffset  ;
-                 dateClone.addMinutes(diffMin);
+                 //dateClone.addMinutes(diffMin);
                  
                 return dateClone;
             }
@@ -598,7 +598,7 @@
             if (firstOffset != secondOffset) {
 
                 var diffMin = secondOffset - firstOffset  ;
-                 dateClone.addMinutes(-diffMin);
+                 //dateClone.addMinutes(-diffMin);
                 return dateClone;
             }
             return dateToFix;
