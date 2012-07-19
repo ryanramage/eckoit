@@ -13,29 +13,7 @@ $(document).ready(function(){
 
 
 
-    $('.topicFilter li').live('click', function() {
-        var sort = $(this).data('sort');
-        
-    });
 
-
-
-
-
-    /******** New Topic Stuff...modularize....***/
-    $('.newTopicType input').live('click', function() {
-        var rt = "/topics/new/" + $(this).val();
-        app.router.setRoute(rt);
-    }) ;
-
-    $('.topicTypeForm input.url').live('change', function() {
-
-        var url = $(this).val();
-        if (!url) return;
-        var snapshot = app.createBitPixelUrl(url);
-        $('.topicTypeForm img.thumbnail')
-            .attr('src', snapshot);
-    });
 
 
 

@@ -1768,11 +1768,14 @@ Timeline.GregorianDateLabeller.prototype.labelInterval=function(A,C){var B=Timel
 if(B==null){B=Timeline.GregorianDateLabeller.prototype.defaultLabelInterval;
 }return B.call(this,A,C);
 };
-Timeline.GregorianDateLabeller.prototype.labelPrecise=function(A){return SimileAjax.DateTime.removeTimeZoneOffset(A,this._timeZone).toUTCString();
+Timeline.GregorianDateLabeller.prototype.labelPrecise=function(A){
+    var mo = moment(A.getTime());
+    return SimileAjax.DateTime.removeTimeZoneOffset(A,this._timeZone).toUTCString();
 //Timeline.GregorianDateLabeller.prototype.labelPrecise=function(A){return SimileAjax.DateTime.removeTimeZoneOffset(A,this._timeZone).toLocaleDateString();
 };
 Timeline.GregorianDateLabeller.prototype.defaultLabelInterval=function(B,F){var C;
 var E=false;
+var originalDate = moment(B);
 B=SimileAjax.DateTime.removeTimeZoneOffset(B,this._timeZone);
 switch(F){case SimileAjax.DateTime.MILLISECOND:C=B.getUTCMilliseconds();
 break;
@@ -1789,12 +1792,7 @@ case SimileAjax.DateTime.HOUR:
         C=Timeline.GregorianDateLabeller.getMonthName(B.getUTCMonth(),this._locale)+" "+B.getUTCDate();
     } else {
         var ampm = 'am';
-        var hrs = B.getUTCHours();
-        var hrs12 = hrs % 12;
-        if (hrs >= 12) ampm = 'pm';
-        if (hrs == 12) hrs12 = 12;
-        C=hrs12 + ampm;
-
+        C = originalDate.format('ha');
         //C=B.getUTCHours()+"hr";
     }
     break;
