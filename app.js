@@ -3,7 +3,7 @@ var couchapp = require('couchapp')
     , path = require('path');
 
   ddoc = {
-      _id: '_design/app2'
+      _id: '_design/eckoit'
     , views: {}
     , lists: {}
     , shows: {}
